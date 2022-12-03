@@ -3,8 +3,11 @@ local detect = require("filetype.detect")
 -- generate the filetype
 local custom_map = nil
 
--- Lua implementation of the setfiletype builtin function.
--- See :help setf
+--- Lua implementation of the setfiletype builtin function.
+--- See :help setf
+---
+--- @param filetype string the filetype to set
+--- @return true
 local function setf(filetype)
     if vim.fn.did_filetype() == 0 then
         vim.bo.filetype = filetype
@@ -21,13 +24,17 @@ local callback_args = {
     file_ext = "",
 }
 
-local function set_filetype(name)
-    if type(name) == "string" then
-        return setf(name)
+--- @param filetype string|function The filetype to set for the buffer it can
+---                                 either be a string or a function that
+---                                 returns a string
+--- @return boolean Whether the filetype was set or not
+local function set_filetype(filetype)
+    if type(filetype) == "string" then
+        return setf(filetype)
     end
 
-    if type(name) == "function" then
-        local ft = name(callback_args)
+    if type(filetype) == "function" then
+        local ft = filetype(callback_args)
         return type(ft) == "string" and setf(ft)
     end
 
@@ -47,9 +54,13 @@ local function star_set_filetype(name)
     return false
 end
 
--- Loop through the regex-filetype pairs in the map table
--- and check if absolute_path matches any of them
--- Returns true if the filetype was set
+--- Loop through the regex-filetype pairs in the map table and check if
+--- absolute_path matches any of them
+---
+--- @param absolute_path string the path of the file
+--- @param map table A table of mappings
+--- @param star_set? boolean Whether to resepct `g:ft_ignore_pat`
+--- @return boolean Whether the the filetype was set or not
 local function try_pattern(absolute_path, map, star_set)
     if not map then
         return false
@@ -68,6 +79,11 @@ local function try_pattern(absolute_path, map, star_set)
     return false
 end
 
+--- Look up a query in the map
+---
+--- @param query string The pattern to lookup in  `map`
+--- @param map table A table of mappings
+--- @return boolean Whether the the filetype was set or not
 local function try_lookup(query, map)
     if not query or not map then
         return false
