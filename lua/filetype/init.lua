@@ -89,6 +89,27 @@ local function try_pattern(absolute_path, map, star_set)
     return false
 end
 
+--- Loop through the regex-filetype pairs in the map table and check if the
+--- absolute_path matches any of them
+---
+--- @param absolute_path string the path of the file
+--- @param map table A table of mappings
+--- @param star_set? boolean Whether to resepct `g:ft_ignore_pat`
+--- @return boolean Whether the the filetype was set or not
+local function try_regex(absolute_path, map, star_set)
+    for pattern, ft in pairs(map) do
+        if util.match_vim_regex(absolute_path, pattern) then
+            if star_set then
+                return star_set_filetype(ft)
+            end
+
+            return set_filetype(ft)
+        end
+    end
+
+    return false
+end
+
 local M = {}
 
 function M.setup(opts)
@@ -139,6 +160,8 @@ function M.resolve()
         -- Add the user's complex maps
         complex_maps.custom_complex = overrides.complex
         complex_maps.custom_starset = overrides.complex_ft_ignore
+        complex_maps.custom_vcomplex = overrides.vim_regex
+        complex_maps.custom_vstarset = overrides.vim_regex_ft_ignore
 
         fallback = overrides.default_filetype
 
@@ -188,6 +211,14 @@ function M.resolve()
     end
 
     if try_pattern(callback_args.file_path, complex_maps.custom_starset, true) then
+        return
+    end
+
+    if try_regex(callback_args.file_path, complex_maps.custom_vcomplex) then
+        return
+    end
+
+    if try_regex(callback_args.file_path, complex_maps.custom_vstarset, true) then
         return
     end
 

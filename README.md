@@ -119,6 +119,13 @@ require("filetype").setup({
         complex_ft_ignore = {
         },
 
+        -- Same as complex and complex_ft_ignore, but use vim regex for path matching
+        -- They are lower priority than complex
+        vim_regex = {
+        },
+        vim_regex_ft_ignore = {
+        },
+
         -- Set a default filetype in the case no matching filetype is detected
         default_filetype = "foo",
     },
