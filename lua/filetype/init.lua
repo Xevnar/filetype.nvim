@@ -105,24 +105,26 @@ function M.resolve()
     -- Used at the end if no filetype is detected or an extension isn't available
     local detect_sh_args
 
+    -- The default mappings
+    local extension_map = require("filetype.mappings.extensions")
+    local literal_map = require("filetype.mappings.literal")
+    local complex_maps = require("filetype.mappings.complex")
+
     -- Try to match the custom defined filetypes
-    if custom_map ~= nil then
-        -- Avoid indexing nil
-        if try_lookup(callback_args.file_ext, custom_map.extensions) then
-            return
+    if custom_map then
+        -- Extend the shebang_map with users map and override already existing
+        -- values
+        for ext, ft in pairs(custom_map.extensions) do
+            extension_map[ext] = ft
         end
 
-        if try_lookup(callback_args.file_name, custom_map.literal) then
-            return
+        for literal, ft in pairs(custom_map.literal) do
+            literal_map[literal] = ft
         end
 
-        if try_regex(callback_args.file_path, custom_map.complex) then
-            return
-        end
-
-        if try_regex(callback_args.file_path, custom_map.complex_ft_ignore, true) then
-            return
-        end
+        -- Add the user's complex maps
+        complex_maps.custom_complex = custom_map.complex
+        complex_maps.custom_starset = custom_map.complex_ft_ignore
 
         -- Extend the shebang_map with users map and override already existing
         -- values
@@ -163,7 +165,7 @@ function M.resolve()
                 { " is deprecated.\n", "Normal" },
                 { "[filetype.nvim] Please use either of (", "Normal" },
                 {
-                    "overrides.endswith, overrides.complex, overrides.star_sets",
+                    "overrides.complex, overrides.complex_ft_ignore",
                     "WarningMsg",
                 },
                 { ") instead.", "Normal" },
@@ -171,23 +173,30 @@ function M.resolve()
         end
     end
 
-    local extension_map = require("filetype.mappings.extensions")
     if try_lookup(callback_args.file_ext, extension_map) then
         return
     end
 
-    local literal_map = require("filetype.mappings.literal")
     if try_lookup(callback_args.file_name, literal_map) then
         return
     end
 
-    local complex_maps = require("filetype.mappings.complex")
+    if try_regex(callback_args.file_path, complex_maps.custom_complex) then
+        return
+    end
+
+    if try_regex(callback_args.file_path, complex_maps.custom_starset, true) then
+        return
+    end
+
     if try_regex(callback_args.file_path, complex_maps.endswith) then
         return
     end
+
     if try_regex(callback_args.file_path, complex_maps.complex) then
         return
     end
+
     if try_regex(callback_args.file_path, complex_maps.star_sets, true) then
         return
     end
