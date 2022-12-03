@@ -730,7 +730,7 @@ return {
         if util.getline():find("%<%?php") then
             return "php"
         else
-            return detect.sh({ fallback = "bash" })
+            return detect.sh("bash")
         end
     end,
     ["decl"] = function()
@@ -994,28 +994,28 @@ return {
         return detect.mc()
     end,
     ["ebuild"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["bash"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["eclass"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["ksh"] = function()
-        return detect.sh({ fallback = "ksh" })
+        return detect.sh("ksh")
     end,
     ["etc/profile"] = function()
-        return detect.sh({ fallback = "sh", force_shebang_check = true })
+        return detect.sh("sh", true)
     end,
     ["sh"] = function()
-        return detect.sh({ fallback = "sh", force_shebang_check = true })
+        return detect.sh("sh", true)
     end,
     ["env"] = function()
-        return detect.sh({ fallback = "sh", force_shebang_check = true })
+        return detect.sh("sh", true)
     end,
     ["tcsh"] = function()
-        return detect.sh({ fallback = "tcsh" })
+        return detect.sh("tcsh")
     end,
     ["csh"] = function()
         return detect.csh()

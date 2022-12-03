@@ -211,34 +211,34 @@ return {
         return detect.proto() or "indent"
     end,
     [".bashrc"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["bashrc"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["bash.bashrc"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["PKGBUILD"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["APKBUILD"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     [".kshrc"] = function()
-        return detect.sh({ fallback = "ksh" })
+        return detect.sh("ksh")
     end,
     [".profile"] = function()
-        return detect.sh({ fallback = "sh", force_shebang_check = true })
+        return detect.sh("sh", true)
     end,
     [".tcshrc"] = function()
-        return detect.sh({ fallback = "tcsh" })
+        return detect.sh("tcsh")
     end,
     ["tcsh.tcshrc"] = function()
-        return detect.sh({ fallback = "tcsh" })
+        return detect.sh("tcsh")
     end,
     ["tcsh.login"] = function()
-        return detect.sh({ fallback = "tcsh" })
+        return detect.sh("tcsh")
     end,
     [".login"] = function()
         return detect.csh()
@@ -259,6 +259,6 @@ return {
         return detect.csh()
     end,
     [".d"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
 }

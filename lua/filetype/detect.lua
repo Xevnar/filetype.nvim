@@ -2,6 +2,9 @@ local util = require("filetype.util")
 
 local M = {}
 
+-- Maximum number of lines to check before giving up
+M.line_limit = 10
+
 -- A map from executable name to filetype.
 M.shebang_map = {
     ["node"] = "javascript",
@@ -44,46 +47,72 @@ M.shebang_map = {
     },
 }
 
+-- Don't check the content after the shebang of shell files
+M.sh_check_contents = false
+
 --- Checks the first line in the buffer for a shebang If there is one, set the
 --- filetype appropriately.
 --- Taken from vim.filetype.detect
 ---
---- @param args table|nil
----             * fallback string|nil The shell binary that is returned as the
----                                   filetype if no filetype is associated with it
----             * force_shebang_check boolean Forces checking the shebang line even
----                                           if a fallback filetype is defined
----             * check_contents boolean Decides whether the buffer content is
----                                      checked for shell-like filetypes.
---- @return string|nil The detected filetype
-function M.sh(args)
-    args = args or {}
+--- @param opts table|nil
+---             * line_check_limit integer Defines how many lines to search for
+---                                        filetype hints.
+---             * shebang_map table
+---             * sh_check_contents boolean Decides whether the buffer content is
+---                                         checked for shell-like filetypes.
+---@return filetype.detect
+function M.setup(opts)
+    if not opts then
+        return M
+    end
 
+    M.line_limit = opts.line_check_limit
+
+    -- Extend the shebang_map with users map and override already existing
+    -- values
+    for binary, ft in pairs(opts.shebang_map) do
+        M.shebang_map[binary] = ft
+    end
+
+    M.sh_check_contents = opts.check_sh_contents
+
+    return M
+end
+
+--- Checks the first line in the buffer for a shebang If there is one, set the
+--- filetype appropriately.
+--- Taken from vim.filetype.detect
+---
+--- @param fallback? string The filetype that is returned if no filetype is
+---                        detected. This disables shebang checking.
+--- @param force_shebang_check? boolean Forces checking the shebang line even
+---                                    if a fallback filetype is defined
+--- @return string|nil The detected filetype
+function M.sh(fallback, force_shebang_check)
     if vim.fn.did_filetype() ~= 0 then
         -- Filetype was already detected or detection should be skipped
         return
     end
 
-    local name = args.fallback
-
     -- Analyze the first line if there is no file type
-    if not name or args.force_shebang_check then
-        name = M.analyze_shebang(util.getline()) or name
+    if not fallback or force_shebang_check then
+        fallback = M.analyze_shebang(util.getline()) or fallback
     end
 
     -- Check the contents of the file if it overrides the shebang or the
     -- passed name
-    name = (args.check_contents and M.shell(name, util.getlines())) or name
+    fallback = (M.check_contents and M.shell(fallback, util.getlines()))
+        or fallback
 
     -- prioritize the passed shebang over the builtin map. use the passed name
     -- if it isn't defined in either
-    name = (M.shebang_map and M.shebang_map[name]) or name
-    if type(name) == "table" then
-        name.on_detect()
-        name = name.filetype
+    local ft = (M.shebang_map and M.shebang_map[fallback]) or fallback
+    if type(ft) == "table" then
+        ft.on_detect()
+        ft = ft.filetype
     end
 
-    return name
+    return ft
 end
 
 --- Function to extract the binary name from from the shebang
@@ -153,7 +182,7 @@ function M.csh()
         fallback = "csh"
     end
 
-    return M.sh({ fallback = fallback, force_shebang_check = true })
+    return M.sh(fallback, true)
 end
 
 --- This function checks for the kind of assembly that is wanted by the user, or
@@ -277,7 +306,7 @@ function M.perl(file_path, file_ext)
 
     local first_line = util.getline()
     if first_line:find("^#") and first_line:lower():find("perl") then
-        return M.sh({ fallback = "perl" })
+        return M.sh("perl")
     end
 
     for _, line in ipairs(util.getlines(0, 30)) do

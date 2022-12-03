@@ -119,12 +119,19 @@ require("filetype").setup({
         complex_ft_ignore = {
         },
 
-        -- Force check the first line of the file for a shebang if default_filetype is set
-        force_shebang_check = true, -- default is false
+        -- Set a default filetype in the case no matching filetype is detected
+        default_filetype = "foo",
+    },
+
+    -- This table defines the behaviour of the functions in `filetype.detect`
+    detection_settings = {
+        -- Specify the number of lines to check if before deciding that the contents
+        -- don't provide hints to the filetype
+        line_check_limit = 500, -- default is 10 lines
 
         -- Check if the entirety of the shell file for a hint of the executable being used;
         -- currently only checks for `tclsh`
-        check_sh_contents = true, -- default is false
+        sh_check_contents = true, -- default is false
 
         -- The default behaviour when a shebang is detected is to set the filetype to binary
         -- used unless the there is mapping from the binary name to filetype defined.
@@ -152,10 +159,7 @@ require("filetype").setup({
             ["my-sh_interpeter-Ver2"] = "sh", -- This won't work even if it is the actual binary name
             ["bash --posix"] = "sh",          -- Neither would this
         },
-
-        -- Set a default filetype in the case no matching filetype is detected
-        default_filetype = "foo",
-    },
+    }
 })
 ```
 

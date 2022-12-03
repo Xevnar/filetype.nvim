@@ -87,16 +87,16 @@ M.endswith = {
         end
     end,
     ["%.bash[_-]profile"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["%.bash[_-]logout"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["%.bash[_-]aliases"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["%.bash%-fc[_-]"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
 }
 
@@ -219,22 +219,22 @@ M.star_sets = {
     ["zlog.*"] = [[zsh]],
 
     ["%.bashrc.*"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["PKGBUILD.*"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["APKBUILD.*"] = function()
-        return detect.sh({ fallback = "bash" })
+        return detect.sh("bash")
     end,
     ["%.kshrc.*"] = function()
-        return detect.sh({ fallback = "ksh" })
+        return detect.sh("ksh")
     end,
     ["%.profile.*"] = function()
-        return detect.sh({ fallback = "sh", force_shebang_check = true })
+        return detect.sh("sh", true)
     end,
     ["%.tcshrc.*"] = function()
-        return detect.sh({ fallback = "tcsh" })
+        return detect.sh("tcsh")
     end,
     ["%.login.*"] = function()
         return detect.csh()

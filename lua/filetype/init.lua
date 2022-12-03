@@ -1,8 +1,7 @@
 local util = require("filetype.util")
 local detect = require("filetype.detect")
 
--- generate the filetype
-local custom_map = nil
+local overrides = nil
 
 --- Lua implementation of the setfiletype builtin function.
 --- See :help setf
@@ -25,7 +24,8 @@ local callback_args = {
     file_ext = "",
 }
 
---- @param filetype string|function The filetype to set for the buffer it can
+--- Set the buffer's filetype
+--- @param filetype? string|function The filetype to set for the buffer it can
 ---                                 either be a string or a function that
 ---                                 returns a string
 --- @return boolean Whether the filetype was set or not
@@ -97,8 +97,10 @@ local M = {}
 
 function M.setup(opts)
     if opts.overrides then
-        custom_map = opts.overrides
+        overrides = opts.overrides
     end
+
+    detect.setup(opts.detection_settings)
 end
 
 function M.resolve()
@@ -118,59 +120,58 @@ function M.resolve()
     callback_args.file_name = callback_args.file_path:match(".*[\\/](.*)")
     callback_args.file_ext = callback_args.file_name:match(".+%.(%w+)")
 
-    -- Used at the end if no filetype is detected or an extension isn't available
-    local detect_sh_args
-
     -- The default mappings
     local extension_map = require("filetype.mappings.extensions")
     local literal_map = require("filetype.mappings.literal")
     local complex_maps = require("filetype.mappings.complex")
 
+    -- Fallback filetype
+    local fallback
+
     -- Try to match the custom defined filetypes
-    if custom_map then
+    if overrides then
         -- Extend the shebang_map with users map and override already existing
         -- values
-        for ext, ft in pairs(custom_map.extensions) do
+        for ext, ft in pairs(overrides.extensions) do
             extension_map[ext] = ft
         end
 
-        for literal, ft in pairs(custom_map.literal) do
+        for literal, ft in pairs(overrides.literal) do
             literal_map[literal] = ft
         end
 
         -- Add the user's complex maps
-        complex_maps.custom_complex = custom_map.complex
-        complex_maps.custom_starset = custom_map.complex_ft_ignore
+        complex_maps.custom_complex = overrides.complex
+        complex_maps.custom_starset = overrides.complex_ft_ignore
 
-        -- Extend the shebang_map with users map and override already existing
-        -- values
-        for binary, ft in pairs(custom_map.shebang_map) do
-            detect.shebang_map[binary] = ft
+        fallback = overrides.default_filetype
+
+        if overrides.shebang then
+            util.deprecated_option_warning(
+                "overrides.shebang",
+                "detection_settings.shebang_map"
+            )
         end
 
-        detect_sh_args.fallback = custom_map.default_filetype
-        detect_sh_args.force_shebang_check = custom_map.force_shebang_check
-        detect_sh_args.check_contents = custom_map.check_sh_contents
-
-        if custom_map.shebang then
-            util.deprecated_option_warning("overrides.shebang", "overrides.shebang_map")
+        if overrides.force_shebang_check then
+            util.deprecated_option_warning("overrides.force_shebang_check")
         end
 
-        if custom_map.function_extensions then
+        if overrides.function_extensions then
             util.deprecated_option_warning(
                 "overrides.function_extensions",
                 "overrides.extensions"
             )
         end
 
-        if custom_map.function_literal then
+        if overrides.function_literal then
             util.deprecated_option_warning(
                 "overrides.function_literal",
                 "overrides.literal"
             )
         end
 
-        if custom_map.function_complex then
+        if overrides.function_complex then
             util.deprecated_option_warning(
                 "overrides.function_complex",
                 { "overrides.complex", "overrides.complex_ft_ignore" }
@@ -216,7 +217,7 @@ function M.resolve()
     -- that. Look for a shebang override in custom_map first. If there is none,
     -- check the default shebangs defined in function_maps. Otherwise, default
     -- to setting the filetype to the value of shebang itself.
-    set_filetype(detect.sh(detect_sh_args))
+    set_filetype(detect.sh(fallback, true))
 end
 
 return M
