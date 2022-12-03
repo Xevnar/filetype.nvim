@@ -165,18 +165,6 @@ function M.resolve()
         return
     end
 
-    local function_maps = require("filetype.mappings.function")
-    if try_lookup(callback_args.file_ext, function_maps.extensions) then
-        return
-    end
-    if try_lookup(callback_args.file_name, function_maps.literal) then
-        return
-    end
-
-    if try_regex(callback_args.file_path, function_maps.complex) then
-        return
-    end
-
     local complex_maps = require("filetype.mappings.complex")
     if try_regex(callback_args.file_path, complex_maps.endswith) then
         return

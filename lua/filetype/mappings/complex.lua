@@ -1,4 +1,8 @@
+local util = require("filetype.util")
+local detect = require("filetype.detect")
+
 local M = {}
+
 -- mapping of lua regex to filetype
 M.endswith = {
     ["/%.aptitude/config$"] = "aptconf",
@@ -66,6 +70,34 @@ M.endswith = {
     ["lftp/rc$"] = "lftp",
     ["lpe$"] = "dracula",
     ["lvs$"] = "dracula",
+
+    [".*printcap"] = function()
+        vim.b.ptcap_type = "print"
+        return "ptcap"
+    end,
+    [".*termcap"] = function()
+        vim.b.ptcap_type = "term"
+        return "ptcap"
+    end,
+    ["[cC]hange[lL]og"] = function()
+        if util.getline():find("%; urgency%=") then
+            return "debchangelog"
+        else
+            return "changelog"
+        end
+    end,
+    ["%.bash[_-]profile"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["%.bash[_-]logout"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["%.bash[_-]aliases"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["%.bash%-fc[_-]"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
 }
 
 M.complex = {
@@ -104,6 +136,11 @@ M.complex = {
     ["rndc.*%.conf"] = "named",
     ["rndc.*%.key"] = "named",
     [".*/tex/context/.*/.*%.tex"] = "context",
+
+    [".*/xorg%.conf%.d/.*%.conf"] = function()
+        vim.b.xf86conf_xfree86_version = 4
+        return "xf86conf"
+    end,
 }
 
 -- These require a special set_ft function
@@ -180,6 +217,31 @@ M.star_sets = {
     ["%.zcompdump.*"] = [[zsh]],
     ["zsh.*"] = [[zsh]],
     ["zlog.*"] = [[zsh]],
+
+    ["%.bashrc.*"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["PKGBUILD.*"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["APKBUILD.*"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["%.kshrc.*"] = function()
+        return detect.sh({ fallback = "ksh" })
+    end,
+    ["%.profile.*"] = function()
+        return detect.sh({ fallback = "sh", force_shebang_check = true })
+    end,
+    ["%.tcshrc.*"] = function()
+        return detect.sh({ fallback = "tcsh" })
+    end,
+    ["%.login.*"] = function()
+        return detect.csh()
+    end,
+    ["%.cshrc.*"] = function()
+        return detect.csh()
+    end,
 }
 
 return M

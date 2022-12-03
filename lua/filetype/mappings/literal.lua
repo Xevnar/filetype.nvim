@@ -1,3 +1,6 @@
+local util = require("filetype.util")
+local detect = require("filetype.detect")
+
 return {
     [".a2psrc"] = "a2ps",
     [".asoundrc"] = "alsaconf",
@@ -161,4 +164,101 @@ return {
     ["vision.conf"] = "hog",
     ["wgetrc"] = "wget",
     ["wvdial.conf"] = "wvdial",
+
+    ["xorg.conf-4"] = function()
+        vim.b.xf86conf_xfree86_version = 4
+        return "xf86conf"
+    end,
+    ["xorg.conf"] = function()
+        vim.b.xf86conf_xfree86_version = 4
+        return "xf86conf"
+    end,
+    ["XF86Config"] = function()
+        if util.getline():find("XConfigurator") then
+            vim.b.xf86conf_xfree86_version = 3
+        end
+        return "xf86conf"
+    end,
+    ["INDEX"] = function()
+        if
+            util.getline():find(
+                "^%s*(distribution|installed_software|root|bundle|product)%s*$"
+            )
+        then
+            return "psf"
+        end
+    end,
+    ["INFO"] = function()
+        if
+            util.getline():find(
+                "^%s*(distribution|installed_software|root|bundle|product)%s*$"
+            )
+        then
+            return "psf"
+        end
+    end,
+    ["control"] = function()
+        if util.getline():find("^Source%:") then
+            return "debcontrol"
+        end
+    end,
+    ["NEWS"] = function()
+        if util.getline():find("%; urgency%=") then
+            return "debchangelog"
+        end
+    end,
+    ["indent.pro"] = function()
+        return detect.proto() or "indent"
+    end,
+    [".bashrc"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["bashrc"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["bash.bashrc"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["PKGBUILD"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    ["APKBUILD"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
+    [".kshrc"] = function()
+        return detect.sh({ fallback = "ksh" })
+    end,
+    [".profile"] = function()
+        return detect.sh({ fallback = "sh", force_shebang_check = true })
+    end,
+    [".tcshrc"] = function()
+        return detect.sh({ fallback = "tcsh" })
+    end,
+    ["tcsh.tcshrc"] = function()
+        return detect.sh({ fallback = "tcsh" })
+    end,
+    ["tcsh.login"] = function()
+        return detect.sh({ fallback = "tcsh" })
+    end,
+    [".login"] = function()
+        return detect.csh()
+    end,
+    [".cshrc"] = function()
+        return detect.csh()
+    end,
+    ["csh.cshrc"] = function()
+        return detect.csh()
+    end,
+    ["csh.login"] = function()
+        return detect.csh()
+    end,
+    ["csh.logout"] = function()
+        return detect.csh()
+    end,
+    [".alias"] = function()
+        return detect.csh()
+    end,
+    [".d"] = function()
+        return detect.sh({ fallback = "bash" })
+    end,
 }
