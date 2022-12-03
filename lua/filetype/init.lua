@@ -104,6 +104,12 @@ function M.resolve()
 
     callback_args.file_path = vim.api.nvim_buf_get_name(0)
 
+    -- Special exception for *.orig files. We remove the .orig extensions to get the
+    -- original filename
+    if callback_args.file_path:find("%.orig$") then
+        callback_args.file_path = callback_args.file_path:match("(.*)%.orig")
+    end
+
     if vim.g.ft_ignore_pat == nil then
         vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
     end
