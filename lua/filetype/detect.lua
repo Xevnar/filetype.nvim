@@ -5,6 +5,15 @@ local M = {}
 -- Maximum number of lines to check before giving up
 M.line_limit = 10
 
+--- Builder style function to set the line limit before calling a
+--- detect function
+--- @param limit number The new line limit
+--- @return table
+function M.set_line_limit(limit)
+    M.line_limit = limit
+    return M
+end
+
 -- A map from executable name to filetype.
 M.shebang_map = {
     ["node"] = "javascript",
