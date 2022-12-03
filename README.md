@@ -64,25 +64,17 @@ That's it! You should now have a much snappier neovim experience!
 -- In init.lua or filetype.nvim's config file
 require("filetype").setup({
     overrides = {
+        -- The following overrides use simple table lookup for matching
+        -- The values of each key can be either a string or a function that returns the filetype
         extensions = {
             -- Set the filetype of *.pn files to potion
             pn = "potion",
-        },
-        literal = {
-            -- Set the filetype of files named "MyBackupFile" to lua
-            MyBackupFile = "lua",
-        },
-        complex = {
-            -- Set the filetype of any full filename matching the regex to gitconfig
-            [".*git/config"] = "gitconfig", -- Included in the plugin
-        },
 
-        -- The same as the ones above except the keys map to functions
-        function_extensions = {
+            -- Append L0 to cinoptions for *.cpp files
             ["cpp"] = function()
-                vim.bo.filetype = "cpp"
                 -- Remove annoying indent jumping
                 vim.bo.cinoptions = vim.bo.cinoptions .. "L0"
+                return "cpp"
             end,
 
             -- The functions recieves an table table with following fields:
@@ -90,20 +82,40 @@ require("filetype").setup({
             --             * file_name: The name of the file (including extension)
             --             * file_ext:  The extention at the end of the file
             ["pdf"] = function(args)
-                vim.bo.filetype = "pdf"
                 -- Open in PDF viewer (Skim.app) automatically
                 vim.fn.jobstart([[open -a skim "]] .. args.file_path .. '"')
+                return "pdf"
             end,
         },
-        function_literal = {
+
+        literal = {
+            -- Set the filetype of files named "MyBackupFile" to lua
+            MyBackupFile = "lua",
+
+            -- Set the filetype of files named "Brewfile" to ruby and turn off syntax highlighting
             Brewfile = function()
                 vim.cmd("syntax off")
+                return "ruby"
             end,
         },
-        function_complex = {
-            ["*.math_notes/%w+"] = function()
+
+        -- The following override uses lua patterns to match against the full file path
+        complex = {
+            -- Set the filetype of any config file inside a directory that ends with git to gitconfig
+            [".*git/config$"] = "gitconfig", -- Included in the plugin
+
+            -- Add an abbreviation to all files with an alphanumeric name in the .math_notes directory
+            [".*.math_notes/%w+"] = function()
                 vim.cmd("iabbrev $ $$")
+                return "markdown"
             end,
+
+            -- Set the filetype to all files that have the word bin in their path to sh
+            ["^.*bin.*$"] = "sh",
+        },
+
+        -- Same as complex, but it respects `g:ft_ignore_pat`
+        complex_ft_ignore = {
         },
 
         -- Force check the first line of the file for a shebang if default_filetype is set
@@ -141,7 +153,7 @@ require("filetype").setup({
         },
 
         -- Set a default filetype in the case no matching filetype is detected
-        default_filetype = 'foo',
+        default_filetype = "foo",
     },
 })
 ```

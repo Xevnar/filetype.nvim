@@ -116,31 +116,11 @@ function M.resolve()
             return
         end
 
-        if
-            try_lookup(callback_args.file_ext, custom_map.function_extensions)
-        then
-            return
-        end
-
-        if
-            try_lookup(callback_args.file_name, custom_map.function_literal)
-        then
-            return
-        end
-
-        if try_regex(callback_args.file_path, custom_map.endswith) then
-            return
-        end
-
         if try_regex(callback_args.file_path, custom_map.complex) then
             return
         end
 
-        if try_regex(callback_args.file_path, custom_map.function_complex) then
-            return
-        end
-
-        if try_regex(callback_args.file_path, custom_map.star_sets, true) then
+        if try_regex(callback_args.file_path, custom_map.complex_ft_ignore, true) then
             return
         end
 
@@ -153,6 +133,42 @@ function M.resolve()
         detect_sh_args.fallback = custom_map.default_filetype
         detect_sh_args.force_shebang_check = custom_map.force_shebang_check
         detect_sh_args.check_contents = custom_map.check_sh_contents
+
+        if custom_map.function_extensions then
+            vim.api.nvim_echo({
+                { "[filetype.nvim] ", "Normal" },
+                { "overrides.function_extensions", "WarningMsg" },
+                { " is deprecated.\n", "Normal" },
+                { "[filetype.nvim] Please use ", "Normal" },
+                { "overrides.extensions", "WarningMsg" },
+                { " instead.", "Normal" },
+            }, true, {})
+        end
+
+        if custom_map.function_literal then
+            vim.api.nvim_echo({
+                { "[filetype.nvim] ", "Normal" },
+                { "overrides.function_literal", "WarningMsg" },
+                { " is deprecated.\n", "Normal" },
+                { "[filetype.nvim] Please use ", "Normal" },
+                { "overrides.literal", "WarningMsg" },
+                { " instead.", "Normal" },
+            }, true, {})
+        end
+
+        if custom_map.function_complex then
+            vim.api.nvim_echo({
+                { "[filetype.nvim] ", "Normal" },
+                { "overrides.function_complex", "WarningMsg" },
+                { " is deprecated.\n", "Normal" },
+                { "[filetype.nvim] Please use either of (", "Normal" },
+                {
+                    "overrides.endswith, overrides.complex, overrides.star_sets",
+                    "WarningMsg",
+                },
+                { ") instead.", "Normal" },
+            }, true, {})
+        end
     end
 
     local extension_map = require("filetype.mappings.extensions")
