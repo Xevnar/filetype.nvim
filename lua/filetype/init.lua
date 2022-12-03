@@ -1,3 +1,4 @@
+local util = require("filetype.util")
 local detect = require("filetype.detect")
 
 -- generate the filetype
@@ -152,39 +153,24 @@ function M.resolve()
         detect_sh_args.check_contents = custom_map.check_sh_contents
 
         if custom_map.function_extensions then
-            vim.api.nvim_echo({
-                { "[filetype.nvim] ", "Normal" },
-                { "overrides.function_extensions", "WarningMsg" },
-                { " is deprecated.\n", "Normal" },
-                { "[filetype.nvim] Please use ", "Normal" },
-                { "overrides.extensions", "WarningMsg" },
-                { " instead.", "Normal" },
-            }, true, {})
+            util.deprecated_option_warning(
+                "overrides.function_extensions",
+                "overrides.extensions"
+            )
         end
 
         if custom_map.function_literal then
-            vim.api.nvim_echo({
-                { "[filetype.nvim] ", "Normal" },
-                { "overrides.function_literal", "WarningMsg" },
-                { " is deprecated.\n", "Normal" },
-                { "[filetype.nvim] Please use ", "Normal" },
-                { "overrides.literal", "WarningMsg" },
-                { " instead.", "Normal" },
-            }, true, {})
+            util.deprecated_option_warning(
+                "overrides.function_literal",
+                "overrides.literal"
+            )
         end
 
         if custom_map.function_complex then
-            vim.api.nvim_echo({
-                { "[filetype.nvim] ", "Normal" },
-                { "overrides.function_complex", "WarningMsg" },
-                { " is deprecated.\n", "Normal" },
-                { "[filetype.nvim] Please use either of (", "Normal" },
-                {
-                    "overrides.complex, overrides.complex_ft_ignore",
-                    "WarningMsg",
-                },
-                { ") instead.", "Normal" },
-            }, true, {})
+            util.deprecated_option_warning(
+                "overrides.function_complex",
+                { "overrides.complex", "overrides.complex_ft_ignore" }
+            )
         end
     end
 
