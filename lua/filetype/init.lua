@@ -9,6 +9,8 @@ local function setf(filetype)
     if vim.fn.did_filetype() == 0 then
         vim.bo.filetype = filetype
     end
+
+    return true
 end
 
 -- Arguments to pass to function callbacks.
@@ -21,16 +23,12 @@ local callback_args = {
 
 local function set_filetype(name)
     if type(name) == "string" then
-        setf(name)
-        return true
+        return setf(name)
     end
 
     if type(name) == "function" then
-        local result = name(callback_args)
-        if type(result) == "string" then
-            setf(result)
-            return true
-        end
+        local ft = name(callback_args)
+        return type(ft) == "string" and setf(ft)
     end
 
     return false
@@ -45,18 +43,20 @@ local function star_set_filetype(name)
     if not ft_ignore_regex:match_str(name) then
         return set_filetype(name)
     end
+
     return false
 end
 
 -- Loop through the regex-filetype pairs in the map table
 -- and check if absolute_path matches any of them
 -- Returns true if the filetype was set
-local function try_regex(absolute_path, maps, star_set)
-    if maps == nil then
+local function try_pattern(absolute_path, map, star_set)
+    if not map then
         return false
     end
-    for regexp, ft in pairs(maps) do
-        if absolute_path:find(regexp) then
+
+    for pattern, ft in pairs(map) do
+        if absolute_path:find(pattern) then
             if star_set then
                 return star_set_filetype(ft)
             end
@@ -64,17 +64,16 @@ local function try_regex(absolute_path, maps, star_set)
             return set_filetype(ft)
         end
     end
+
     return false
 end
 
 local function try_lookup(query, map)
-    if query == nil or map == nil then
+    if not query or not map then
         return false
     end
-    if map[query] ~= nil then
-        return set_filetype(map[query])
-    end
-    return false
+
+    return set_filetype(map[query])
 end
 
 local M = {}
@@ -181,23 +180,23 @@ function M.resolve()
         return
     end
 
-    if try_regex(callback_args.file_path, complex_maps.custom_complex) then
+    if try_pattern(callback_args.file_path, complex_maps.custom_complex) then
         return
     end
 
-    if try_regex(callback_args.file_path, complex_maps.custom_starset, true) then
+    if try_pattern(callback_args.file_path, complex_maps.custom_starset, true) then
         return
     end
 
-    if try_regex(callback_args.file_path, complex_maps.endswith) then
+    if try_pattern(callback_args.file_path, complex_maps.endswith) then
         return
     end
 
-    if try_regex(callback_args.file_path, complex_maps.complex) then
+    if try_pattern(callback_args.file_path, complex_maps.complex) then
         return
     end
 
-    if try_regex(callback_args.file_path, complex_maps.star_sets, true) then
+    if try_pattern(callback_args.file_path, complex_maps.star_sets, true) then
         return
     end
 
