@@ -111,6 +111,7 @@ require("filetype").setup({
             end,
 
             -- Set the filetype to all files that have the word bin in their path to sh
+            -- Avoid doing this since it might obscure more concrete patterns you defined
             ["^.*bin.*$"] = "sh",
         },
 
