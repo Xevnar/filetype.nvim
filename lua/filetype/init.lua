@@ -1,8 +1,8 @@
 --- @module 'filetype.util'
-local util = require("filetype.util")
+local util = require('filetype.util')
 
 --- @module 'filetype.detect'
-local detect = require("filetype.detect")
+local detect = require('filetype.detect')
 
 --- Lua implementation of the setfiletype builtin function.
 --- @see :help setf
@@ -10,11 +10,11 @@ local detect = require("filetype.detect")
 --- @param filetype string the filetype to set
 --- @return true
 local function setf(filetype)
-    if vim.fn.did_filetype() == 0 then
-        vim.bo.filetype = filetype
-    end
+	if vim.fn.did_filetype() == 0 then
+		vim.bo.filetype = filetype
+	end
 
-    return true
+	return true
 end
 
 --- Arguments to pass to function callbacks. The argements should be set when the resolve function is called
@@ -26,9 +26,9 @@ end
 ---
 --- @type filetype_mapping_argument
 local callback_args = {
-    file_path = "",
-    file_name = "",
-    file_ext = "",
+	file_path = '',
+	file_name = '',
+	file_ext = '',
 }
 
 --- Set the buffer's filetype
@@ -38,16 +38,16 @@ local callback_args = {
 ---                                   returns a string
 --- @return boolean # Whether the filetype was set or not
 local function set_filetype(filetype)
-    if type(filetype) == "string" then
-        return setf(filetype)
-    end
+	if type(filetype) == 'string' then
+		return setf(filetype)
+	end
 
-    if type(filetype) == "function" then
-        local ft = filetype(callback_args)
-        return type(ft) == "string" and setf(ft)
-    end
+	if type(filetype) == 'function' then
+		local ft = filetype(callback_args)
+		return type(ft) == 'string' and setf(ft)
+	end
 
-    return false
+	return false
 end
 
 --- Look up a query in the map
@@ -56,11 +56,11 @@ end
 --- @param map { [string]: filetype_mapping } A table of literal mappings
 --- @return boolean # Whether the the filetype was set or not
 local function try_lookup(query, map)
-    if not query or not map then
-        return false
-    end
+	if not query or not map then
+		return false
+	end
 
-    return set_filetype(map[query])
+	return set_filetype(map[query])
 end
 
 --- Loop through the pattern-filetype pairs in the map table and check if the absolute_path matches any of them
@@ -69,13 +69,13 @@ end
 --- @param map { [string]: filetype_mapping } A table of lua pattern mappings
 --- @return boolean # Whether the the filetype was set or not
 local function try_pattern(absolute_path, map)
-    for pattern, ft in pairs(map) do
-        if absolute_path:find(pattern) then
-            return set_filetype(ft)
-        end
-    end
+	for pattern, ft in pairs(map) do
+		if absolute_path:find(pattern) then
+			return set_filetype(ft)
+		end
+	end
 
-    return false
+	return false
 end
 
 --- Loop through the regex-filetype pairs in the map table and check if the absolute_path matches any of them
@@ -84,13 +84,13 @@ end
 --- @param map { [string]: filetype_mapping } A table of vim regex mappings
 --- @return boolean # Whether the the filetype was set or not
 local function try_regex(absolute_path, map)
-    for pattern, ft in pairs(map) do
-        if util.match_vim_regex(absolute_path, pattern) then
-            return set_filetype(ft)
-        end
-    end
+	for pattern, ft in pairs(map) do
+		if util.match_vim_regex(absolute_path, pattern) then
+			return set_filetype(ft)
+		end
+	end
 
-    return false
+	return false
 end
 
 local M = {}
@@ -99,13 +99,13 @@ local M = {}
 --- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
 
 --- @type { [string]: filetype_mapping }
-local extension_map = require("filetype.mappings.extensions")
+local extension_map = require('filetype.mappings.extensions')
 
 --- @type { [string]: filetype_mapping }
-local literal_map = require("filetype.mappings.literal")
+local literal_map = require('filetype.mappings.literal')
 
 --- @type table<string, { [string]: filetype_mapping }>
-local complex_maps = require("filetype.mappings.complex")
+local complex_maps = require('filetype.mappings.complex')
 
 --- Fallback filetype
 ---
@@ -127,128 +127,119 @@ local fallback
 ---
 --- @param opts filetype_opts
 function M.setup(opts)
-    if opts.overrides then
-        -- Extend the shebang_map with users map and override already existing values
-        for ext, ft in pairs(opts.overrides.extensions or {}) do
-            extension_map[ext] = ft
-        end
+	if opts.overrides then
+		-- Extend the shebang_map with users map and override already existing values
+		for ext, ft in pairs(opts.overrides.extensions or {}) do
+			extension_map[ext] = ft
+		end
 
-        for literal, ft in pairs(opts.overrides.literal or {}) do
-            literal_map[literal] = ft
-        end
+		for literal, ft in pairs(opts.overrides.literal or {}) do
+			literal_map[literal] = ft
+		end
 
-        -- Add the user's complex maps
-        complex_maps.custom_complex = opts.overrides.complex
-        complex_maps.custom_vcomplex = opts.overrides.vim_regex
+		-- Add the user's complex maps
+		complex_maps.custom_complex = opts.overrides.complex
+		complex_maps.custom_vcomplex = opts.overrides.vim_regex
 
-        fallback = opts.overrides.default_filetype
+		fallback = opts.overrides.default_filetype
 
-        if opts.overrides.shebang then
-            util.deprecated_option_warning(
-                "overrides.shebang",
-                "detection_settings.shebang_map"
-            )
-        end
+		if opts.overrides.shebang then
+			util.deprecated_option_warning('overrides.shebang', 'detection_settings.shebang_map')
+		end
 
-        if opts.overrides.force_shebang_check then
-            util.deprecated_option_warning("overrides.force_shebang_check")
-        end
+		if opts.overrides.force_shebang_check then
+			util.deprecated_option_warning('overrides.force_shebang_check')
+		end
 
-        if opts.overrides.function_extensions then
-            util.deprecated_option_warning(
-                "overrides.function_extensions",
-                "overrides.extensions"
-            )
-        end
+		if opts.overrides.function_extensions then
+			util.deprecated_option_warning('overrides.function_extensions', 'overrides.extensions')
+		end
 
-        if opts.overrides.function_literal then
-            util.deprecated_option_warning(
-                "overrides.function_literal",
-                "overrides.literal"
-            )
-        end
+		if opts.overrides.function_literal then
+			util.deprecated_option_warning('overrides.function_literal', 'overrides.literal')
+		end
 
-        if opts.overrides.function_complex then
-            util.deprecated_option_warning(
-                "overrides.function_complex",
-                { "overrides.complex", "overrides.complex_ft_ignore" }
-            )
-        end
-    end
+		if opts.overrides.function_complex then
+			util.deprecated_option_warning(
+				'overrides.function_complex',
+				{ 'overrides.complex', 'overrides.complex_ft_ignore' }
+			)
+		end
+	end
 
-    detect.setup(opts.detection_settings)
+	detect.setup(opts.detection_settings)
 end
 
 --- The function tries to resolve the filetype of the current buffer, either from the file name or through the file's
 --- contents
 ---
 function M.resolve()
-    -- Just in case
-    vim.g.did_load_filetypes = 1
+	-- Just in case
+	vim.g.did_load_filetypes = 1
 
-    callback_args.file_path = vim.api.nvim_buf_get_name(0)
+	callback_args.file_path = vim.api.nvim_buf_get_name(0)
 
-    -- Special exception for *.orig files. We remove the .orig extensions to get the original filename
-    if callback_args.file_path:find("%.orig$") then
-        callback_args.file_path = callback_args.file_path:match("(.*)%.orig")
-    end
+	-- Special exception for *.orig files. We remove the .orig extensions to get the original filename
+	if callback_args.file_path:find('%.orig$') then
+		callback_args.file_path = callback_args.file_path:match('(.*)%.orig')
+	end
 
-    if vim.g.ft_ignore_pat == nil then
-        vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
-    end
+	if vim.g.ft_ignore_pat == nil then
+		vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
+	end
 
-    if util.match_vim_regex(callback_args.file_path, vim.g.ft_ignore_pat) then
-        return -- Don't set the files filetype
-    end
+	if util.match_vim_regex(callback_args.file_path, vim.g.ft_ignore_pat) then
+		return -- Don't set the files filetype
+	end
 
-    if vim.bo.filetype == "bqfpreview" then
-        callback_args.file_path = vim.fn.expand("<amatch>")
-    end
+	if vim.bo.filetype == 'bqfpreview' then
+		callback_args.file_path = vim.fn.expand('<amatch>')
+	end
 
-    if #callback_args.file_path == 0 then
-        return
-    end
+	if #callback_args.file_path == 0 then
+		return
+	end
 
-    callback_args.file_name = callback_args.file_path:match(".*[\\/](.*)")
-    callback_args.file_ext = callback_args.file_name:match(".+%.(%w+)")
+	callback_args.file_name = callback_args.file_path:match('.*[\\/](.*)')
+	callback_args.file_ext = callback_args.file_name:match('.+%.(%w+)')
 
-    if try_lookup(callback_args.file_ext, extension_map) then
-        return
-    end
+	if try_lookup(callback_args.file_ext, extension_map) then
+		return
+	end
 
-    if try_lookup(callback_args.file_name, literal_map) then
-        return
-    end
+	if try_lookup(callback_args.file_name, literal_map) then
+		return
+	end
 
-    if try_pattern(callback_args.file_path, complex_maps.custom_complex) then
-        return
-    end
+	if try_pattern(callback_args.file_path, complex_maps.custom_complex) then
+		return
+	end
 
-    if try_regex(callback_args.file_path, complex_maps.custom_vcomplex) then
-        return
-    end
+	if try_regex(callback_args.file_path, complex_maps.custom_vcomplex) then
+		return
+	end
 
-    if try_pattern(callback_args.file_path, complex_maps.endswith) then
-        return
-    end
+	if try_pattern(callback_args.file_path, complex_maps.endswith) then
+		return
+	end
 
-    if try_pattern(callback_args.file_path, complex_maps.complex) then
-        return
-    end
+	if try_pattern(callback_args.file_path, complex_maps.complex) then
+		return
+	end
 
-    if try_pattern(callback_args.file_path, complex_maps.star_sets) then
-        return
-    end
+	if try_pattern(callback_args.file_path, complex_maps.star_sets) then
+		return
+	end
 
-    -- At this point, no filetype has been detected so let's just default to the extension, if it has one
-    if callback_args.file_ext and set_filetype(callback_args.file_ext) then
-        return
-    end
+	-- At this point, no filetype has been detected so let's just default to the extension, if it has one
+	if callback_args.file_ext and set_filetype(callback_args.file_ext) then
+		return
+	end
 
-    -- If there is no extension, look for a shebang and set the filetype to that. Look for a shebang override in
-    -- custom_map first. If there is none, check the default shebangs defined in function_maps. Otherwise, default to
-    -- setting the filetype to the value of shebang itself.
-    set_filetype(detect.sh(fallback, true))
+	-- If there is no extension, look for a shebang and set the filetype to that. Look for a shebang override in
+	-- custom_map first. If there is none, check the default shebangs defined in function_maps. Otherwise, default to
+	-- setting the filetype to the value of shebang itself.
+	set_filetype(detect.sh(fallback, true))
 end
 
 return M
