@@ -206,7 +206,7 @@ end
 ---
 --- @return string The detected filetype or g:asmsyntax or "asm"
 function M.asm_syntax()
-    local lines = " " .. util.getlines_as_string(0, 5, " "):lower() .. " "
+    local lines = " " .. util.getlines_as_string(0, M.line_limit, " "):lower() .. " "
     local match = lines:match("%sasmsyntax=([a-zA-Z0-9]+)%s")
     if match then
         return match
@@ -248,7 +248,7 @@ function M.eiffel_check()
         return vim.g.filetype_euphoria
     end
 
-    for _, line in ipairs(util.getlines(0, 100)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.findany(line, { "^%s*<'%s*$", "^%s*'>%s*$" }) then
             return "specman"
         end
@@ -267,7 +267,7 @@ function M.elixir_check()
         return vim.g.filetype_euphoria
     end
 
-    for _, line in ipairs(util.getlines(0, 100)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.match_vim_regex(line, [[\c^--\|^ifdef\>\|^include\>]]) then
             return "euphoria3"
         end
@@ -282,7 +282,7 @@ end
 ---
 --- @return string|nil The detected filetype
 function M.nroff()
-    for _, line in ipairs(util.getlines(0, 5)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:find("^%.") then
             return "nroff"
         end
@@ -309,7 +309,7 @@ function M.perl(file_path, file_ext)
         return M.sh("perl")
     end
 
-    for _, line in ipairs(util.getlines(0, 30)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.match_vim_regex(line, [[\c^use\s\s*\k]]) then
             return "perl"
         end
@@ -343,7 +343,7 @@ function M.vbasic()
     local qb64_preproc =
         [[\c^\s*\%($\a\+\|option\s\+\%(_explicit\|_\=explicitarray\)\>\)]]
 
-    for _, line in ipairs(util.getlines(0, 100)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.findany(line:lower(), visual_basic_markers) then
             return "vb"
         end
@@ -372,7 +372,7 @@ function M.vbasic_form()
         return vim.g.filetype_frm
     end
 
-    local lines = table.concat(util.getlines(0, 5)):lower()
+    local lines = table.concat(util.getlines(0, M.line_limit)):lower()
     if util.findany(lines, visual_basic_markers) then
         return "vb"
     end
@@ -385,7 +385,7 @@ end
 ---
 --- @return string The detected filetype
 function M.html()
-    for _, line in ipairs(util.getlines(0, 10)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.match_vim_regex(line, [[\<DTD\s\+XHTML\s]]) then
             return "xhtml"
         end
@@ -422,7 +422,7 @@ end
 ---
 --- @return string The detected filetype
 function M.sgml()
-    for _, line in ipairs(util.getlines(0, 100)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:find("linuxdoc") then
             return "sgmlnx"
         end
@@ -442,7 +442,7 @@ end
 ---
 --- @return string The detected filetype
 function M.xml()
-    for _, line in ipairs(util.getlines(0, 100)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         local ft = is_docbook(line, "sgml")
         if ft then
             return ft
@@ -498,7 +498,7 @@ function M.tex(file_path)
         [[documentclass\>\|usepackage\>\|begin{\|newcommand\>\|renewcommand\>]]
     local context_pat =
         [[start\a\+\|setup\a\+\|usemodule\|enablemode\|enableregime\|setvariables\|useencoding\|usesymbols\|stelle\a\+\|verwende\a\+\|stel\a\+\|gebruik\a\+\|usa\a\+\|imposta\a\+\|regle\a\+\|utilisemodule\>]]
-    for i, l in ipairs(util.getlines(0, 1000)) do
+    for i, l in ipairs(util.getlines(0, M.line_limit)) do
         -- Skip comments
         if l:find("^%s*%%%S") then
             goto continue
@@ -544,7 +544,7 @@ end
 ---
 --- @return string The detected filetype
 function M.r()
-    local lines = util.getlines(0, 50)
+    local lines = util.getlines(0, M.line_limit)
     -- Rebol is easy to recognize, check for that first
     if util.match_vim_regex(table.concat(lines), [[\c\<rebol\>]]) then
         return "rebol"
@@ -608,7 +608,7 @@ function M.dtrace()
         return
     end
 
-    for _, line in ipairs(util.getlines(0, 100)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.match_vim_regex(line, [[\c^module\>\|^import\>]]) then
             --  D files often start with a module and/or import statement.
             return "d"
@@ -636,7 +636,7 @@ function M.lpc()
         return "c"
     end
 
-    for _, line in ipairs(util.getlines(0, 12)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if
             util.findany(line, {
                 "^//",
@@ -663,7 +663,7 @@ end
 --- @return string The filetype detected
 function M.header()
     -- Check the file contents for objective c hints
-    for _, line in ipairs(util.getlines(0, 200)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if
             util.findany(line:lower(), { "^@interface", "^@end", "^@class" })
         then
@@ -699,7 +699,7 @@ function M.change()
         return "ch"
     end
 
-    for _, line in ipairs(util.getlines(0, 10)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:find("^@") then
             return "change"
         end
@@ -722,7 +722,7 @@ end
 ---
 --- @return string The detected filetype
 function M.idl()
-    for _, line in ipairs(util.getlines(0, 50)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if
             util.findany(
                 line:lower(),
@@ -753,7 +753,7 @@ function M.m()
 
     -- Whether we've seen a multiline comment leader
     local saw_comment = false
-    for _, line in ipairs(util.getlines(0, 100)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:find("^%s*/%*") then
             -- /* ... */ is a comment in Objective C and Murphi, so we can't conclude
             -- it's either of them yet, but track this as a hint in case we don't see
@@ -809,7 +809,7 @@ end
 ---
 --- @return string the Detected filetype
 function M.mm()
-    for _, line in ipairs(util.getlines(0, 20)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if
             util.match_vim_regex(
                 line,
@@ -828,7 +828,7 @@ end
 ---
 --- @return string the Detected filetype
 function M.mms()
-    for _, line in ipairs(util.getlines(0, 20)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.findany(line, { "^%s*%%", "^%s*//", "^%*" }) then
             return "mmix"
         end
@@ -897,7 +897,7 @@ function M.inc()
         return vim.g.filetype_inc
     end
 
-    local lines = util.getlines_as_string(0, 3, " ")
+    local lines = util.getlines_as_string(0, M.line_limit, " ")
     if lines:lower():find("perlscript") then
         return "aspperl"
     end
@@ -948,7 +948,7 @@ function M.progress_asm()
         return vim.g.filetype_i
     end
 
-    for _, line in ipairs(util.getlines(0, 10)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:find("^%s*;") or line:find("^/%*") then
             return M.asm()
         end
@@ -993,7 +993,7 @@ function M.progress_pascal()
         return vim.g.filetype_p
     end
 
-    for _, line in ipairs(util.getlines(0, 10)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if
             util.findany(line, pascal_comments)
             or util.match_vim_regex(line, pascal_keywords)
@@ -1016,7 +1016,7 @@ end
 ---
 --- @return string|nil The detected filetype
 function M.bindzone()
-    local lines = util.getlines_as_string(0, 4)
+    local lines = util.getlines_as_string(0, M.line_limit)
     if
         util.findany(
             lines,
@@ -1097,7 +1097,7 @@ function M.inp()
         return "abaqus"
     end
 
-    for _, line in ipairs(util.getlines(0, 500)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:lower():find("^header surface data") then
             return "trasys"
         end
@@ -1109,7 +1109,7 @@ end
 ---
 --- @return string The detected filetype
 function M.y()
-    for _, line in ipairs(util.getlines(0, 100)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:find("^%s*%%") then
             return "yacc"
         end
@@ -1131,7 +1131,7 @@ end
 ---
 --- @return string The detected filetype
 function M.mc()
-    for _, line in ipairs(util.getlines(0, 20)) do
+    for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.findany(line, { "^%s*#", "^s*dnl" }) then
             return "m4"
         end
