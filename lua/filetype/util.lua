@@ -65,23 +65,29 @@ M.findany = vim.filetype.findany
 --- Print a deprecation warning to the user
 ---
 ---@param old string|table<string> The deprecated options
----@param replacement string|table<string> The replacement options
+---@param replacement? string|table<string> The replacement options
 function M.deprecated_option_warning(old, replacement)
     if type(old) == "table" then
-        old = table.concat(old, ",")
+        old = "(" .. table.concat(old, ",") .. ")"
     end
 
-    if type(replacement) == "table" then
-        replacement = table.concat(replacement, ",")
-    end
-    vim.api.nvim_echo({
+    local msg = {
         { "[filetype.nvim] ", "Normal" },
         { old, "WarningMsg" },
         { " is deprecated.\n", "Normal" },
-        { "[filetype.nvim] Please use ", "Normal" },
-        { replacement, "WarningMsg" },
-        { " instead.", "Normal" },
-    }, true, {})
+    }
+
+    if type(replacement) == "table" then
+        replacement = "(" .. table.concat(replacement, ",") .. ")"
+    end
+
+    if replacement then
+        table.insert(msg, { "[filetype.nvim] Please use ", "Normal" })
+        table.insert(msg, { replacement, "WarningMsg" })
+        table.insert(msg, { " instead.", "Normal" })
+    end
+
+    vim.api.nvim_echo(msg, true, {})
 end
 
 return M
