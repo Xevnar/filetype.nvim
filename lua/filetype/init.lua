@@ -88,11 +88,63 @@ end
 
 local M = {}
 
-local overrides = nil
+-- The default mappings
+local extension_map = require("filetype.mappings.extensions")
+local literal_map = require("filetype.mappings.literal")
+local complex_maps = require("filetype.mappings.complex")
+
+-- Fallback filetype
+local fallback
 
 function M.setup(opts)
     if opts.overrides then
-        overrides = opts.overrides
+        -- Extend the shebang_map with users map and override already existing
+        -- values
+        for ext, ft in pairs(opts.overrides.extensions or {}) do
+            extension_map[ext] = ft
+        end
+
+        for literal, ft in pairs(opts.overrides.literal or {}) do
+            literal_map[literal] = ft
+        end
+
+        -- Add the user's complex maps
+        complex_maps.custom_complex = opts.overrides.complex
+        complex_maps.custom_vcomplex = opts.overrides.vim_regex
+
+        fallback = opts.overrides.default_filetype
+
+        if opts.overrides.shebang then
+            util.deprecated_option_warning(
+                "overrides.shebang",
+                "detection_settings.shebang_map"
+            )
+        end
+
+        if opts.overrides.force_shebang_check then
+            util.deprecated_option_warning("overrides.force_shebang_check")
+        end
+
+        if opts.overrides.function_extensions then
+            util.deprecated_option_warning(
+                "overrides.function_extensions",
+                "overrides.extensions"
+            )
+        end
+
+        if opts.overrides.function_literal then
+            util.deprecated_option_warning(
+                "overrides.function_literal",
+                "overrides.literal"
+            )
+        end
+
+        if opts.overrides.function_complex then
+            util.deprecated_option_warning(
+                "overrides.function_complex",
+                { "overrides.complex", "overrides.complex_ft_ignore" }
+            )
+        end
     end
 
     detect.setup(opts.detection_settings)
@@ -128,65 +180,6 @@ function M.resolve()
 
     callback_args.file_name = callback_args.file_path:match(".*[\\/](.*)")
     callback_args.file_ext = callback_args.file_name:match(".+%.(%w+)")
-
-    -- The default mappings
-    local extension_map = require("filetype.mappings.extensions")
-    local literal_map = require("filetype.mappings.literal")
-    local complex_maps = require("filetype.mappings.complex")
-
-    -- Fallback filetype
-    local fallback
-
-    -- Try to match the custom defined filetypes
-    if overrides then
-        -- Extend the shebang_map with users map and override already existing
-        -- values
-        for ext, ft in pairs(overrides.extensions or {}) do
-            extension_map[ext] = ft
-        end
-
-        for literal, ft in pairs(overrides.literal or {}) do
-            literal_map[literal] = ft
-        end
-
-        -- Add the user's complex maps
-        complex_maps.custom_complex = overrides.complex
-        complex_maps.custom_vcomplex = overrides.vim_regex
-
-        fallback = overrides.default_filetype
-
-        if overrides.shebang then
-            util.deprecated_option_warning(
-                "overrides.shebang",
-                "detection_settings.shebang_map"
-            )
-        end
-
-        if overrides.force_shebang_check then
-            util.deprecated_option_warning("overrides.force_shebang_check")
-        end
-
-        if overrides.function_extensions then
-            util.deprecated_option_warning(
-                "overrides.function_extensions",
-                "overrides.extensions"
-            )
-        end
-
-        if overrides.function_literal then
-            util.deprecated_option_warning(
-                "overrides.function_literal",
-                "overrides.literal"
-            )
-        end
-
-        if overrides.function_complex then
-            util.deprecated_option_warning(
-                "overrides.function_complex",
-                { "overrides.complex", "overrides.complex_ft_ignore" }
-            )
-        end
-    end
 
     if try_lookup(callback_args.file_ext, extension_map) then
         return
