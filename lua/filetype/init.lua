@@ -1,10 +1,8 @@
 local util = require("filetype.util")
 local detect = require("filetype.detect")
 
-local overrides = nil
-
 --- Lua implementation of the setfiletype builtin function.
---- See :help setf
+--- @see :help setf
 ---
 --- @param filetype string the filetype to set
 --- @return true
@@ -25,6 +23,7 @@ local callback_args = {
 }
 
 --- Set the buffer's filetype
+---
 --- @param filetype? string|function The filetype to set for the buffer it can
 ---                                  either be a string or a function that
 ---                                  returns a string
@@ -88,6 +87,8 @@ local function try_regex(absolute_path, map)
 end
 
 local M = {}
+
+local overrides = nil
 
 function M.setup(opts)
     if opts.overrides then

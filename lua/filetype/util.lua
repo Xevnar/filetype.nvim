@@ -50,16 +50,14 @@ end
 --- Check whether the given string matches the Vim regex pattern. It
 --- stores the patterns in a cache
 ---
---- @param s string String to check against regex against
---- @param pattern string Vim regex pattern
---- @return integer(s) The byte indices for the beginning and end of the match
+--- @return integer[] The byte indices for the beginning and end of the match
+--- @type fun(s: string, pattern: string): integer[]
 M.match_vim_regex = vim.filetype.matchregex
 
 --- Check whether a string matches any of the given Lua patterns.
 ---
----@param s string The string to check
----@param patterns table<string> A list of Lua patterns
----@return boolean `true` if s matched a pattern, else `false`
+--- @return boolean `true` if s matched a pattern, else `false`
+--- @type fun(s: string, patterns: string[]): boolean
 M.findany = vim.filetype.findany
 
 --- Print a deprecation warning to the user
