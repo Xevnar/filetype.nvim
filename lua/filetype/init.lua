@@ -135,11 +135,11 @@ function M.resolve()
     if overrides then
         -- Extend the shebang_map with users map and override already existing
         -- values
-        for ext, ft in pairs(overrides.extensions) do
+        for ext, ft in pairs(overrides.extensions or {}) do
             extension_map[ext] = ft
         end
 
-        for literal, ft in pairs(overrides.literal) do
+        for literal, ft in pairs(overrides.literal or {}) do
             literal_map[literal] = ft
         end
 
