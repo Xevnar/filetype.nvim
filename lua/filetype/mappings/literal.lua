@@ -1,4 +1,7 @@
+--- @module 'filetype.util'
 local util = require("filetype.util")
+
+--- @module 'filetype.detect'
 local detect = require("filetype.detect")
 
 return {

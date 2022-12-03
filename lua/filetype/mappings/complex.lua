@@ -1,9 +1,12 @@
+--- @module 'filetype.util'
 local util = require("filetype.util")
+
+--- @module 'filetype.detect'
 local detect = require("filetype.detect")
 
+--- @type table<string, { [string]: filetype_mapping }>
 local M = {}
 
--- mapping of lua regex to filetype
 M.endswith = {
     ["/%.aptitude/config$"] = "aptconf",
     ["/%.config/git/config$"] = "gitconfig",
@@ -143,7 +146,6 @@ M.complex = {
     end,
 }
 
--- These require a special set_ft function
 M.star_sets = {
     [".*/etc/Muttrc%.d/.*"] = [[muttrc]],
     [".*/etc/proftpd/.*%.conf.*"] = [[apachestyle]],

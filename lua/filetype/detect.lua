@@ -1,20 +1,58 @@
+--- @module 'filetype.util'
 local util = require("filetype.util")
 
+--- @alias filetype_detect_module table
 local M = {}
 
--- Maximum number of lines to check before giving up
+--- Maximum number of lines to check before giving up
+---
+--- @type number
 M.line_limit = 10
 
---- Builder style function to set the line limit before calling a
---- detect function
+--- Builder style function to set the line limit before calling a detect function
+---
 --- @param limit number The new line limit
---- @return table
+--- @return filetype_detect_module
 function M.set_line_limit(limit)
     M.line_limit = limit
     return M
 end
 
--- A map from executable name to filetype.
+--- Setup the module
+---
+--- @class filetype_detect_opts
+--- @field line_check_limit number
+--- @field sh_check_contents boolean
+--- @field shebang_map { [string]: string|shebang_map_table }
+---
+--- @param opts? filetype_detect_opts
+--- @return filetype_detect_module
+function M.setup(opts)
+    if not opts then
+        return M
+    end
+
+    M.line_limit = opts.line_check_limit
+
+    -- Extend the shebang_map with users map and override already existing
+    -- values
+    for binary, ft in pairs(opts.shebang_map) do
+        M.shebang_map[binary] = ft
+    end
+
+    M.sh_check_contents = opts.sh_check_contents
+
+    return M
+end
+
+
+--- A map from executable name to filetype.
+---
+--- @class shebang_map_table
+--- @field filetype string
+--- @field on_detect fun()
+---
+--- @type { [string]: string|shebang_map_table }
 M.shebang_map = {
     ["node"] = "javascript",
     ["tclsh"] = "tcl",
@@ -56,47 +94,17 @@ M.shebang_map = {
     },
 }
 
--- Don't check the content after the shebang of shell files
+--- Don't check the content after the shebang of shell files
+---
+--- @type boolean
 M.sh_check_contents = false
 
---- Checks the first line in the buffer for a shebang If there is one, set the
---- filetype appropriately.
+--- Checks the first line in the buffer for a shebang; if there is one, set the filetype appropriately.
 --- Taken from vim.filetype.detect
 ---
---- @param opts table|nil
----             * line_check_limit integer Defines how many lines to search for
----                                        filetype hints.
----             * shebang_map table
----             * sh_check_contents boolean Decides whether the buffer content is
----                                         checked for shell-like filetypes.
----@return filetype.detect
-function M.setup(opts)
-    if not opts then
-        return M
-    end
-
-    M.line_limit = opts.line_check_limit
-
-    -- Extend the shebang_map with users map and override already existing
-    -- values
-    for binary, ft in pairs(opts.shebang_map) do
-        M.shebang_map[binary] = ft
-    end
-
-    M.sh_check_contents = opts.check_sh_contents
-
-    return M
-end
-
---- Checks the first line in the buffer for a shebang If there is one, set the
---- filetype appropriately.
---- Taken from vim.filetype.detect
----
---- @param fallback? string The filetype that is returned if no filetype is
----                        detected. This disables shebang checking.
---- @param force_shebang_check? boolean Forces checking the shebang line even
----                                    if a fallback filetype is defined
---- @return string|nil The detected filetype
+--- @param fallback? string The filetype that is returned if no filetype is detected. This disables shebang checking.
+--- @param force_shebang_check? boolean Forces checking the shebang line even if a fallback filetype is defined
+--- @return string? # The detected filetype
 function M.sh(fallback, force_shebang_check)
     if vim.fn.did_filetype() ~= 0 then
         -- Filetype was already detected or detection should be skipped
@@ -127,27 +135,25 @@ end
 --- Function to extract the binary name from from the shebang
 ---
 --- @param shebang string The shebang to analyze
---- @return string|nil The extracted binary name
+--- @return string? # The extracted binary name
 function M.analyze_shebang(shebang)
     if not shebang or type(shebang) ~= "string" then
         return -- Not a string, so don't bother
     end
 
-    -- The regex requires that all binaries end in an alpha character, so that
-    -- the same shell with different version numbers as suffix are treated the same
+    -- The regex requires that all binaries end in an alpha character, so that the same shell with different version
+    -- numbers as suffix are treated the same
     -- (python3 => python | zsh-5.9 => zsh | test-b#in_sh2 => test-b#in_sh )
     return shebang:match("#!.*/env%s+([^/%s]*%a)")
         or shebang:match("#!.*/([^/%s]*%a)")
 end
 
---- For shell-like file types, check for an "exec" command hidden in a comment,
---- as used for Tcl.
+--- For shell-like file types, check for an "exec" command hidden in a comment, as used for Tcl.
 --- Taken from vim.filetype.detect
 ---
---- @param name string|nil The filetype returned if the contents don't hint to a
----                        different filetype
+--- @param name string|nil The filetype returned if the contents don't hint to a different filetype
 --- @param contents table An array of the lines in the buffer
---- @return string|nil The detected filetype
+--- @return string? # The detected filetype
 function M.shell(name, contents)
     if vim.fn.did_filetype() ~= 0 then
         -- Filetype was already detected or detection should be skipped
@@ -169,11 +175,10 @@ function M.shell(name, contents)
     return name
 end
 
---- The function tries to determine which csh varient is this filetype. The
---- function still checks if shebang matches or not
+--- The function tries to determine which csh varient is this filetype. The function still checks if shebang matches or not
 --- Taken from vim.filetype.detect
 ---
---- @return string|nil The detected filetype
+--- @return string? # The detected filetype
 function M.csh()
     if vim.fn.did_filetype() ~= 0 then
         -- Filetype was already detected
@@ -194,11 +199,11 @@ function M.csh()
     return M.sh(fallback, true)
 end
 
---- This function checks for the kind of assembly that is wanted by the user, or
---- can be detected from the first five lines of the file.
+--- This function checks for the kind of assembly that is wanted by the user, or can be detected from the first five
+--- lines of the file.
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.asm()
     local syntax = vim.b.asmsyntax
     if not syntax or syntax == "" then
@@ -213,9 +218,11 @@ end
 --- Only whitespace characters can be present immediately before or after this statement.
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype or g:asmsyntax or "asm"
+--- @return string # The detected filetype or g:asmsyntax or "asm"
 function M.asm_syntax()
-    local lines = " " .. util.getlines_as_string(0, M.line_limit, " "):lower() .. " "
+    local lines = " "
+        .. util.getlines_as_string(0, M.line_limit, " "):lower()
+        .. " "
     local match = lines:match("%sasmsyntax=([a-zA-Z0-9]+)%s")
     if match then
         return match
@@ -234,11 +241,10 @@ function M.asm_syntax()
     return (vim.g.asmsyntax ~= 0 and vim.g.asmsyntax) or "asm"
 end
 
---- This function checks for user define g:filetype_euphoria and returns
---- "euphoira3" if it isn't set
+--- This function checks for user define g:filetype_euphoria and returns euphoira3 if it isn't set
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.euphoria_check()
     if vim.g.filetype_euphoria then
         return vim.g.filetype_euphoria
@@ -247,11 +253,10 @@ function M.euphoria_check()
     return "euphoria3"
 end
 
---- This function checks for user define g:filetype_euphoria and checks
---- the contents of the first 100 lines for hints if it isn't set
+--- This function checks for user define g:filetype_euphoria and checks the contents for specman hints if it isn't set
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.eiffel_check()
     if vim.g.filetype_euphoria then
         return vim.g.filetype_euphoria
@@ -266,11 +271,10 @@ function M.eiffel_check()
     return "eiffel"
 end
 
---- This function checks for user define g:filetype_euphoria and checks
---- the contents of the first 100 lines for hints if it isn't set
+--- This function checks for user define g:filetype_euphoria and checks the contents for euphoria3 hints if it isn't set
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.elixir_check()
     if vim.g.filetype_euphoria then
         return vim.g.filetype_euphoria
@@ -285,11 +289,10 @@ function M.elixir_check()
     return "elixir"
 end
 
---- This function checks if one of the first five lines start with a dot. In
---- that case it is probably an nroff file.
+--- This function checks if one of the first five lines start with a dot. In that case it is probably an nroff file.
 --- Taken from vim.filetype.detect
 ---
---- @return string|nil The detected filetype
+--- @return string? # The detected filetype
 function M.nroff()
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:find("^%.") then
@@ -298,15 +301,14 @@ function M.nroff()
     end
 end
 
---- If the file has an extension of 't' and is in a directory 't' or 'xt' then
---- it is almost certainly a Perl test file.
+--- If the file has an extension of 't' and is in a directory 't' or 'xt' then it is almost certainly a Perl test file.
 --- If the first line starts with '#' and contains 'perl' it's probably a Perl file.
---- (Slow test) If a file contains a 'use' statement then it is almost certainly a Perl file.
+--- If a file contains a 'use' statement then it is almost certainly a Perl file.
 --- Taken from vim.filetype.detect
 ---
 --- @param file_path string|nil The absolute path to the file
 --- @param file_ext string|nil The file extension
---- @return string|nil The detected filetype
+--- @return string? # The detected filetype
 function M.perl(file_path, file_ext)
     local dir_name = vim.fs.dirname(file_path)
     if file_ext == "t" and (dir_name == "t" or dir_name == "xt") then
@@ -332,10 +334,10 @@ local visual_basic_markers = {
     "begin vb%.usercontrol",
 }
 
---- Read the first 100 lines to check for any hints to Basic filetype
+--- Check the file contents for hints between freebasic, qb64 and vbasic
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.vbasic()
     if vim.g.filetype_bas then
         return vim.g.filetype_bas
@@ -372,10 +374,10 @@ function M.vbasic()
     return "basic"
 end
 
---- Read the first 100 lines to check for any hints to Basic form filetype
+--- Read the file contents to check for visual basic hints
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.vbasic_form()
     if vim.g.filetype_frm then
         return vim.g.filetype_frm
@@ -389,10 +391,10 @@ function M.vbasic_form()
     return "form"
 end
 
---- Read the first 10 lines to check for any hints
+--- Read the file contens for hints on the html flavour
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.html()
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.match_vim_regex(line, [[\<DTD\s\+XHTML\s]]) then
@@ -413,9 +415,8 @@ function M.html()
 end
 
 --- Checks if the line is a doc book or not
---- Taken from vim.filetype.detect
 ---
---- @return string|nil The docbook filetype
+--- @return string? # The docbook filetype
 local function is_docbook(line, type)
     local is_docbook4 = line:find("%<%!DOCTYPE.*DocBook")
     local is_docbook5 = line:lower()
@@ -427,9 +428,10 @@ local function is_docbook(line, type)
     end
 end
 
---- Read the first 100 lines to check for any hints on whether it's a dockbook file or not
+--- Read the file contens for hints on the sgml flavour
+--- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.sgml()
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:find("linuxdoc") then
@@ -445,11 +447,10 @@ function M.sgml()
     return "sgml"
 end
 
---- Read the first 100 lines to check for any hints on whether it's a dockbook or not file
---- or a docbook
+--- Read the file contens for hints on the xml flavour
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.xml()
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         local ft = is_docbook(line, "sgml")
@@ -468,7 +469,7 @@ end
 --- Return either the user defined sql filetype or not
 --- Taken from dist#ft
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.sql()
     if vim.g.filetype_sql then
         return vim.g.filetype_sql
@@ -484,7 +485,7 @@ end
 --- Taken from vim.filetype.detect
 ---
 --- @param file_path string The absolute path of the file
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.tex(file_path)
     local format = M.getline():find("^%%&%s*(%a+)")
     if format then
@@ -551,7 +552,7 @@ end
 --- Detect the flavor of R that is used.
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.r()
     local lines = util.getlines(0, M.line_limit)
     -- Rebol is easy to recognize, check for that first
@@ -584,24 +585,25 @@ end
 --- Distinguish between Prolog and Cproto prototype file.
 --- Taken from vim.filetype.detect
 ---
---- @return string|nil The filetype detected
+--- @return string? nil # The filetype detected
 function M.proto()
-    -- Cproto files have a comment in the first line and a function prototype in
-    -- the second line, it always ends in ";".  Indent files may also have
-    -- comments, thus we can't match comments to see the difference.
-    -- IDL files can have a single ';' in the second line, require at least one
-    -- character before the ';'.
+    -- Cproto files have a comment in the first line and a function prototype in the second line, it always ends in ";".
+    -- Indent files may also have comments, thus we can't match comments to see the difference.
+    -- IDL files can have a single ';' in the second line, require at least one character before the ';'.
     if util.getlines_as_string(0, 2, " "):find(".;$") then
         return "cpp"
     end
 
-    -- Recognize Prolog by specific text in the first non-empty line;
-    -- require a blank after the '%' because Perl uses "%list" and "%translate"
+    -- Recognize Prolog by specific text in the first non-empty line; require a blank after the '%' because Perl uses "%list"
+    -- and "%translate"
     local line = util.get_next_nonblank_line()
     if
-        line and line:find(":%-")
-        or util.match_vim_regex(line, [[\c\<prolog\>]])
-        or util.findany(line, { "^%s*%%+%s", "^%s*%%+$", "^%s*/%*" })
+        line
+        and (
+            line:find(":%-")
+            or util.match_vim_regex(line, [[\c\<prolog\>]])
+            or util.findany(line, { "^%s*%%+%s", "^%s*%%+$", "^%s*/%*" })
+        )
     then
         return "prolog"
     end
@@ -610,7 +612,7 @@ end
 --- Distinguish between dtrace and d files
 --- Taken from vim.filetype.detect
 ---
---- @return string|nil The filetype detected
+--- @return string? # The filetype detected
 function M.dtrace()
     if vim.fn.did_filetype() ~= 0 then
         -- Filetype was already detected
@@ -619,7 +621,7 @@ function M.dtrace()
 
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.match_vim_regex(line, [[\c^module\>\|^import\>]]) then
-            --  D files often start with a module and/or import statement.
+            -- D files often start with a module and/or import statement.
             return "d"
         end
 
@@ -639,7 +641,7 @@ end
 --- Check for lpc syntax if the user specifies g:lpc_syntax_for_c
 --- Taken from vim.filetype.detect
 ---
---- @return string The filetype detected
+--- @return string # The filetype detected
 function M.lpc()
     if not vim.g.lpc_syntax_for_c then
         return "c"
@@ -669,7 +671,7 @@ end
 --- Distinguish between different header files
 --- Taken from vim.filetype.detect
 ---
---- @return string The filetype detected
+--- @return string # The filetype detected
 function M.header()
     -- Check the file contents for objective c hints
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
@@ -701,7 +703,7 @@ end
 ---     2. If the first line starts with # or ! it's probably a ch file.
 ---     3. If a line has "main", "include", "//" or "/*" it's probably ch.
 ---     4. Otherwise CHILL is assumed.
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.change()
     local first_line = util.getline()
     if util.findany(first_line, { "^#", "^!" }) then
@@ -727,9 +729,9 @@ function M.change()
     return "chill"
 end
 
---- This function checks the first 50 lines for msidl hints
+--- Read the file contents for msidl hints
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.idl()
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if
@@ -745,10 +747,10 @@ function M.idl()
     return "idl"
 end
 
---- Diffrentiate between matlab, octave, objective c, and other filetypes
+--- Read the file contest to differentiate between matlab, octave, objective c, and other filetypes
 --- Taken from vim.filetype.detect
 ---
---- @return string the Detected filetype
+--- @return string # the Detected filetype
 function M.m()
     if vim.g.filetype_m then
         return vim.g.filetype_m
@@ -803,9 +805,8 @@ function M.m()
     end
 
     if saw_comment then
-        -- We didn't see anything definitive, but this looks like either Objective C
-        -- or Murphi based on the comment leader. Assume the former as it is more
-        -- common.
+        -- We didn't see anything definitive, but this looks like either Objective C or Murphi based on the comment
+        -- leader. Assume the former as it is more common.
         return "objc"
     end
 
@@ -813,10 +814,10 @@ function M.m()
     return "matlab"
 end
 
---- Diffrentiate between nroff and objective cpp
+--- Read the file contents to diffrentiate between nroff and objective cpp
 --- Taken from vim.filetype.detect
 ---
---- @return string the Detected filetype
+--- @return string # the Detected filetype
 function M.mm()
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if
@@ -832,10 +833,10 @@ function M.mm()
     return "nroff"
 end
 
---- Diffrentiate between make and mmix files
+--- Read the file contents to diffrentiate between make and mmix files
 --- Taken from vim.filetype.detect
 ---
---- @return string the Detected filetype
+--- @return string # the Detected filetype
 function M.mms()
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.findany(line, { "^%s*%%", "^%s*//", "^%*" }) then
@@ -854,10 +855,10 @@ local pascal_comments = { "^%s*{", "^%s*%(%*", "^%s*//" }
 local pascal_keywords =
     [[\c^\s*\%(program\|unit\|library\|uses\|begin\|procedure\|function\|const\|type\|var\)\>]]
 
---- Diffrentiate between pascal and puppet filetypes
+--- Read the file contents to diffrentiate between pascal and puppet filetypes
 --- Taken from vim.filetype.detect
 ---
---- @return string the Detected filetype
+--- @return string # the Detected filetype
 function M.pp()
     if vim.g.filetype_pp then
         return vim.g.filetype_pp
@@ -865,8 +866,11 @@ function M.pp()
 
     local line = util.get_next_nonblank_line()
     if
-        util.findany(line, pascal_comments)
-        or util.match_vim_regex(line, pascal_keywords)
+        line
+        and (
+            util.findany(line, pascal_comments)
+            or util.match_vim_regex(line, pascal_keywords)
+        )
     then
         return "pascal"
     end
@@ -874,22 +878,25 @@ function M.pp()
     return "puppet"
 end
 
---- Diffrentiate between prolog and perl filetypes
+--- Read the file contents to diffrentiate between prolog and perl filetypes
 --- Taken from vim.filetype.detect
 ---
---- @return string the Detected filetype
+--- @return string # the Detected filetype
 function M.pl()
     if vim.g.filetype_pl then
         return vim.g.filetype_pl
     end
 
-    -- Recognize Prolog by specific text in the first non-empty line;
-    -- require a blank after the '%' because Perl uses "%list" and "%translate"
+    -- Recognize Prolog by specific text in the first non-empty line; require a blank after the '%' because Perl uses
+    -- "%list" and "%translate"
     local line = util.get_next_nonblank_line()
     if
-        line and line:find(":%-")
-        or util.match_vim_regex(line, [[\c\<prolog\>]])
-        or util.findany(line, { "^%s*%%+%s", "^%s*%%+$", "^%s*/%*" })
+        line
+        and (
+            line:find(":%-")
+            or util.match_vim_regex(line, [[\c\<prolog\>]])
+            or util.findany(line, { "^%s*%%+%s", "^%s*%%+$", "^%s*/%*" })
+        )
     then
         return "prolog"
     end
@@ -897,10 +904,10 @@ function M.pl()
     return "perl"
 end
 
---- Diffrentiate between different inc filetypes
+--- Read the file contents to diffrentiate between different inc filetypes
 --- Taken from vim.filetype.detect
 ---
---- @return string the Detected filetype
+--- @return string # the Detected filetype
 function M.inc()
     if vim.g.filetype_inc then
         return vim.g.filetype_inc
@@ -919,8 +926,7 @@ function M.inc()
         return "php"
     end
 
-    -- Pascal supports // comments but they're vary rarely used for file
-    -- headers so assume POV-Ray
+    -- Pascal supports // comments but they're vary rarely used for file headers so assume POV-Ray
     if
         util.findany(lines, { "^%s{", "^%s%(%*" })
         or util.match_vim_regex(lines, pascal_keywords)
@@ -947,11 +953,10 @@ function M.inc()
     return syntax
 end
 
---- This function checks for an assembly comment in the first ten lines.
---- If not found, assume Progress.
+--- This function checks the file conents for an assembly commet. If not found, assume Progress.
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.progress_asm()
     if vim.g.filetype_i then
         return vim.g.filetype_i
@@ -963,8 +968,7 @@ function M.progress_asm()
         end
 
         if not line:find("^%s*$") or line:find("^/%*") then
-            -- Not an empty line: doesn't look like valid assembly code
-            -- or it looks like a Progress /* comment.
+            -- Not an empty line: doesn't look like valid assembly code or it looks like a Progress /* comment.
             break
         end
     end
@@ -975,7 +979,7 @@ end
 --- This function checks cweb files for hints on whether they are progress files or not
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.progress_cweb()
     if vim.g.filetype_w then
         return vim.g.filetype_w
@@ -991,12 +995,11 @@ function M.progress_cweb()
     end
 end
 
---- This function checks for valid Pascal syntax in the first 10 lines.
---- Look for either an opening comment or a program start.
---- If not found, assume Progress.
+--- This function checks for valid Pascal syntax. Look for either an opening comment or a program start. If not found,
+--- assume Progress.
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.progress_pascal()
     if vim.g.filetype_p then
         return vim.g.filetype_p
@@ -1011,8 +1014,7 @@ function M.progress_pascal()
         end
 
         if not line:find("^%s*$") or line:find("^/%*") then
-            -- Not an empty line: Doesn't look like valid Pascal code.
-            -- Or it looks like a Progress /* comment
+            -- Not an empty line: Doesn't look like valid Pascal code, or it looks like a Progress /* comment
             break
         end
     end
@@ -1020,10 +1022,10 @@ function M.progress_pascal()
     return "progress"
 end
 
---- Checks if this is a bindzone file or not
+--- Read the file contents for hints Checks if this is a bindzone file or not
 --- Taken from vim.filetype.detect
 ---
---- @return string|nil The detected filetype
+--- @return string? # The detected filetype
 function M.bindzone()
     local lines = util.getlines_as_string(0, M.line_limit)
     if
@@ -1038,13 +1040,12 @@ end
 
 local udev_rules_pattern = '^%s*udev_rules%s*=%s*"([%^"]+)/*".*'
 
---- This function looks at the file path rather the contents of the rule file.
---- if the path is in any of the predifined udev rules path or is in one off
---- the paths defined in '/etc/udev/udev.conf', then it is not a udevrules file
+--- This function looks at the file path rather the contents of the rule file. if the path is in any of the predifined
+--- udev rules path or is in one off the paths defined in '/etc/udev/udev.conf', then it is not a udevrules file.
 --- Taken from vim.filetype.detect
 ---
 --- @param path string The absolute path the file is at
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.rules(path)
     path = path:lower()
     if
@@ -1097,10 +1098,10 @@ function M.rules(path)
     return "hog"
 end
 
---- Diffrentiate between racc and yacc
+--- Read the file contents to diffrentiate between racc and yacc
 --- Taken from vim.filetype.detect
 ---
---- @return string|nil The detected filetype
+--- @return string? # The detected filetype
 function M.inp()
     if util.getline():find("^%*") then
         return "abaqus"
@@ -1113,10 +1114,10 @@ function M.inp()
     end
 end
 
---- Diffrentiate between racc and yacc
+--- Read the file contents to diffrentiate between racc and yacc
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.y()
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if line:find("^%s*%%") then
@@ -1138,7 +1139,7 @@ end
 --- MS message text files use ';', Sendmail files use '#' or 'dnl'
 --- Taken from vim.filetype.detect
 ---
---- @return string The detected filetype
+--- @return string # The detected filetype
 function M.mc()
     for _, line in ipairs(util.getlines(0, M.line_limit)) do
         if util.findany(line, { "^%s*#", "^s*dnl" }) then

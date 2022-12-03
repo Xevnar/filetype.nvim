@@ -1,4 +1,7 @@
+--- @module 'filetype.util'
 local util = require("filetype.util")
+
+--- @module 'filetype.detect'
 local detect = require("filetype.detect")
 
 --- Lua implementation of the setfiletype builtin function.
@@ -14,8 +17,14 @@ local function setf(filetype)
     return true
 end
 
--- Arguments to pass to function callbacks.
--- The argements should be set when the resolve function is called
+--- Arguments to pass to function callbacks. The argements should be set when the resolve function is called
+---
+--- @class filetype_mapping_argument
+--- @field file_path string The file's aboslute path (includes filename)
+--- @field file_name string The file's name (includes extension)
+--- @field file_ext string The file's extension
+---
+--- @type filetype_mapping_argument
 local callback_args = {
     file_path = "",
     file_name = "",
@@ -24,10 +33,10 @@ local callback_args = {
 
 --- Set the buffer's filetype
 ---
---- @param filetype? string|function The filetype to set for the buffer it can
----                                  either be a string or a function that
----                                  returns a string
---- @return boolean Whether the filetype was set or not
+--- @param filetype? filetype_mapping The filetype to set for the buffer it can
+---                                   either be a string or a function that
+---                                   returns a string
+--- @return boolean # Whether the filetype was set or not
 local function set_filetype(filetype)
     if type(filetype) == "string" then
         return setf(filetype)
@@ -44,8 +53,8 @@ end
 --- Look up a query in the map
 ---
 --- @param query string The pattern to lookup in  `map`
---- @param map table A table of mappings
---- @return boolean Whether the the filetype was set or not
+--- @param map { [string]: filetype_mapping } A table of literal mappings
+--- @return boolean # Whether the the filetype was set or not
 local function try_lookup(query, map)
     if not query or not map then
         return false
@@ -54,12 +63,11 @@ local function try_lookup(query, map)
     return set_filetype(map[query])
 end
 
---- Loop through the pattern-filetype pairs in the map table and check if the
---- absolute_path matches any of them
+--- Loop through the pattern-filetype pairs in the map table and check if the absolute_path matches any of them
 ---
 --- @param absolute_path string the path of the file
---- @param map table A table of mappings
---- @return boolean Whether the the filetype was set or not
+--- @param map { [string]: filetype_mapping } A table of lua pattern mappings
+--- @return boolean # Whether the the filetype was set or not
 local function try_pattern(absolute_path, map)
     for pattern, ft in pairs(map) do
         if absolute_path:find(pattern) then
@@ -70,12 +78,11 @@ local function try_pattern(absolute_path, map)
     return false
 end
 
---- Loop through the regex-filetype pairs in the map table and check if the
---- absolute_path matches any of them
+--- Loop through the regex-filetype pairs in the map table and check if the absolute_path matches any of them
 ---
 --- @param absolute_path string the path of the file
---- @param map table A table of mappings
---- @return boolean Whether the the filetype was set or not
+--- @param map { [string]: filetype_mapping } A table of vim regex mappings
+--- @return boolean # Whether the the filetype was set or not
 local function try_regex(absolute_path, map)
     for pattern, ft in pairs(map) do
         if util.match_vim_regex(absolute_path, pattern) then
@@ -88,18 +95,40 @@ end
 
 local M = {}
 
--- The default mappings
+--- The default mappings
+--- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
+
+--- @type { [string]: filetype_mapping }
 local extension_map = require("filetype.mappings.extensions")
+
+--- @type { [string]: filetype_mapping }
 local literal_map = require("filetype.mappings.literal")
+
+--- @type table<string, { [string]: filetype_mapping }>
 local complex_maps = require("filetype.mappings.complex")
 
--- Fallback filetype
+--- Fallback filetype
+---
+--- @type string
 local fallback
 
+--- Setup function
+---
+--- @class filetype_opts
+--- @field overrides filetype_overrides Overiddes for the default filetype mappings
+--- @field detection_settings filetype_detect_opts Options to override the behaviour of detection functions
+---
+--- @class filetype_overrides
+--- @field extensions { [string]: filetype_mapping } Lookup table that maps file extensions to filetypes
+--- @field literal { [string]: filetype_mapping } Lookup table that maps file names to filetypes
+--- @field complex { [string]: filetype_mapping } Table of lua patterns that are tested against the full file path
+--- @field vim_regex { [string]: filetype_mapping } Table of vim regexes that are tested against the full file path
+--- @field default_filetype string The default filetype if no filetype is detected
+---
+--- @param opts filetype_opts
 function M.setup(opts)
     if opts.overrides then
-        -- Extend the shebang_map with users map and override already existing
-        -- values
+        -- Extend the shebang_map with users map and override already existing values
         for ext, ft in pairs(opts.overrides.extensions or {}) do
             extension_map[ext] = ft
         end
@@ -150,14 +179,16 @@ function M.setup(opts)
     detect.setup(opts.detection_settings)
 end
 
+--- The function tries to resolve the filetype of the current buffer, either from the file name or through the file's
+--- contents
+---
 function M.resolve()
     -- Just in case
     vim.g.did_load_filetypes = 1
 
     callback_args.file_path = vim.api.nvim_buf_get_name(0)
 
-    -- Special exception for *.orig files. We remove the .orig extensions to get the
-    -- original filename
+    -- Special exception for *.orig files. We remove the .orig extensions to get the original filename
     if callback_args.file_path:find("%.orig$") then
         callback_args.file_path = callback_args.file_path:match("(.*)%.orig")
     end
@@ -209,16 +240,14 @@ function M.resolve()
         return
     end
 
-    -- At this point, no filetype has been detected
-    -- so let's just default to the extension, if it has one
+    -- At this point, no filetype has been detected so let's just default to the extension, if it has one
     if callback_args.file_ext and set_filetype(callback_args.file_ext) then
         return
     end
 
-    -- If there is no extension, look for a shebang and set the filetype to
-    -- that. Look for a shebang override in custom_map first. If there is none,
-    -- check the default shebangs defined in function_maps. Otherwise, default
-    -- to setting the filetype to the value of shebang itself.
+    -- If there is no extension, look for a shebang and set the filetype to that. Look for a shebang override in
+    -- custom_map first. If there is none, check the default shebangs defined in function_maps. Otherwise, default to
+    -- setting the filetype to the value of shebang itself.
     set_filetype(detect.sh(fallback, true))
 end
 

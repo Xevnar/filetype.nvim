@@ -64,8 +64,8 @@ That's it! You should now have a much snappier neovim experience!
 -- In init.lua or filetype.nvim's config file
 require("filetype").setup({
     overrides = {
-        -- The following overrides use simple table lookup for matching
-        -- The values of each key can be either a string or a function that returns the filetype
+        -- The following overrides use simple table lookup for matching. The values of each key can be either a string or a
+        -- function that returns the filetype
         extensions = {
             -- Set the filetype of *.pn files to potion
             pn = "potion",
@@ -92,10 +92,10 @@ require("filetype").setup({
             -- Set the filetype of files named "MyBackupFile" to lua
             MyBackupFile = "lua",
 
-            -- Set the filetype of files named "Brewfile" to ruby and turn off syntax highlighting
-            Brewfile = function()
+            -- Set the filetype of files named "Cargo.lock" to toml and turn off syntax highlighting
+            ["Cargo.lock"] = function()
                 vim.cmd("syntax off")
-                return "ruby"
+                return "toml"
             end,
         },
 
@@ -115,15 +115,9 @@ require("filetype").setup({
             ["^.*bin.*$"] = "sh",
         },
 
-        -- Same as complex, but it respects `g:ft_ignore_pat`
-        complex_ft_ignore = {
-        },
-
-        -- Same as complex and complex_ft_ignore, but use vim regex for path matching
-        -- They are lower priority than complex
+        -- Same as complex, but use vim regex for path matching
+        -- It is lower priority than complex
         vim_regex = {
-        },
-        vim_regex_ft_ignore = {
         },
 
         -- Set a default filetype in the case no matching filetype is detected
@@ -132,16 +126,15 @@ require("filetype").setup({
 
     -- This table defines the behaviour of the functions in `filetype.detect`
     detection_settings = {
-        -- Specify the number of lines to check if before deciding that the contents
-        -- don't provide hints to the filetype
+        -- Specify the number of lines to check if before deciding that the contents don't provide hints to the filetype
         line_check_limit = 500, -- default is 10 lines
 
         -- Check if the entirety of the shell file for a hint of the executable being used;
         -- currently only checks for `tclsh`
         sh_check_contents = true, -- default is false
 
-        -- The default behaviour when a shebang is detected is to set the filetype to binary
-        -- used unless the there is mapping from the binary name to filetype defined.
+        -- The default behaviour when a shebang is detected is to set the filetype to binary used unless the there is mapping
+        -- from the binary name to filetype defined.
         -- You can define your own mapping here
         shebang_map = {
             -- Set the filetype of files with a dash shebang to sh
@@ -160,8 +153,7 @@ require("filetype").setup({
                 end,
             },
 
-            -- Binary names must end in an alpha character and not contain a space
-            -- to be correctly identified
+            -- Binary names must end in an alpha character and not contain a space to be correctly identified
             ["my-sh_interpeter"] = "sh",
             ["my-sh_interpeter-Ver2"] = "sh", -- This won't work even if it is the actual binary name
             ["bash --posix"] = "sh",          -- Neither would this
