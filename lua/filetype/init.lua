@@ -144,13 +144,17 @@ function M.resolve()
 
         -- Extend the shebang_map with users map and override already existing
         -- values
-        for binary, ft in pairs(custom_map.shebang) do
-            detect.shebang[binary] = ft
+        for binary, ft in pairs(custom_map.shebang_map) do
+            detect.shebang_map[binary] = ft
         end
 
         detect_sh_args.fallback = custom_map.default_filetype
         detect_sh_args.force_shebang_check = custom_map.force_shebang_check
         detect_sh_args.check_contents = custom_map.check_sh_contents
+
+        if custom_map.shebang then
+            util.deprecated_option_warning("overrides.shebang", "overrides.shebang_map")
+        end
 
         if custom_map.function_extensions then
             util.deprecated_option_warning(

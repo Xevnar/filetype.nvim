@@ -3,7 +3,7 @@ local util = require("filetype.util")
 local M = {}
 
 -- A map from executable name to filetype.
-M.shebang = {
+M.shebang_map = {
     ["node"] = "javascript",
     ["tclsh"] = "tcl",
     ["ksh"] = {
@@ -77,7 +77,7 @@ function M.sh(args)
 
     -- prioritize the passed shebang over the builtin map. use the passed name
     -- if it isn't defined in either
-    name = (M.shebang and M.shebang[name]) or name
+    name = (M.shebang_map and M.shebang_map[name]) or name
     if type(name) == "table" then
         name.on_detect()
         name = name.filetype

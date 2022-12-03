@@ -129,7 +129,7 @@ require("filetype").setup({
         -- The default behaviour when a shebang is detected is to set the filetype to binary
         -- used unless the there is mapping from the binary name to filetype defined.
         -- You can define your own mapping here
-        shebang = {
+        shebang_map = {
             -- Set the filetype of files with a dash shebang to sh
             dash = "sh",
 
