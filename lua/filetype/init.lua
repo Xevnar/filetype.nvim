@@ -42,19 +42,6 @@ local function set_filetype(filetype)
     return false
 end
 
-if vim.g.ft_ignore_pat == nil then
-    vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
-end
-local ft_ignore_regex = vim.regex(vim.g.ft_ignore_pat)
-
-local function star_set_filetype(name)
-    if not ft_ignore_regex:match_str(name) then
-        return set_filetype(name)
-    end
-
-    return false
-end
-
 --- Look up a query in the map
 ---
 --- @param query string The pattern to lookup in  `map`
@@ -73,15 +60,10 @@ end
 ---
 --- @param absolute_path string the path of the file
 --- @param map table A table of mappings
---- @param star_set? boolean Whether to resepct `g:ft_ignore_pat`
 --- @return boolean Whether the the filetype was set or not
-local function try_pattern(absolute_path, map, star_set)
+local function try_pattern(absolute_path, map)
     for pattern, ft in pairs(map) do
         if absolute_path:find(pattern) then
-            if star_set then
-                return star_set_filetype(ft)
-            end
-
             return set_filetype(ft)
         end
     end
@@ -94,15 +76,10 @@ end
 ---
 --- @param absolute_path string the path of the file
 --- @param map table A table of mappings
---- @param star_set? boolean Whether to resepct `g:ft_ignore_pat`
 --- @return boolean Whether the the filetype was set or not
-local function try_regex(absolute_path, map, star_set)
+local function try_regex(absolute_path, map)
     for pattern, ft in pairs(map) do
         if util.match_vim_regex(absolute_path, pattern) then
-            if star_set then
-                return star_set_filetype(ft)
-            end
-
             return set_filetype(ft)
         end
     end
@@ -125,6 +102,14 @@ function M.resolve()
     vim.g.did_load_filetypes = 1
 
     callback_args.file_path = vim.api.nvim_buf_get_name(0)
+
+    if vim.g.ft_ignore_pat == nil then
+        vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
+    end
+
+    if util.match_vim_regex(callback_args.file_path, vim.g.ft_ignore_pat) then
+        return -- Don't set the files filetype
+    end
 
     if vim.bo.filetype == "bqfpreview" then
         callback_args.file_path = vim.fn.expand("<amatch>")
@@ -159,9 +144,7 @@ function M.resolve()
 
         -- Add the user's complex maps
         complex_maps.custom_complex = overrides.complex
-        complex_maps.custom_starset = overrides.complex_ft_ignore
         complex_maps.custom_vcomplex = overrides.vim_regex
-        complex_maps.custom_vstarset = overrides.vim_regex_ft_ignore
 
         fallback = overrides.default_filetype
 
@@ -210,15 +193,7 @@ function M.resolve()
         return
     end
 
-    if try_pattern(callback_args.file_path, complex_maps.custom_starset, true) then
-        return
-    end
-
     if try_regex(callback_args.file_path, complex_maps.custom_vcomplex) then
-        return
-    end
-
-    if try_regex(callback_args.file_path, complex_maps.custom_vstarset, true) then
         return
     end
 
@@ -230,7 +205,7 @@ function M.resolve()
         return
     end
 
-    if try_pattern(callback_args.file_path, complex_maps.star_sets, true) then
+    if try_pattern(callback_args.file_path, complex_maps.star_sets) then
         return
     end
 
