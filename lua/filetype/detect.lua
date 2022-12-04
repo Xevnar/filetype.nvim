@@ -449,18 +449,6 @@ function M.xml()
 	return 'xml'
 end
 
---- Return either the user defined sql filetype or not
---- Taken from dist#ft
----
---- @return string # The detected filetype
-function M.sql()
-	if vim.g.filetype_sql then
-		return vim.g.filetype_sql
-	end
-
-	return 'sql'
-end
-
 --- Choose context, plaintex, or tex (LaTeX) based on these rules:
 ---     1. Check the first line of the file for "%&<format>".
 ---     2. Check the first 1000 non-comment lines for LaTeX or ConTeXt keywords.

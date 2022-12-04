@@ -4,7 +4,8 @@ local util = require('filetype.util')
 --- @module 'filetype.detect'
 local detect = require('filetype.detect')
 
-return {
+--- @type { [string]: filetype_mapping }
+local literal = {
 	['.a2psrc'] = 'a2ps',
 	['.asoundrc'] = 'alsaconf',
 	['.babelrc'] = 'json',
@@ -183,24 +184,30 @@ return {
 		return 'xf86conf'
 	end,
 	['INDEX'] = function()
-		if util.getline():find('^%s*(distribution|installed_software|root|bundle|product)%s*$') then
+		if
+			util.findand(
+				util.getline(),
+				{ '^%s*distribution%s*$', '^%s*installed_software%s*$', '^%s*root%s*$', '^%s*bundle%s*$', '^%s*product%s*$' }
+			)
+		then
 			return 'psf'
 		end
 	end,
 	['INFO'] = function()
-		if util.getline():find('^%s*(distribution|installed_software|root|bundle|product)%s*$') then
+		if
+			util.findand(
+				util.getline(),
+				{ '^%s*distribution%s*$', '^%s*installed_software%s*$', '^%s*root%s*$', '^%s*bundle%s*$', '^%s*product%s*$' }
+			)
+		then
 			return 'psf'
 		end
 	end,
 	['control'] = function()
-		if util.getline():find('^Source%:') then
-			return 'debcontrol'
-		end
+		return util.getline():find('^Source%:') and 'debcontrol'
 	end,
 	['NEWS'] = function()
-		if util.getline():find('%; urgency%=') then
-			return 'debchangelog'
-		end
+		return util.getline():find('%; urgency%=') and 'debchangelog'
 	end,
 	['indent.pro'] = function()
 		return detect.proto() or 'indent'
@@ -257,3 +264,5 @@ return {
 		return detect.sh('bash')
 	end,
 }
+
+return literal

@@ -4,7 +4,8 @@ local util = require('filetype.util')
 --- @module 'filetype.detect'
 local detect = require('filetype.detect')
 
-return {
+--- @type { [string]: filetype_mapping }
+local extensions = {
 	['.ch'] = 'chill',
 	['4gh'] = 'fgl',
 	['4gl'] = 'fgl',
@@ -654,39 +655,19 @@ return {
 		return detect.nroff() or 'xmath'
 	end,
 	['xpm'] = function()
-		if util.getline():find('XPM2') then
-			return 'xpm2'
-		else
-			return 'xpm'
-		end
+		return (util.getline():find('XPM2') and 'xpm2') or 'xpm'
 	end,
 	['module'] = function()
-		if util.getline():find('%<%?php') then
-			return 'php'
-		else
-			return 'virata'
-		end
+		return (util.getline():find('%<%?php') and 'php') or 'virata'
 	end,
 	['pkg'] = function()
-		if util.getline():find('%<%?php') then
-			return 'php'
-		else
-			return 'virata'
-		end
+		return (util.getline():find('%<%?php') and 'php') or 'virata'
 	end,
 	['hw'] = function()
-		if util.getline():find('%<%?php') then
-			return 'php'
-		else
-			return 'virata'
-		end
+		return (util.getline():find('%<%?php') and 'php') or 'virata'
 	end,
 	['ts'] = function()
-		if util.getline():find('<%?xml') then
-			return 'xml'
-		else
-			return 'typescript'
-		end
+		return (util.getline():find('<%?xml') and 'xml') or 'typescript'
 	end,
 	['ttl'] = function()
 		if util.getline():find('^@?(prefix|base)') then
@@ -704,40 +685,28 @@ return {
 		end
 	end,
 	['smi'] = function()
-		if util.getline():find('smil') then
-			return 'smil'
-		else
-			return 'mib'
-		end
+		return (util.getline():find('smil') and 'smil') or 'mib'
 	end,
 	['smil'] = function()
-		if util.getline():find('<?%s*xml.*?>') then
-			return 'xml'
-		else
-			return 'smil'
-		end
+		return (util.getline():find('<?%s*xml.*?>') and 'xml') or 'smil'
 	end,
 	['cls'] = function()
-		local first_line = util.getline()
-		if first_line:find('^%%') then
+		local line = util.getline()
+		if line:find('^%%') then
 			return 'tex'
-		elseif first_line:sub(1, 1) == '#' and first_line:find('rexx') then
-			return 'rexx'
-		else
-			return 'st'
 		end
+
+		if line:sub(1, 1) == '#' and line:find('rexx') then
+			return detect.sh('rexx')
+		end
+
+		return 'st'
 	end,
 	['install'] = function()
-		if util.getline():find('%<%?php') then
-			return 'php'
-		else
-			return detect.sh('bash')
-		end
+		return (util.getline():find('%<%?php') and 'php') or detect.sh('bash')
 	end,
 	['decl'] = function()
-		if util.getlines_as_string(0, 3, ' '):find('^%<%!SGML') then
-			return 'sgmldecl'
-		end
+		return util.getlines_as_string(0, detect.line_limit, ' '):find('^%<%!SGML') and 'sgmldecl'
 	end,
 	['sgm'] = function()
 		return detect.sgml()
@@ -751,90 +720,53 @@ return {
 		end
 	end,
 	['pm'] = function()
-		if util.getline():find('XPM2') then
-			return 'xpm2'
-		elseif util.getline():find('XPM') then
-			return 'xpm'
-		else
-			return 'perl'
-		end
+		local line = util.getline()
+		return (line:find('XPM2') and 'xpm2') or (line:find('XPM') and 'xpm') or 'perl'
 	end,
-	['me'] = function()
-		if vim.fn.expand('<afile>') ~= 'read.me' and vim.fn.expand('<afile>') ~= 'click.me' then
+	['me'] = function(args)
+		if args.file_name ~= 'read.me' and args.file_name ~= 'click.me' then
 			return 'nroff'
 		end
 	end,
-	['m4'] = function()
-		if not vim.fn.expand('<afile>'):find('(html.m4$|fvwm2rc)') then
+	['m4'] = function(args)
+		if not util.findany(args.file_path, { 'html.m4$', 'fvwm2rc' }) then
 			return 'm4'
 		end
 	end,
 	['edn'] = function()
-		if util.getline():find('^%s*%(%s*edif') then
-			return 'edif'
-		else
-			return 'clojure'
-		end
+		return (util.getline():find('^%s*%(%s*edif') and 'edif') or 'clojure'
 	end,
 	['rul'] = function()
-		local top_file = util.getlines(0, 6)
-		if top_file:find('InstallShield') then
-			return 'ishd'
-		else
-			return 'diva'
-		end
+		return (util.getlines_as_string(0, detect.line_limit):find('InstallShield') and 'ishd') or 'diva'
 	end,
 	['prg'] = function()
-		if vim.fn.exists('g:filetype_prg') == 1 then
-			return vim.g.filetype_prg
-		else
-			return 'clipper'
-		end
+		return (vim.g.filetype_prg and vim.g.filetype_prg) or 'clipper'
 	end,
 	['cpy'] = function()
-		if util.getline():find('^%#%#') then
-			return 'python'
-		else
-			return 'cobol'
-		end
+		return (util.getline():find('^%#%#') and 'python') or 'cobol'
 	end,
-	-- Complicated functions
 	['asp'] = function()
-		if vim.g.filetype_asp ~= nil then
+		if vim.g.filetype_asp then
 			return vim.g.filetype_asp
-		elseif util.getlines_as_string(0, 3, ' '):find('perlscript') then
-			return 'aspperl'
-		else
-			return 'aspvbs'
 		end
+
+		if util.getlines_as_string(0, detect.line_limit, ' '):find('perlscript') then
+			return 'aspperl'
+		end
+
+		return 'aspvbs'
 	end,
 	['asa'] = function()
-		if vim.g.filetype_asa ~= nil then
-			return vim.g.filetype_asa
-		else
-			return 'aspvbs'
-		end
+		return (vim.g.filetype_asa and vim.g.filetype_asa) or 'aspvbs'
 	end,
 	['cmd'] = function()
-		if util.getline():find('^%/%*') then
-			return 'rexx'
-		else
-			return 'dosbatch'
-		end
+		return (util.getline():find('^%/%*') and 'rexx') or 'dosbatch'
 	end,
 	['cc'] = function()
-		if vim.fn.exists('cynlib_syntax_for_cc') == 1 then
-			return 'cynlib'
-		else
-			return 'cpp'
-		end
+		return (vim.g.cynlib_syntax_for_cc and 'cynlib') or 'cpp'
 	end,
 	['cpp'] = function()
-		if vim.fn.exists('cynlib_syntax_for_cpp') == 1 then
-			return 'cynlib'
-		else
-			return 'cpp'
-		end
+		return (vim.g.cynlib_syntax_for_cc and 'cynlib') or 'cpp'
 	end,
 	['inp'] = function()
 		return detect.inp()
@@ -864,7 +796,7 @@ return {
 		return detect.vbasic()
 	end,
 	['btm'] = function()
-		if vim.fn.exists('g:dosbatch_syntax_for_btm') == 1 and vim.g.dosbatch_syntax_for_btm ~= 0 then
+		if vim.g.dosbatch_syntax_for_btm and vim.g.dosbatch_syntax_for_btm ~= 0 then
 			return 'dosbatch'
 		end
 
@@ -1015,7 +947,7 @@ return {
 		return detect.rules(args.file_path)
 	end,
 	['sql'] = function()
-		return detect.sql()
+		return (vim.g.filetype_sql and vim.g.filetype_sql) or 'sql'
 	end,
 	['tex'] = function(args)
 		return detect.tex(args.file_path)
@@ -1039,6 +971,8 @@ return {
 		return detect.html()
 	end,
 	['zsql'] = function()
-		return detect.sql()
+		return (vim.g.filetype_sql and vim.g.filetype_sql) or 'sql'
 	end,
 }
+
+return extensions

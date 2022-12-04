@@ -83,11 +83,7 @@ M.endswith = {
 		return 'ptcap'
 	end,
 	['[cC]hange[lL]og'] = function()
-		if util.getline():find('%; urgency%=') then
-			return 'debchangelog'
-		else
-			return 'changelog'
-		end
+		return (util.getline():find('%; urgency%=') and 'debchangelog') or 'changelog'
 	end,
 	['%.bash[_-]profile'] = function()
 		return detect.sh('bash')
