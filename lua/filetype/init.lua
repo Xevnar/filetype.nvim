@@ -69,6 +69,10 @@ end
 --- @param map { [string]: filetype_mapping } A table of lua pattern mappings
 --- @return boolean # Whether the the filetype was set or not
 local function try_pattern(absolute_path, map)
+	if not map then
+		return false
+	end
+
 	for pattern, ft in pairs(map) do
 		if absolute_path:find(pattern) then
 			return set_filetype(ft)
@@ -84,6 +88,10 @@ end
 --- @param map { [string]: filetype_mapping } A table of vim regex mappings
 --- @return boolean # Whether the the filetype was set or not
 local function try_regex(absolute_path, map)
+	if not map then
+		return false
+	end
+
 	for pattern, ft in pairs(map) do
 		if util.match_vim_regex(absolute_path, pattern) then
 			return set_filetype(ft)
@@ -129,12 +137,16 @@ local fallback
 function M.setup(opts)
 	if opts.overrides then
 		-- Extend the shebang_map with users map and override already existing values
-		for ext, ft in pairs(opts.overrides.extensions or {}) do
-			extension_map[ext] = ft
+		if opts.overrides.extensions then
+			for ext, ft in pairs(opts.overrides.extensions) do
+				extension_map[ext] = ft
+			end
 		end
 
-		for literal, ft in pairs(opts.overrides.literal or {}) do
-			literal_map[literal] = ft
+		if opts.overrides.literal then
+			for literal, ft in pairs(opts.overrides.literal) do
+				literal_map[literal] = ft
+			end
 		end
 
 		-- Add the user's complex maps
