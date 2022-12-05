@@ -64,6 +64,9 @@ That's it! You should now have a much snappier neovim experience!
 ```lua
 -- In init.lua or filetype.nvim's config file
 require("filetype").setup({
+    -- If you want to source ftdetect files add this option
+    source_ftdetect = true,
+
     overrides = {
         -- The following overrides use simple table lookup for matching. The values of each key can be either a string or a
         -- function that returns the filetype

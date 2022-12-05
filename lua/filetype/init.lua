@@ -125,6 +125,7 @@ local fallback
 --- @class filetype_opts
 --- @field overrides filetype_overrides Overiddes for the default filetype mappings
 --- @field detection_settings filetype_detect_opts Options to override the behaviour of detection functions
+--- @field source_ftdetect boolean Whether to source runtime ftdetect files or not
 ---
 --- @class filetype_overrides
 --- @field extensions { [string]: filetype_mapping } Lookup table that maps file extensions to filetypes
@@ -180,6 +181,16 @@ function M.setup(opts)
 	end
 
 	detect.setup(opts.detection_settings)
+
+	-- Source runtime ftdetect files if the user so wishes
+	if opts.source_ftdetect then
+		vim.cmd([[
+			augroup filetypedetect
+			runtime! ftdetect/*.vim
+			runtime! ftdetect/*.lua
+			augroup END
+		]])
+	end
 end
 
 --- The function tries to resolve the filetype of the current buffer, either from the file name or through the file's
