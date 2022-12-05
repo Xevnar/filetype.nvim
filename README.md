@@ -67,6 +67,21 @@ require("filetype").setup({
     overrides = {
         -- The following overrides use simple table lookup for matching. The values of each key can be either a string or a
         -- function that returns the filetype
+        literal = {
+            -- Set the filetype of files named "MyBackupFile" to lua
+            MyBackupFile = "lua",
+
+            -- Set the filetype of files named "Cargo.lock" to toml and turn off syntax highlighting
+            ["Cargo.lock"] = function()
+                vim.cmd("syntax off")
+                return "toml"
+            end,
+
+            -- The keys can also be filepaths. These must match the absolute path path of the file.
+            ["/bin/myscriptfile"] = "lua", -- This won't match '/usr/bin/myscriptfile'
+        },
+
+        -- The `literal` overrides are a higher priority over extensions, since extensions are more generalised
         extensions = {
             -- Set the filetype of *.pn files to potion
             pn = "potion",
@@ -86,17 +101,6 @@ require("filetype").setup({
                 -- Open in PDF viewer (Skim.app) automatically
                 vim.fn.jobstart([[open -a skim "]] .. args.file_path .. '"')
                 return "pdf"
-            end,
-        },
-
-        literal = {
-            -- Set the filetype of files named "MyBackupFile" to lua
-            MyBackupFile = "lua",
-
-            -- Set the filetype of files named "Cargo.lock" to toml and turn off syntax highlighting
-            ["Cargo.lock"] = function()
-                vim.cmd("syntax off")
-                return "toml"
             end,
         },
 
@@ -163,7 +167,7 @@ require("filetype").setup({
 })
 ```
 
-The `extensions` and `literal` tables are orders faster than the other ones because they only require a table lookup.
+The `literal` and `extensions`  tables are orders faster than the other ones because they only require a table lookup.
 Always try to use these before resorting to the `complex` and `vim_regex` tables, which require looping over the
 entries and running a regex for each one. Furthermore, always try to use `complex` over `vim_regex` since matching
 lua patterns is faster than vim regexes.

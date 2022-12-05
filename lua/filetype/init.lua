@@ -215,11 +215,15 @@ function M.resolve()
 	callback_args.file_name = callback_args.file_path:match('.*[\\/](.*)')
 	callback_args.file_ext = callback_args.file_name:match('.+%.(%w+)')
 
-	if try_lookup(callback_args.file_ext, extension_map) then
+	if try_lookup(callback_args.file_path, literal_map) then
 		return
 	end
 
 	if try_lookup(callback_args.file_name, literal_map) then
+		return
+	end
+
+	if try_lookup(callback_args.file_ext, extension_map) then
 		return
 	end
 
