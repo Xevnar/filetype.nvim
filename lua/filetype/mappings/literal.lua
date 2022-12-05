@@ -185,32 +185,26 @@ local literal = {
 	end,
 	['INDEX'] = function()
 		if
-			util.findand(
-				util.getline(),
-				{
-					'^%s*distribution%s*$',
-					'^%s*installed_software%s*$',
-					'^%s*root%s*$',
-					'^%s*bundle%s*$',
-					'^%s*product%s*$',
-				}
-			)
+			util.findand(util.getline(), {
+				'^%s*distribution%s*$',
+				'^%s*installed_software%s*$',
+				'^%s*root%s*$',
+				'^%s*bundle%s*$',
+				'^%s*product%s*$',
+			})
 		then
 			return 'psf'
 		end
 	end,
 	['INFO'] = function()
 		if
-			util.findand(
-				util.getline(),
-				{
-					'^%s*distribution%s*$',
-					'^%s*installed_software%s*$',
-					'^%s*root%s*$',
-					'^%s*bundle%s*$',
-					'^%s*product%s*$',
-				}
-			)
+			util.findand(util.getline(), {
+				'^%s*distribution%s*$',
+				'^%s*installed_software%s*$',
+				'^%s*root%s*$',
+				'^%s*bundle%s*$',
+				'^%s*product%s*$',
+			})
 		then
 			return 'psf'
 		end
