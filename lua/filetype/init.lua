@@ -191,6 +191,10 @@ function M.resolve()
 
 	callback_args.file_path = vim.api.nvim_buf_get_name(0)
 
+	if vim.bo.filetype == 'bqfpreview' then
+		callback_args.file_path = vim.fn.expand('<amatch>')
+	end
+
 	-- Special exception for *.orig files. We remove the .orig extensions to get the original filename
 	if callback_args.file_path:find('%.orig$') then
 		callback_args.file_path = callback_args.file_path:match('(.*)%.orig')
@@ -204,12 +208,9 @@ function M.resolve()
 		return -- Don't set the files filetype
 	end
 
-	if vim.bo.filetype == 'bqfpreview' then
-		callback_args.file_path = vim.fn.expand('<amatch>')
-	end
-
+	-- If this an empty buffer, skip to detecting from file contents
 	if #callback_args.file_path == 0 then
-		return
+		goto detect_from_contents
 	end
 
 	callback_args.file_name = callback_args.file_path:match('.*[\\/](.*)')
@@ -252,9 +253,10 @@ function M.resolve()
 		return
 	end
 
-	-- If there is no extension, look for a shebang and set the filetype to that. Look for a shebang override in
-	-- custom_map first. If there is none, check the default shebangs defined in function_maps. Otherwise, default to
-	-- setting the filetype to the value of shebang itself.
+	-- If this is an empty buffer, or there is no filetype extention then try and detect from the file's contents
+	::detect_from_contents::
+
+	-- Detect filetype from shebang
 	set_filetype(detect.sh(fallback, true))
 end
 
