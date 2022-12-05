@@ -187,7 +187,13 @@ local literal = {
 		if
 			util.findand(
 				util.getline(),
-				{ '^%s*distribution%s*$', '^%s*installed_software%s*$', '^%s*root%s*$', '^%s*bundle%s*$', '^%s*product%s*$' }
+				{
+					'^%s*distribution%s*$',
+					'^%s*installed_software%s*$',
+					'^%s*root%s*$',
+					'^%s*bundle%s*$',
+					'^%s*product%s*$',
+				}
 			)
 		then
 			return 'psf'
@@ -197,7 +203,13 @@ local literal = {
 		if
 			util.findand(
 				util.getline(),
-				{ '^%s*distribution%s*$', '^%s*installed_software%s*$', '^%s*root%s*$', '^%s*bundle%s*$', '^%s*product%s*$' }
+				{
+					'^%s*distribution%s*$',
+					'^%s*installed_software%s*$',
+					'^%s*root%s*$',
+					'^%s*bundle%s*$',
+					'^%s*product%s*$',
+				}
 			)
 		then
 			return 'psf'
