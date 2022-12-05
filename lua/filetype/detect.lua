@@ -45,18 +45,17 @@ function M.setup(opts)
 	return M
 end
 
---- A map from executable name to filetype.
+--- A map from executable name to filetype
 ---
 --- @class shebang_map_table
---- @field filetype string
---- @field on_detect fun()
+--- @field filetype string The filetype matched to the binary name, If it's missing the binary is used as the filetype
+--- @field on_detect fun() Function that is executed if the binary is detected
 ---
 --- @type { [string]: string|shebang_map_table }
 M.shebang_map = {
 	['node'] = 'javascript',
 	['tclsh'] = 'tcl',
 	['ksh'] = {
-		filetype = 'ksh',
 		on_detect = function()
 			vim.b.is_kornshell = 1
 			vim.b.is_bash = nil
@@ -65,7 +64,6 @@ M.shebang_map = {
 		end,
 	},
 	['bash'] = {
-		filetype = 'bash',
 		on_detect = function()
 			vim.b.is_bash = 1
 			vim.b.is_kornshell = nil
@@ -74,7 +72,6 @@ M.shebang_map = {
 		end,
 	},
 	['dash'] = {
-		filetype = 'dash',
 		on_detect = function()
 			vim.b.is_dash = 1
 			vim.b.is_kornshell = nil
@@ -83,7 +80,6 @@ M.shebang_map = {
 		end,
 	},
 	['sh'] = {
-		filetype = 'sh',
 		on_detect = function()
 			vim.b.is_sh = 1
 			vim.b.is_kornshell = vim.g.is_kornshell
@@ -124,7 +120,7 @@ function M.sh(fallback, force_shebang_check)
 	local ft = (M.shebang_map and M.shebang_map[fallback]) or fallback
 	if type(ft) == 'table' then
 		ft.on_detect()
-		ft = ft.filetype
+		ft = ft.filetype or fallback
 	end
 
 	return ft
