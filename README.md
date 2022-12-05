@@ -5,10 +5,11 @@ Easily speed up your neovim startup time!
 
 ## What does this do?
 
-This plugin is a replacement for the included `filetype.vim` that is sourced on startup.
-The purpose of that file is to create a series of autocommands that set the `filetype` variable
-depending on the filename. The issue is that creating autocommands have significant overhead, and
-creating [800+ of them](https://github.com/vim/vim/blob/master/runtime/filetype.vim) as `filetype.vim` does is a very inefficient way to get the job done.
+This plugin is a replacement for the included `filetype.vim` that is sourced on startup. The purpose of that file is to
+create a series of autocommands that set the `filetype` variable depending on the filename. The issue is that creating
+autocommands have significant overhead, and creating
+[800+ of them](https://github.com/vim/vim/blob/master/runtime/filetype.vim) as `filetype.vim` does is a very inefficient
+way to get the job done.
 
 As you can see, `filetype.vim` is by far the heaviest nvim runtime file
 
@@ -35,8 +36,8 @@ As you can see, `filetype.vim` is by far the heaviest nvim runtime file
 	0.022     /usr/local/Cellar/neovim/0.5.0/share/nvim/runtime/plugin/health.vim
 ```
 
-`filetype.nvim` fixes the issue by only creating a single autocommand that resolves the file type
-when a buffer is opened. This method is ~175x faster\*!
+`filetype.nvim` fixes the issue by only creating a single autocommand that resolves the file type when a buffer is
+opened. This method is ~175x faster\*!
 
 
 ## Usage
@@ -141,7 +142,7 @@ require("filetype").setup({
             dash = "sh",
 
             -- You don't need to define mappings where the binary name matches the filetype
-            gnuplot = "gnuplot" -- this is unnecessary
+            gnuplot = "gnuplot", -- this is unnecessary
 
             -- Execute code when a python shebang is detected
             -- Version numbers at the end of binary names and the env binary are ignored:
@@ -162,10 +163,10 @@ require("filetype").setup({
 })
 ```
 
-The `extensions` and `literal` tables are orders faster than the other ones
-because they only require a table lookup. Always try to use these before resorting
-to the `complex` tables, which require looping over the entries and running
-a regex for each one.
+The `extensions` and `literal` tables are orders faster than the other ones because they only require a table lookup.
+Always try to use these before resorting to the `complex` and `vim_regex` tables, which require looping over the
+entries and running a regex for each one. Furthermore, always try to use `complex` over `vim_regex` since matching
+lua patterns is faster than vim regexes.
 
 ## Performance Comparison
 
@@ -365,6 +366,5 @@ Average startup time (100 rounds): **26.492 ms**
 All contributions are appreciated! But please make sure to follow these guidelines:
 
 - Format your code with stylua, complying with the rules in the `stylua.toml` file
-- Document any new functions you write, and update the documentation of functions
-you edit if appropriate
+- Document any new functions you write, and update the documentation of functions you edit if appropriate
 - Set the base branch to `dev`
