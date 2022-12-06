@@ -178,7 +178,6 @@ local extensions = {
 	['fpc'] = 'fpcmake',
 	['fpp'] = 'fortran',
 	['frt'] = 'reva',
-	['fs'] = 'forth',
 	['fsl'] = 'framescript',
 	['ft'] = 'forth',
 	['fth'] = 'forth',
@@ -984,6 +983,9 @@ local extensions = {
 	end,
 	['sig'] = function()
 		return detect.sig()
+	end,
+	['fs'] = function()
+		return detect.fs()
 	end,
 }
 

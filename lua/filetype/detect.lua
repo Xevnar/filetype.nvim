@@ -1180,4 +1180,21 @@ function M.sig()
 	end
 end
 
+--- Distinguish between Forth and F# based on the first nonblank line
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.fs()
+	if vim.g.filetype_fs then
+		return vim.g.filetype_fs
+	end
+
+	local line = util.get_next_nonblank_line()
+	if util.findany(line, { '^%s*%.?%( ', '^%s*\\G? ', '^\\$', '^%s*: %S' }) then
+		return 'forth'
+	end
+
+	return 'fsharp'
+end
+
 return M
