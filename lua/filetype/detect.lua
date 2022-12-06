@@ -53,8 +53,24 @@ end
 ---
 --- @type { [string]: string|shebang_map_table }
 M.shebang_map = {
-	['node'] = 'javascript',
+	['rsc'] = 'routeros',
+	['gawk'] = 'awk',
+	['guile'] = 'scheme',
+	['gforth'] = 'forth',
+	['escript'] = 'erlang',
+	['instantfpc'] = 'pascal',
+
+	['wish'] = 'tcl',
 	['tclsh'] = 'tcl',
+	['itclsh'] = 'tcl',
+	['expectk'] = 'tcl',
+	['itkwish'] = 'tcl',
+
+	['js'] = 'javascript',
+	['node'] = 'javascript',
+	['nodejs'] = 'javascript',
+	['rhino'] = 'javascript',
+
 	['ksh'] = {
 		on_detect = function()
 			vim.b.is_kornshell = 1
