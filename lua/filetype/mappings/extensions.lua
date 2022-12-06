@@ -136,7 +136,6 @@ local extensions = {
 	['drac'] = 'dracula',
 	['drc'] = 'dracula',
 	['ds'] = 'datascript',
-	['dsl'] = 'dsl',
 	['dsm'] = 'vb',
 	['dtd'] = 'dtd',
 	['dts'] = 'dts',
@@ -978,6 +977,9 @@ local extensions = {
 	end,
 	['zsql'] = function()
 		return (vim.g.filetype_sql and vim.g.filetype_sql) or 'sql'
+	end,
+	['dsl'] = function()
+		return (util.getline():find('^%s*<!') and 'dsl') or 'structurizr'
 	end,
 }
 
