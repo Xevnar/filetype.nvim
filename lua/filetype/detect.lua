@@ -1103,4 +1103,36 @@ function M.dat(file_name)
 	end
 end
 
+--- This function is called for all files under */debian/patches/*, make sure not to non-dep3patch files, such as README
+--- and other text files.
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.dep3patch()
+	for _, line in ipairs(util.getlines(0, M.line_limit)) do
+		if
+			util.findany(line, {
+				'^Description:',
+				'^Subject:',
+				'^Origin:',
+				'^Bug:',
+				'^Forwarded:',
+				'^Author:',
+				'^From:',
+				'^Reviewed%-by:',
+				'^Acked%-by:',
+				'^Last%-Updated:',
+				'^Applied%-Upstream:',
+			})
+		then
+			return 'dep3patch'
+		end
+
+		if line:find('^%-%-%-') then
+			-- End of headers found. stop processing
+			return
+		end
+	end
+end
+
 return M

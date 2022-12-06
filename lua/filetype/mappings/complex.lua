@@ -73,6 +73,7 @@ M.endswith = {
 	['lftp/rc$'] = 'lftp',
 	['lpe$'] = 'dracula',
 	['lvs$'] = 'dracula',
+	['/debian/patches/series$'] = '',
 
 	['.*printcap'] = function()
 		vim.b.ptcap_type = 'print'
@@ -245,6 +246,9 @@ M.star_sets = {
 	end,
 	['%.cshrc.*'] = function()
 		return detect.csh()
+	end,
+	['.*/debian/patches/.*'] = function()
+		return detect.dep3patch()
 	end,
 }
 
