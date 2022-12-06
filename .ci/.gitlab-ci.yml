@@ -1,0 +1,42 @@
+stages:
+  - build
+  - test
+
+image: archlinux:base-devel-20221127.0.105785
+
+build_neovim:
+  stage: build
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - neovim/
+  script:
+    - pacman -Syu --noconfirm git cmake unzip ninja tree-sitter curl
+    - .ci/build_neovim.sh
+
+run_test_filetype:
+  stage: test
+  dependencies:
+    - build_neovim
+  before_script:
+    - pacman -Syu --noconfirm git cmake unzip ninja tree-sitter curl
+  script:
+    - .ci/run_test_filetype.sh
+
+run_lua_filetype_spec:
+  stage: test
+  dependencies:
+    - build_neovim
+  before_script:
+    - pacman -Syu --noconfirm git cmake unzip ninja tree-sitter curl
+  script:
+    - .ci/run_test_lua_filetype_spec.sh
+
+run_autocmd_filetype_spec:
+  stage: test
+  dependencies:
+    - build_neovim
+  before_script:
+    - pacman -Syu --noconfirm git cmake unzip ninja tree-sitter curl
+  script:
+    - .ci/run_test_autocmd_filetype_spec.sh
