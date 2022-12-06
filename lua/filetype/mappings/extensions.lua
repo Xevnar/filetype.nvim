@@ -690,13 +690,21 @@ local extensions = {
 		return (util.getline():find('<?%s*xml.*?>') and 'xml') or 'smil'
 	end,
 	['cls'] = function()
+		if vim.g.filetype_cls then
+			return vim.g.filetype_cls
+		end
+
 		local line = util.getline()
-		if line:find('^%%') then
+		if line:find('^[%%\\]') then
 			return 'tex'
 		end
 
 		if line:sub(1, 1) == '#' and line:find('rexx') then
 			return detect.sh('rexx')
+		end
+
+		if line == 'VERSION 1.0 CLASS' then
+			return 'vb'
 		end
 
 		return 'st'
