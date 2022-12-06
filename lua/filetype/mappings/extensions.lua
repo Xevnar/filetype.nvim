@@ -86,7 +86,6 @@ local extensions = {
 	['cdl'] = 'cdl',
 	['cdxml'] = 'xml',
 	['cfc'] = 'cf',
-	['cfg'] = 'cfg',
 	['cfi'] = 'cf',
 	['cfm'] = 'cf',
 	['chf'] = 'ch',

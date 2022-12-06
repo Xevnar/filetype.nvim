@@ -97,6 +97,9 @@ M.endswith = {
 	['%.bash%-fc[_-]'] = function()
 		return detect.sh('bash')
 	end,
+	['%.[cC][fF][gG]$'] = function()
+		return detect.cfg()
+	end,
 }
 
 M.complex = {

@@ -1060,4 +1060,36 @@ function M.mc()
 	return 'm4'
 end
 
+--- Check the first nonblank line for RAPID markers
+--- Taken from vim.filetype.detect
+---
+--- @return boolean # If the file contains RAPID markers or not
+local function is_rapid()
+	local line = util.get_next_nonblank_line()
+	if line then
+		-- Called from mod, prg or sys functions
+		--- @diagnostic disable-next-line
+		return util.match_vim_regex(line:lower(), [[\c\v^\s*%(\%{3}|module\s+\k+\s*%(\(|$))]])
+	end
+
+	return false
+end
+
+--- Read the file contents to identify if the file is RAPID or a cfg file
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.cfg()
+	if vim.g.filetype_cfg then
+		return vim.g.filetype_cfg
+	end
+
+	local line = util.getline():lower()
+	if util.findany(line, { 'eio:cfg', 'mmc:cfg', 'moc:cfg', 'proc:cfg', 'sio:cfg', 'sys:cfg' }) or is_rapid() then
+		return 'rapid'
+	end
+
+	return 'cfg'
+end
+
 return M
