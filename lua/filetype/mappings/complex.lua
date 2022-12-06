@@ -147,6 +147,15 @@ M.complex = {
 		vim.b.xf86conf_xfree86_version = 4
 		return 'xf86conf'
 	end,
+	['[a-zA-Z0-9].*Dict'] = function()
+		return detect.foam()
+	end,
+	['[a-zA-Z].*Properties'] = function()
+		return detect.foam()
+	end,
+	['.*/constant/g'] = function()
+		return detect.foam()
+	end,
 }
 
 M.star_sets = {
@@ -255,6 +264,21 @@ M.star_sets = {
 		if util.match_vim_regex(line, [[^\x\{40,\}\>\|^ref: ]]) then
 			return 'git'
 		end
+	end,
+	['[a-zA-Z0-9].*Dict%..*'] = function()
+		return detect.foam()
+	end,
+	['[a-zA-Z].*Properties%..*'] = function()
+		return detect.foam()
+	end,
+	['.*Transport%..*'] = function()
+		return detect.foam()
+	end,
+	['.*/0/.*'] = function()
+		return detect.foam()
+	end,
+	['.*/0%.orig/.*'] = function()
+		return detect.foam()
 	end,
 }
 

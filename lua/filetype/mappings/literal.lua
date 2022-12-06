@@ -269,6 +269,18 @@ local literal = {
 	['.d'] = function()
 		return detect.sh('bash')
 	end,
+	['fvSchemes'] = function()
+		return detect.foam()
+	end,
+	['fvSolution'] = function()
+		return detect.foam()
+	end,
+	['fvConstraints'] = function()
+		return detect.foam()
+	end,
+	['fvModels'] = function()
+		return detect.foam()
+	end,
 }
 
 return literal

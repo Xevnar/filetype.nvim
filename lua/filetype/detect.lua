@@ -1197,4 +1197,18 @@ function M.fs()
 	return 'fsharp'
 end
 
+--- This function checks the file's contents for appearance of 'FoamFile' and then 'object' in a following line. In that
+--- case, it's probably an OpenFOAM file
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.foam()
+	local lines = util.getlines(0, M.line_limit)
+	for i, line in ipairs(lines) do
+		if line:find('^FoamFile') and string.find(lines[i + 1], '^%s*object') then
+			return 'foam'
+		end
+	end
+end
+
 return M
