@@ -511,7 +511,6 @@ local extensions = {
 	['sexp'] = 'sexplib',
 	['si'] = 'cuplsim',
 	['sieve'] = 'sieve',
-	['sig'] = 'lprolog',
 	['sil'] = 'sil',
 	['sim'] = 'simula',
 	['sin'] = 'sinda',
@@ -982,6 +981,9 @@ local extensions = {
 	end,
 	['sc'] = function()
 		return detect.sc()
+	end,
+	['sig'] = function()
+		return detect.sig()
 	end,
 }
 

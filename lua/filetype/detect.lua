@@ -1159,4 +1159,25 @@ function M.sc()
 	return 'scala'
 end
 
+--- LambdaProlog and Standard ML signature files are differentiated by the first non blank line
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.sig()
+	if vim.g.filetype_sig then
+		return vim.g.filetype_sig
+	end
+
+	local line = util.get_next_nonblank_line()
+	-- LambdaProlog comment or keyword
+	if util.findany(line, { '^%s*/%*', '^%s*%%', '^%s*sig%s+%a' }) then
+		return 'lprolog'
+	end
+
+	-- SML comment or keyword
+	if util.findany(line, { '^%s*%(%*', '^%s*signature%s+%a', '^%s*structure%s+%a' }) then
+		return 'sml'
+	end
+end
+
 return M
