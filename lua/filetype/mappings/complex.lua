@@ -250,6 +250,12 @@ M.star_sets = {
 	['.*/debian/patches/.*'] = function()
 		return detect.dep3patch()
 	end,
+	['.*%.git/.*'] = function()
+		local line = util.getline()
+		if util.match_vim_regex(line, [[^\x\{40,\}\>\|^ref: ]]) then
+			return 'git'
+		end
+	end,
 }
 
 return M
