@@ -1135,4 +1135,28 @@ function M.dep3patch()
 	end
 end
 
+--- Read the file's content to differentiate between scala and SuperCollider files
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.sc()
+	for _, line in ipairs(util.getlines(0, M.line_limit)) do
+		if
+			util.findany(line, {
+				'[A-Za-z0-9]*%s:%s[A-Za-z0-9]',
+				'var%s<',
+				'classvar%s<',
+				'%^this.*',
+				'|%w*|',
+				'%+%s%w*%s{',
+				'%*ar%s',
+			})
+		then
+			return 'supercollider'
+		end
+	end
+
+	return 'scala'
+end
+
 return M

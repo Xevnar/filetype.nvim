@@ -496,7 +496,6 @@ local extensions = {
 	['sass'] = 'sass',
 	['sba'] = 'vb',
 	['sbt'] = 'sbt',
-	['sc'] = 'scala',
 	['scala'] = 'scala',
 	['sce'] = 'scilab',
 	['sci'] = 'scilab',
@@ -980,6 +979,9 @@ local extensions = {
 	end,
 	['dsl'] = function()
 		return (util.getline():find('^%s*<!') and 'dsl') or 'structurizr'
+	end,
+	['sc'] = function()
+		return detect.sc()
 	end,
 }
 
