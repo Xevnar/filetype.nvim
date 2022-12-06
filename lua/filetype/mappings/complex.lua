@@ -100,6 +100,9 @@ M.endswith = {
 	['%.[cC][fF][gG]$'] = function()
 		return detect.cfg()
 	end,
+	['%.[dD][aA][tT]$'] = function(args)
+		return detect.dat(args.file_name)
+	end,
 }
 
 M.complex = {

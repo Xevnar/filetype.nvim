@@ -1092,4 +1092,26 @@ function M.cfg()
 	return 'cfg'
 end
 
+--- Read the check if the filename is an upstreamdat file before checking the file contents
+--- Taken from vim.filetype.detect
+---
+--- @param file_name string? The file name
+--- @return string? # The detected filetype
+function M.dat(file_name)
+	-- Innovation data processing
+	if util.findany(file_name, { '^upstream%.dat$', '^upstream%..*%.dat$', '^.*%.upstream%.dat$' }) then
+		return 'upstreamdat'
+	end
+
+	if vim.g.filetype_dat then
+		return vim.g.filetype_dat
+	end
+
+	-- Determine if a *.dat file is Kuka Robot Language
+	local line = util.get_next_nonblank_line()
+	if util.match_vim_regex(line, [[\c\v^\s*%(\&\w+|defdat>)]]) then
+		return 'krl'
+	end
+end
+
 return M

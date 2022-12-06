@@ -123,7 +123,6 @@ local extensions = {
 	['cxx'] = 'cpp',
 	['cyn'] = 'cynpp',
 	['dart'] = 'dart',
-	['dat'] = 'nastran',
 	['dcd'] = 'dcd',
 	['dcl'] = 'clean',
 	['def'] = 'def',
