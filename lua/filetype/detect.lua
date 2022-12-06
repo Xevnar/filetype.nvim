@@ -558,12 +558,9 @@ function M.proto()
 	-- and "%translate"
 	local line = util.get_next_nonblank_line()
 	if
-		line
-		and (
-			line:find(':%-')
-			or util.match_vim_regex(line, [[\c\<prolog\>]])
-			or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
-		)
+		line:find(':%-')
+		or util.match_vim_regex(line, [[\c\<prolog\>]])
+		or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
 	then
 		return 'prolog'
 	end
@@ -801,7 +798,7 @@ function M.pp()
 	end
 
 	local line = util.get_next_nonblank_line()
-	if line and (util.findany(line, pascal_comments) or util.match_vim_regex(line, pascal_keywords)) then
+	if util.findany(line, pascal_comments) or util.match_vim_regex(line, pascal_keywords) then
 		return 'pascal'
 	end
 
@@ -821,12 +818,9 @@ function M.pl()
 	-- "%list" and "%translate"
 	local line = util.get_next_nonblank_line()
 	if
-		line
-		and (
-			line:find(':%-')
-			or util.match_vim_regex(line, [[\c\<prolog\>]])
-			or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
-		)
+		line:find(':%-')
+		or util.match_vim_regex(line, [[\c\<prolog\>]])
+		or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
 	then
 		return 'prolog'
 	end
@@ -1065,14 +1059,9 @@ end
 ---
 --- @return boolean # If the file contains RAPID markers or not
 local function is_rapid()
+	-- Called from mod, prg or sys functions
 	local line = util.get_next_nonblank_line()
-	if line then
-		-- Called from mod, prg or sys functions
-		--- @diagnostic disable-next-line
-		return util.match_vim_regex(line:lower(), [[\c\v^\s*%(\%{3}|module\s+\k+\s*%(\(|$))]])
-	end
-
-	return false
+	return util.match_vim_regex(line, [[\c\v^\s*%(\%{3}|module\s+\k+\s*%(\(|$))]]) ---@diagnostic disable-line
 end
 
 --- Read the file contents to identify if the file is RAPID or a cfg file

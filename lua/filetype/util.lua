@@ -51,13 +51,13 @@ end
 --- stores the patterns in a cache
 ---
 --- @return integer[] The byte indices for the beginning and end of the match
---- @type fun(s: string, pattern: string): integer[]
+--- @type fun(s: string?, pattern: string): integer[]
 M.match_vim_regex = vim.filetype.matchregex
 
 --- Check whether a string matches any of the given Lua patterns.
 ---
 --- @return boolean `true` if s matched a pattern, else `false`
---- @type fun(s: string, patterns: string[]): boolean
+--- @type fun(s: string?, patterns: string[]): boolean
 M.findany = vim.filetype.findany
 
 --- Print a deprecation warning to the user
