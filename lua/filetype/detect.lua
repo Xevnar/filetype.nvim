@@ -454,7 +454,7 @@ end
 --- @param file_path string The absolute path of the file
 --- @return string # The detected filetype
 function M.tex(file_path)
-	local format = M.getline():find('^%%&%s*(%a+)')
+	local format = util.getline():find('^%%&%s*(%a+)')
 	if format then
 		format = format:lower():gsub('pdf', '', 1)
 		if format == 'tex' then
