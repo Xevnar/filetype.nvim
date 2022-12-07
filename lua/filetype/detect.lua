@@ -151,10 +151,26 @@ function M.analyze_shebang(shebang)
 		return -- Not a string, so don't bother
 	end
 
-	-- The regex requires that all binaries end in an alpha character, so that the same shell with different version
-	-- numbers as suffix are treated the same
+	-- The pattern extracs the everything after tha last path separateor
+	local tail = shebang:match('#!.*/env%s+(.*)') or shebang:match('#!.*/(.*)')
+	if not tail then
+		return -- Not a shebang, so don't bother
+	end
+
+	-- Loop over the tail of the shebang looking for the binary being used
+	local bin
+	for token in string.gmatch(tail, '%S+') do
+		-- Ignore any argument possible arguments to env (--flag | var=assignment)
+		if not util.findany(token, { '^%-%-?.*$', '^%S-%=[^=]*$' }) then
+			bin = token
+			break
+		end
+	end
+
+	-- The pattern extracts the binary name ignoring the version number at the end. The pattern requires that all
+	-- binaries end in an alpha character, so that shells with different version numbers as suffix are treated the same
 	-- (python3 => python | zsh-5.9 => zsh | test-b#in_sh2 => test-b#in_sh )
-	return shebang:match('#!.*/env%s+([^/%s]*%a)') or shebang:match('#!.*/([^/%s]*%a)')
+	return bin and bin:match('^(.*%a)')
 end
 
 --- For shell-like file types, check for an "exec" command hidden in a comment, as used for Tcl.
