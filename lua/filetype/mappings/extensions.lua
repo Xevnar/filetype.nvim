@@ -6,7 +6,6 @@ local detect = require('filetype.detect')
 
 --- @type { [string]: filetype_mapping }
 local extensions = {
-	['.ch'] = 'chill',
 	['4gh'] = 'fgl',
 	['4gl'] = 'fgl',
 	['8th'] = '8th',
