@@ -387,7 +387,6 @@ local extensions = {
 	['page'] = 'mallard',
 	['papp'] = 'papp',
 	['pas'] = 'pascal',
-	['patch'] = 'diff',
 	['pbtxt'] = 'pbtxt',
 	['pc'] = 'proc',
 	['pcmk'] = 'pcmk',
@@ -990,6 +989,9 @@ local extensions = {
 	end,
 	['tf'] = function()
 		return detect.tf()
+	end,
+	['patch'] = function()
+		return detect.patch()
 	end,
 }
 

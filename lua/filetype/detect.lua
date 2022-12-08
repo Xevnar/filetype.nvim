@@ -1291,6 +1291,19 @@ function M.tf()
 	return 'tf'
 end
 
+--- Determine if a patch file is a regular diff file or a getsendmail file
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.patch()
+	local line = util.getline()
+	if string.find(line, '^From ' .. string.rep('%x', 40) .. '+ Mon Sep 17 00:00:00 2001$') then
+		return 'gitsendemail'
+	end
+
+	return 'diff'
+end
+
 --- Various patterns that might hint to the filetype
 --- Taken from vim.filetype.detect
 ---
