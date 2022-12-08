@@ -1243,6 +1243,21 @@ function M.foam()
 	end
 end
 
+--- Determine if a *.src file is Kuka Robot Language
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.src()
+	if vim.g.filetype_src then
+		return vim.g.filetype_src
+	end
+
+	local line = util.get_next_nonblank_line()
+	if util.match_vim_regex(line, [[\c\v^\s*%(\&\w+|%(global\s+)?def%(fct)?>)]]) then
+		return 'krl'
+	end
+end
+
 --- Various patterns that might hint to the filetype
 --- Taken from vim.filetype.detect
 ---
