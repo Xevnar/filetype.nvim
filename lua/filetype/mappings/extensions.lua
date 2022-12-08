@@ -563,7 +563,6 @@ local extensions = {
 	['texi'] = 'texinfo',
 	['texinfo'] = 'texinfo',
 	['text'] = 'text',
-	['tf'] = 'tf',
 	['ti'] = 'terminfo',
 	['tk'] = 'tcl',
 	['tlh'] = 'cpp',
@@ -988,6 +987,9 @@ local extensions = {
 	end,
 	['lsl'] = function()
 		return detect.lsl()
+	end,
+	['tf'] = function()
+		return detect.tf()
 	end,
 }
 

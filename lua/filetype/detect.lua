@@ -1275,6 +1275,22 @@ function M.lsl()
 	return 'lsl'
 end
 
+--- Determine if a *.tf file is TF mud client or terraform
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.tf()
+	for _, line in ipairs(util.getlines(0, M.line_limit)) do
+		-- Assume terraform file on a non-empty line (not whitespace-only) and when the first non-whitespace character is
+		-- not a ; or /
+		if not line:find('^%s*$') and not line:find('^%s*[;/]') then
+			return 'terraform'
+		end
+	end
+
+	return 'tf'
+end
+
 --- Various patterns that might hint to the filetype
 --- Taken from vim.filetype.detect
 ---
