@@ -268,7 +268,7 @@ function M.resolve()
 	::detect_from_contents::
 
 	-- Detect filetype from shebang
-	set_filetype(detect.sh(fallback, true))
+	set_filetype(detect.from_content() or fallback)
 end
 
 return M
