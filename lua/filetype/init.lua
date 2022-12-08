@@ -115,6 +115,24 @@ local literal_map = require('filetype.mappings.literal')
 --- @type table<string, { [string]: filetype_mapping }>
 local complex_maps = require('filetype.mappings.complex')
 
+--- The extensions are stripped from the end of the file_path before it is processed
+local ignored_extensions = {
+	['bk'] = true,
+	['in'] = true,
+	['bak'] = true,
+	['new'] = true,
+	['old'] = true,
+	['orig'] = true,
+	['pacnew'] = true,
+	['rmpnew'] = true,
+	['pacsave'] = true,
+	['rpmsave'] = true,
+	['dpkg-bak'] = true,
+	['dpkg-new'] = true,
+	['dpkg-old'] = true,
+	['dpkg-dist'] = true,
+}
+
 --- Fallback filetype
 ---
 --- @type string
@@ -206,9 +224,16 @@ function M.resolve()
 		callback_args.file_path = vim.fn.expand('<amatch>')
 	end
 
-	-- Special exception for *.orig files. We remove the .orig extensions to get the original filename
-	if callback_args.file_path:find('%.orig$') then
-		callback_args.file_path = callback_args.file_path:match('(.*)%.orig')
+	-- If this an empty buffer, skip to detecting from file contents
+	if #callback_args.file_path == 0 then
+		goto detect_from_contents
+	end
+
+	-- Some extensions are tacked at the end of the filename to indicate that the file is a backup
+	callback_args.file_ext = callback_args.file_path:match('[^/]+%.([^./]+)$')
+	while ignored_extensions[callback_args.file_ext] do
+		callback_args.file_path = callback_args.file_path:match('(.*)%.' .. callback_args.file_ext)
+		callback_args.file_ext = callback_args.file_path:match('[^/]%.([^./]+)$')
 	end
 
 	if vim.g.ft_ignore_pat == nil then
@@ -219,13 +244,7 @@ function M.resolve()
 		return -- Don't set the files filetype
 	end
 
-	-- If this an empty buffer, skip to detecting from file contents
-	if #callback_args.file_path == 0 then
-		goto detect_from_contents
-	end
-
 	callback_args.file_name = callback_args.file_path:match('.*[\\/](.*)')
-	callback_args.file_ext = callback_args.file_name:match('.+%.(%w+)')
 
 	if try_lookup(callback_args.file_path, literal_map) then
 		return

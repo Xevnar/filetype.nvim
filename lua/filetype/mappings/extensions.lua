@@ -640,6 +640,13 @@ local extensions = {
 	['zsh'] = 'zsh',
 	['zu'] = 'zimbu',
 	['zut'] = 'zimbutempl',
+	['asd'] = 'lisp',
+	['m3'] = 'modula3',
+	['mg'] = 'modula3',
+	['i3'] = 'modula3',
+	['ig'] = 'modula3',
+	['lm3'] = 'modula3',
+	['elv'] = 'elvish',
 
 	['ms'] = function()
 		return detect.nroff() or 'xmath'
