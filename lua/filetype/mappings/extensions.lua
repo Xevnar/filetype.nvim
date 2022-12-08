@@ -296,7 +296,6 @@ local extensions = {
 	['lout'] = 'lout',
 	['lpc'] = 'lpc',
 	['lpr'] = 'pascal',
-	['lsl'] = 'lsl',
 	['lsp'] = 'lisp',
 	['lss'] = 'lss',
 	['lt'] = 'lite',
@@ -986,6 +985,9 @@ local extensions = {
 	end,
 	['fs'] = function()
 		return detect.fs()
+	end,
+	['lsl'] = function()
+		return detect.lsl()
 	end,
 }
 

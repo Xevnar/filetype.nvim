@@ -1258,6 +1258,23 @@ function M.src()
 	end
 end
 
+--- Determine if an lsl file is an larch file or not
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.lsl()
+	if vim.g.filetype_lsl then
+		return vim.g.filetype_lsl
+	end
+
+	local line = util.get_next_nonblank_line()
+	if util.findany(line, { '^%s*%%', ':%s*trait%s*$' }) then
+		return 'larch'
+	end
+
+	return 'lsl'
+end
+
 --- Various patterns that might hint to the filetype
 --- Taken from vim.filetype.detect
 ---
