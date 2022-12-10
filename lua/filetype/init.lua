@@ -17,9 +17,12 @@ local literal_map = require('filetype.mappings.literal')
 local complex_maps = require('filetype.mappings.complex')
 
 --- The extensions are stripped from the end of the file_path before it is processed
+--- @type { [string]: boolean|string[] }
 local ignored_extensions = {
 	['bk'] = true,
-	['in'] = true,
+	['in'] = {
+		'configure.in'
+	},
 	['bak'] = true,
 	['new'] = true,
 	['old'] = true,
@@ -33,6 +36,26 @@ local ignored_extensions = {
 	['dpkg-old'] = true,
 	['dpkg-dist'] = true,
 }
+
+--- This function strips all ignored_extensions from
+--- @param args filetype_mapping_argument
+local function strip_ignored_extensions(args)
+	while ignored_extensions[args.file_ext] do
+		if type(ignored_extensions[args.file_ext]) ~= 'table' then
+			goto continue
+		end
+
+		---@diagnostic disable-next-line: param-type-mismatch
+		for _, file in ipairs(ignored_extensions[args.file_ext]) do
+			if args.file_name == file then
+				return
+			end
+		end
+
+		::continue::
+		args:strip_ext():gen_from_path()
+	end
+end
 
 --- Fallback filetype
 ---
@@ -66,6 +89,23 @@ local callback_args = {
 	file_name = '',
 	file_ext = '',
 }
+
+--- Generate the rest of paramaters from the file_path
+---
+--- @return filetype_mapping_argument # Self
+function callback_args:gen_from_path()
+	self.file_name = self.file_path:match('.*[\\/]([^/]*)')
+	self.file_ext = self.file_name:match('.+%.([^./]+)$')
+	return self
+end
+
+--- Strip extension from file path, call gen_from_path after it
+---
+--- @return filetype_mapping_argument # Self
+function callback_args:strip_ext()
+	self.file_path = self.file_path:match('(.*)%.' .. self.file_ext)
+	return self
+end
 
 --- Set the buffer's filetype
 ---
@@ -272,11 +312,8 @@ function M.resolve()
 	callback_args.file_path = vim.fs.normalize(callback_args.file_path)
 
 	-- Some extensions are tacked at the end of the filename to indicate that the file is a backup
-	callback_args.file_ext = callback_args.file_path:match('[^/]+%.([^./]+)$')
-	while ignored_extensions[callback_args.file_ext] do
-		callback_args.file_path = callback_args.file_path:match('(.*)%.' .. callback_args.file_ext)
-		callback_args.file_ext = callback_args.file_path:match('[^/]%.([^./]+)$')
-	end
+	callback_args:gen_from_path()
+	strip_ignored_extensions(callback_args)
 
 	if vim.g.ft_ignore_pat == nil then
 		vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
@@ -285,8 +322,6 @@ function M.resolve()
 	if util.match_vim_regex(callback_args.file_path, vim.g.ft_ignore_pat) then
 		return -- Don't set the files filetype
 	end
-
-	callback_args.file_name = callback_args.file_path:match('.*[\\/](.*)')
 
 	if try_lookup(callback_args.file_path, literal_map) then
 		return
