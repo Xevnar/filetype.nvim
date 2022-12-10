@@ -427,6 +427,7 @@ M.starsets = {
 	['/etc/hostname%..*'] = 'config',
 	['crontab%..*'] = 'crontab',
 	['/etc/cron%.d/.*'] = 'crontab',
+	['cvs%d+$'] = 'cvs',
 	['/etc/dnsmasq%.d/.*'] = 'dnsmasq',
 	['Dockerfile%..*'] = 'dockerfile',
 	['Containerfile%..*'] = 'dockerfile',
