@@ -1359,6 +1359,22 @@ function M.prg()
 	return 'clipper'
 end
 
+--- This function checks the first line of file extension "scd" to resolve detection between scdoc and SuperCollider
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.scd()
+	local first = '^%S+%(%d[0-9A-Za-z]*%)'
+	local opt = [[%s+"[^"]*"]]
+
+	local line = util.getline()
+	if util.findany(line, { first .. '$', first .. opt .. '$', first .. opt .. opt .. '$' }) then
+		return 'scdoc'
+	end
+
+	return 'supercollider'
+end
+
 --- Determine if a patch file is a regular diff file or a getsendmail file
 --- Taken from vim.filetype.detect
 ---

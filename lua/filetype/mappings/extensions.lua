@@ -1199,6 +1199,9 @@ local extensions = {
 	['sil'] = function()
 		return detect.sil()
 	end,
+	['scd'] = function()
+		return detect.scd()
+	end,
 }
 
 return extensions
