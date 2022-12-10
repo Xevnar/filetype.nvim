@@ -293,10 +293,6 @@ function M.resolve()
 		return
 	end
 
-	if try_lookup(callback_args.file_ext, extension_map) then
-		return
-	end
-
 	if try_pattern(callback_args.file_path, complex_maps.custom_complex) then
 		return
 	end
@@ -313,6 +309,11 @@ function M.resolve()
 		return
 	end
 
+	if try_lookup(callback_args.file_ext, extension_map) then
+		return
+	end
+
+	-- Starsets are always lower priority
 	if try_pattern(callback_args.file_path, complex_maps.starsets) then
 		return
 	end

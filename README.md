@@ -84,29 +84,6 @@ require("filetype").setup({
 			["/bin/myscriptfile"] = "lua", -- This won't match '/usr/bin/myscriptfile'
 		},
 
-		-- The `literal` overrides are a higher priority over extensions, since extensions are more generalised
-		extensions = {
-			-- Set the filetype of *.pn files to potion
-			pn = "potion",
-
-			-- Append L0 to cinoptions for *.cpp files
-			["cpp"] = function()
-				-- Remove annoying indent jumping
-				vim.bo.cinoptions = vim.bo.cinoptions .. "L0"
-				return "cpp"
-			end,
-
-			-- The functions recieves an table table with following fields:
-			-- args table: * file_path: The absolute path of the file
-			--             * file_name: The name of the file (including extension)
-			--             * file_ext:  The extention at the end of the file
-			["pdf"] = function(args)
-				-- Open in PDF viewer (Skim.app) automatically
-				vim.fn.jobstart([[open -a skim "]] .. args.file_path .. '"')
-				return "pdf"
-			end,
-		},
-
 		-- The following override uses lua patterns to match against the full file path
 		complex = {
 			-- Set the filetype of any config file inside a directory that ends with git to gitconfig
@@ -136,6 +113,30 @@ require("filetype").setup({
 			-- This is how you can define a vim regex
 			[ [[\c.*\(foofile\|barfile\)]] ] = 'myfiletype'
 		},
+
+		-- This is the lowest priority override
+		extensions = {
+			-- Set the filetype of *.pn files to potion
+			pn = "potion",
+
+			-- Append L0 to cinoptions for *.cpp files
+			["cpp"] = function()
+				-- Remove annoying indent jumping
+				vim.bo.cinoptions = vim.bo.cinoptions .. "L0"
+				return "cpp"
+			end,
+
+			-- The functions recieves an table table with following fields:
+			-- args table: * file_path: The absolute path of the file
+			--             * file_name: The name of the file (including extension)
+			--             * file_ext:  The extention at the end of the file
+			["pdf"] = function(args)
+				-- Open in PDF viewer (Skim.app) automatically
+				vim.fn.jobstart([[open -a skim "]] .. args.file_path .. '"')
+				return "pdf"
+			end,
+		},
+
 
 		-- Set a default filetype in the case no matching filetype is detected
 		default_filetype = "foo",
@@ -179,10 +180,49 @@ require("filetype").setup({
 })
 ```
 
-The `literal` and `extensions`  tables are orders faster than the other ones because they only require a table lookup.
+The `literal` and `extensions` tables are orders faster than the other ones because they only require a table lookup.
 Always try to use these before resorting to the `complex` and `vim_regex` tables, which require looping over the
 entries and running a regex for each one. Furthermore, always try to use `complex` over `vim_regex` since matching
 lua patterns is faster than vim regexes.
+
+Even though the `extensions` table is orders faster than the `complex` and `vim_regex` tables, its the last table
+checked for filetype matching. That is due to how general an extension can be. Take the following filetype for example:
+
+```lua
+-- The file 'file.t.html'
+overrides = {
+	extensions = {
+		['html'] = 'html',
+	},
+
+	complex = {
+		['%.t%.html$'] = 'tilde',
+	},
+}
+
+-- If extensions were higher priority
+--     file.t.html => html
+-- If complex were higher priority
+--     file.t.html => tilde
+```
+
+```lua
+-- Any cfg file in a specific directory
+overrides = {
+	extensions = {
+		['cfg'] = 'config',
+	},
+
+	complex = {
+		['/mydir/.*%.cfg$'] = 'toml',
+	},
+}
+
+-- If extensions were higher priority
+--     mydir/file.cfg => config
+-- If complex were higher priority
+--     mydir/file.cfg => toml
+```
 
 ## Performance Comparison
 
