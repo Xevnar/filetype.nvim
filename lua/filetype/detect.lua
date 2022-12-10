@@ -1237,7 +1237,7 @@ function M.foam()
 	end
 end
 
---- Determine if a *.src file is Kuka Robot Language
+--- Determine if a .src file is Kuka Robot Language
 --- Taken from vim.filetype.detect
 ---
 --- @return string? # The detected filetype

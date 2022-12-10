@@ -21,7 +21,7 @@ local complex_maps = require('filetype.mappings.complex')
 local ignored_extensions = {
 	['bk'] = true,
 	['in'] = {
-		'configure.in'
+		'configure.in',
 	},
 	['bak'] = true,
 	['new'] = true,
@@ -61,7 +61,6 @@ end
 ---
 --- @type string
 local fallback
-
 
 --- Lua implementation of the setfiletype builtin function.
 --- @see :help setf
