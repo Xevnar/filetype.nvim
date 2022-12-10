@@ -291,6 +291,9 @@ M.fendswith = {
 	[util.to_case_insensitive('%.dat$')] = function()
 		return detect.dat()
 	end,
+	[util.to_case_insensitive('%.sys$')] = function()
+		return detect.sys()
+	end,
 }
 
 M.complex = {

@@ -1113,6 +1113,22 @@ function M.cfg()
 	return 'cfg'
 end
 
+--- Read the file contents to identify if the file is RAPID or a bat file
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.sys()
+	if vim.g.filetype_sys then
+		return vim.g.filetype_sys
+	end
+
+	if is_rapid() then
+		return 'rapid'
+	end
+
+	return 'bat'
+end
+
 --- Determine if a .dat file is Kuka Robot Language
 --- Taken from vim.filetype.detect
 ---
