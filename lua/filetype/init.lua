@@ -274,7 +274,7 @@ function M.resolve()
 		return
 	end
 
-	if try_pattern(callback_args.file_path, complex_maps.star_sets) then
+	if try_pattern(callback_args.file_path, complex_maps.starsets) then
 		return
 	end
 

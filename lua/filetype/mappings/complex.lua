@@ -175,7 +175,7 @@ M.complex = {
 	end,
 }
 
-M.star_sets = {
+M.starsets = {
 	['.*/etc/Muttrc%.d/.*'] = 'muttrc',
 	['.*/etc/proftpd/.*%.conf.*'] = 'apachestyle',
 	['.*/etc/proftpd/conf%..*/.*'] = 'apachestyle',
