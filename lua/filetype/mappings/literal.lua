@@ -224,7 +224,6 @@ local literal = {
 	['Rprofile.site'] = 'r',
 	['ratpoisonrc'] = 'ratpoison',
 	['.ratpoisonrc'] = 'ratpoison',
-	['rc'] = 'rc',
 	['inputrc'] = 'readline',
 	['.inputrc'] = 'readline',
 	['.reminders'] = 'remind',
