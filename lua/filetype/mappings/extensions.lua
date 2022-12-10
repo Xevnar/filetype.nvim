@@ -1189,6 +1189,9 @@ local extensions = {
 		vim.b.mp_metafun = 1
 		return 'mp'
 	end,
+	['dat'] = function()
+		return detect.dat()
+	end,
 }
 
 return extensions

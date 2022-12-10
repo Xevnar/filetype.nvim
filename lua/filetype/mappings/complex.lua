@@ -378,6 +378,17 @@ M.complex = {
 	['/usr/share/upstart/.*%.conf$'] = 'upstart',
 	['/%.config/upstart/.*%.override$'] = 'upstart',
 	['/usr/share/upstart/.*%.override$'] = 'upstart',
+	[util.to_case_insensitive('%.?upstream%.dat$')] = 'upstreamdat',
+	[util.to_case_insensitive('upstream%..*%.dat$')] = 'upstreamdat',
+	[util.to_case_insensitive('%.?upstreaminstall%.log$')] = 'upstreaminstalllog',
+	[util.to_case_insensitive('upstreaminstall%..*%.log$')] = 'upstreaminstalllog',
+	[util.to_case_insensitive('upstream%-.*%.log')] = 'upstreamlog',
+	[util.to_case_insensitive('%.?upstream%.log$')] = 'upstreamlog',
+	[util.to_case_insensitive('upstream%..*%.log$')] = 'upstreamlog',
+	[util.to_case_insensitive('%.?usserver%.log')] = 'usserverlog',
+	[util.to_case_insensitive('usserver%..*%.log')] = 'usserverlog',
+	[util.to_case_insensitive('%.?usw2kagt%.log')] = 'usw2kagtlog',
+	[util.to_case_insensitive('usw2kagt%..*%.log')] = 'usw2kagtlog',
 	['/etc/xdg/menus/.*%.menu$'] = 'xml',
 
 	['.*/xorg%.conf%.d/.*%.conf'] = function()

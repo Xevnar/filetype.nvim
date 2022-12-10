@@ -88,4 +88,25 @@ function M.deprecated_option_warning(old, replacement)
 	vim.api.nvim_echo(msg, true, {})
 end
 
+--- Convert a lua pattern it case insensitive:
+---     `xyz = %d+ or %% end`  => `[xX][yY][zZ] = %d+ [oO][rR] %% [eE][nN][dD]`
+--- Taken from https://stackoverflow.com/questions/11401890/case-insensitive-lua-pattern-matching
+---
+--- @param pattern string The pattern to convert to case-insensitive
+--- @return string # The case insensitive pattern
+function M.to_case_insensitive(pattern)
+	-- find an optional '%' (group 1) followed by any character (group 2)
+	local p = pattern:gsub('(%%?)(.)', function(percent, letter)
+		if percent ~= '' or not letter:match('%a') then
+			-- if the '%' matched, or `letter` is not a letter, return "as is"
+			return percent .. letter
+		end
+
+		-- else, return a case-insensitive character class of the matched letter
+		return string.format('[%s%s]', letter:lower(), letter:upper())
+	end)
+
+	return p
+end
+
 return M
