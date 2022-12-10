@@ -2,6 +2,9 @@
 
 cp -vr ./lua ./filetype.lua ./neovim/runtime
 
+# Delet bash test from `Test_filetype_detection`
+sed -i -E -e "s/'\.bashrc', 'file\.bash', //g" neovim/src/nvim/testdir/test_filetype.vim
+
 # Delete shebang tests that we don't care about passing from `Test_script_detection`
 sed -i -E -e '\%.*#!/path/(bash|dash|ksh).*%d' -e "s%\[\['#!/path/sh'],%[['#!/path/sh']],%g" neovim/src/nvim/testdir/test_filetype.vim
 

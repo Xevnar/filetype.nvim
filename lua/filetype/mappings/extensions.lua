@@ -413,7 +413,6 @@ local extensions = {
 	['monk'] = 'monk',
 	['moo'] = 'moo',
 	['moon'] = 'moonscript',
-	['mp'] = 'mp',
 	['mof'] = 'msidl',
 	['odl'] = 'msidl',
 	['msql'] = 'msql',
@@ -1188,9 +1187,6 @@ local extensions = {
 	['mpxl'] = function()
 		vim.b.mp_metafun = 1
 		return 'mp'
-	end,
-	['dat'] = function()
-		return detect.dat()
 	end,
 }
 

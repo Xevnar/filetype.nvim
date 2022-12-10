@@ -108,8 +108,7 @@ M.endswith = {
 	['/%.icewm/menu$'] = 'icemenu',
 	['%.properties_..$'] = 'jproperties',
 	['%.properties_.._..$'] = 'jproperties',
-	['%.[Ss][Uu][Bb]$'] = 'krl',
-	['%.[sS][uU][bB]$'] = 'krl',
+	[util.to_case_insensitive('%.sub$')] = 'krl',
 	['lftp/rc$'] = 'lftp',
 	['/%.libao$'] = 'libao',
 	['/etc/libao%.conf$'] = 'libao',
@@ -208,7 +207,6 @@ M.endswith = {
 	['/etc/modules$'] = 'modconf',
 	['/etc/conf%.modules$'] = 'modconf',
 	['/etc/modules%.conf$'] = 'modconf',
-	['%.[mi][3g]$'] = 'modula3',
 	['/%.mplayer/config$'] = 'mplayerconf',
 	['Muttrc$'] = 'muttrc',
 	['Muttngrc$'] = 'muttrc',
@@ -219,8 +217,7 @@ M.endswith = {
 	['%.mli%.cppo$'] = 'ocaml',
 	['%.mli?%.cppo$'] = 'ocaml',
 	['%.opam%.template$'] = 'opam',
-	['%.[Oo][Pp][Ll]$'] = 'opl',
-	['%.[oO][pP][lL]$'] = 'opl',
+	[util.to_case_insensitive('%.opl$')] = 'opl',
 	['/etc/pam%.conf$'] = 'pamconf',
 	['/etc/passwd$'] = 'passwd',
 	['/etc/shadow$'] = 'passwd',
@@ -296,14 +293,11 @@ M.endswith = {
 	['%.bash%-fc[_-]'] = function()
 		return detect.sh('bash')
 	end,
-	['%.[cC][fF][gG]$'] = function()
-		return detect.cfg()
-	end,
-	['%.[dD][aA][tT]$'] = function(args)
-		return detect.dat(args.file_name)
-	end,
-	['%.[sS][rR][cC]$'] = function()
+	[util.to_case_insensitive('%.src$')] = function()
 		return detect.src()
+	end,
+	[util.to_case_insensitive('%.dat$')] = function()
+		return detect.dat()
 	end,
 }
 
@@ -548,6 +542,11 @@ M.starsets = {
 	end,
 	['.*/0%.orig/.*'] = function()
 		return detect.foam()
+	end,
+
+	-- .cfg has many conflicting file patterns and names
+	[util.to_case_insensitive('%.cfg$')] = function()
+		return detect.cfg()
 	end,
 }
 
