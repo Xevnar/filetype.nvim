@@ -18,6 +18,8 @@ local literal = {
 	['/.aptitude/config'] = 'aptconf',
 	['.arch-inventory'] = 'arch',
 	['=tagging-method'] = 'arch',
+	['makefile.am'] = 'automake',
+	['Makefile.am'] = 'automake',
 	['GNUmakefile.am'] = 'automake',
 	['named.root'] = 'bindzone',
 	['BUILD'] = 'bzl',
@@ -180,6 +182,8 @@ local literal = {
 	['/.mplayer/config'] = 'mplayerconf',
 	['mrxvtrc'] = 'mrxvtrc',
 	['.mrxvtrc'] = 'mrxvtrc',
+	['Muttrc'] = 'muttrc',
+	['Muttngrc'] = 'muttrc',
 	['nanorc'] = 'nanorc',
 	['/etc/nanorc'] = 'nanorc',
 	['Neomuttrc'] = 'neomuttrc',
@@ -367,6 +371,30 @@ local literal = {
 	['bashrc'] = function()
 		return detect.sh('bash')
 	end,
+	['.bash_profile'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash-profile'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash_logout'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash-logout'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash_aliases'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash-aliases'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash-fc_'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash-fc-'] = function()
+		return detect.sh('bash')
+	end,
 	['bash.bashrc'] = function()
 		return detect.sh('bash')
 	end,
@@ -423,6 +451,14 @@ local literal = {
 	end,
 	['fvModels'] = function()
 		return detect.foam()
+	end,
+	['printcap.*'] = function()
+		vim.b.ptcap_type = 'print'
+		return 'ptcap'
+	end,
+	['termcap'] = function()
+		vim.b.ptcap_type = 'term'
+		return 'ptcap'
 	end,
 }
 

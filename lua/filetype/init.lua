@@ -245,10 +245,8 @@ function M.setup(opts)
 		end
 
 		-- Add the user's complex maps
-		complex_maps.custom_complex = opts.overrides.complex
-		complex_maps.custom_vcomplex = opts.overrides.vim_regex
-		complex_maps.check_for_env_vars(complex_maps.custom_complex)
-		complex_maps.check_for_env_vars(complex_maps.custom_vcomplex)
+		complex_maps:add_custom_map('custom_complex', opts.overrides.complex)
+		complex_maps:add_custom_map('custom_vcomplex', opts.overrides.vim_regex)
 
 		fallback = opts.overrides.default_filetype
 
@@ -334,7 +332,15 @@ function M.resolve()
 		return
 	end
 
+	if try_pattern(callback_args.file_name, complex_maps.fcustom_complex) then
+		return
+	end
+
 	if try_regex(callback_args.file_path, complex_maps.custom_vcomplex) then
+		return
+	end
+
+	if try_regex(callback_args.file_name, complex_maps.fcustom_vcomplex) then
 		return
 	end
 
@@ -342,7 +348,15 @@ function M.resolve()
 		return
 	end
 
+	if try_pattern(callback_args.file_name, complex_maps.fendswith) then
+		return
+	end
+
 	if try_pattern(callback_args.file_path, complex_maps.complex) then
+		return
+	end
+
+	if try_pattern(callback_args.file_name, complex_maps.fcomplex) then
 		return
 	end
 
@@ -352,6 +366,10 @@ function M.resolve()
 
 	-- Starsets are always lower priority
 	if try_pattern(callback_args.file_path, complex_maps.starsets) then
+		return
+	end
+
+	if try_pattern(callback_args.file_name, complex_maps.fstarsets) then
 		return
 	end
 
