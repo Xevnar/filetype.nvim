@@ -11,5 +11,8 @@ sed -i -E -e '\%.*#!/path/(bash|dash|ksh).*%d' -e "s%\[\['#!/path/sh'],%[['#!/pa
 # Delete test from `Test_sig_file` that we don't care about
 sed -i -E -e '1807,1810d' neovim/src/nvim/testdir/test_filetype.vim
 
+# Delete the `Test_conf_file` test.
+sed -i -E -e '15,27d' neovim/src/nvim/testdir/test_filetype.vim
+
 cd neovim
-make oldtest TEST_FILE=test_filetype.vim
+TEST_FILE='test_filetype.vim' make oldtest
