@@ -21,6 +21,7 @@ local complex_maps = require('filetype.mappings.complex')
 local ignored_extensions = {
 	['bk'] = true,
 	['in'] = {
+		'cmake.in',
 		'configure.in',
 	},
 	['bak'] = true,
