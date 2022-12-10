@@ -268,6 +268,9 @@ function M.resolve()
 		goto detect_from_contents
 	end
 
+	-- Normalize filepath
+	callback_args.file_path = vim.fs.normalize(callback_args.file_path)
+
 	-- Some extensions are tacked at the end of the filename to indicate that the file is a backup
 	callback_args.file_ext = callback_args.file_path:match('[^/]+%.([^./]+)$')
 	while ignored_extensions[callback_args.file_ext] do
