@@ -43,7 +43,6 @@ M.endswith = {
 	['/usr/share/alsa/alsa%.conf$'] = 'alsaconf',
 	['/%.aptitude/config$'] = 'aptconf',
 	['[mM]akefile%.am$'] = 'automake',
-	['bsd$'] = 'bsdl',
 	['${HOME}/cabal%.config$'] = 'cabalconfig',
 	['/etc/cdrdao%.conf$'] = 'cdrdaoconf',
 	['/etc/default/cdrdao$'] = 'cdrdaoconf',
