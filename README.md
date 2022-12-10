@@ -118,6 +118,10 @@ require("filetype").setup({
 				return "markdown"
 			end,
 
+			-- Patterns can contain environment variable that will be expanded before matching.
+			-- The variables MUST be enclosed in `${}`
+			["^${XDG_CONFIG_HOME}/mydir/.*"] = 'toml',
+
 			-- Set the filetype to all files that have the word bin in their path to sh
 			-- Avoid doing this since it might obscure more concrete patterns you defined
 			["^.*bin.*$"] = "sh",
@@ -126,6 +130,11 @@ require("filetype").setup({
 		-- Same as complex, but use vim regex for path matching
 		-- It is lower priority than complex
 		vim_regex = {
+			-- Environment variables can be also used with vim regexes
+			[ [[^${XDG_CONFIG_HOME}/\(mydir\|notmydir\)/.*]] ] = 'toml',
+
+			-- This is how you can define a vim regex
+			[ [[\c.*\(foofile\|barfile\)]] ] = 'myfiletype'
 		},
 
 		-- Set a default filetype in the case no matching filetype is detected

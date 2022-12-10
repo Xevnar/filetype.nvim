@@ -7,6 +7,35 @@ local detect = require('filetype.detect')
 --- @type table<string, { [string]: filetype_mapping }>
 local M = {}
 
+--- Cache table that stores if the pattern contains an en enviroment variable that must
+--- be expanded
+---
+--- @type { [string]: boolean } A table of lua pattern mappings
+M.contains_env_var = {
+	['${HOME}/cabal%.config$'] = true,
+	['${XDG_CONFIG_HOME}/git/attributes$'] = true,
+	['${XDG_CONFIG_HOME}/git/config$'] = true,
+	['${XDG_CONFIG_HOME}/git/ignore$'] = true,
+	['${GNUPGHOME}/options$'] = true,
+	['${GNUPGHOME}/gpg%.conf$'] = true,
+	['${VIMRUNTIME}/doc/.*%.txt$'] = true,
+}
+
+--- The function updates the cache with with patterns in map that contain environment variables
+---
+--- @param map { [string]: filetype_mapping } A table of lua pattern mappings
+function M.check_for_env_vars(map)
+	if not map then
+		return
+	end
+
+	for pat, _ in pairs(map) do
+		if M.contains_env_var[pat] == nil then
+			M.contains_env_var[pat] = pat:find('%${') ~= nil
+		end
+	end
+end
+
 M.endswith = {
 	['/debian/patches/series$'] = '',
 	['/etc/a2ps%.cfg$'] = 'a2ps',

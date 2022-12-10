@@ -4,6 +4,42 @@ local util = require('filetype.util')
 --- @module 'filetype.detect'
 local detect = require('filetype.detect')
 
+--- The default mappings
+--- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
+
+--- @type { [string]: filetype_mapping }
+local extension_map = require('filetype.mappings.extensions')
+
+--- @type { [string]: filetype_mapping }
+local literal_map = require('filetype.mappings.literal')
+
+--- @type table<string, { [string]: filetype_mapping }>
+local complex_maps = require('filetype.mappings.complex')
+
+--- The extensions are stripped from the end of the file_path before it is processed
+local ignored_extensions = {
+	['bk'] = true,
+	['in'] = true,
+	['bak'] = true,
+	['new'] = true,
+	['old'] = true,
+	['orig'] = true,
+	['pacnew'] = true,
+	['rmpnew'] = true,
+	['pacsave'] = true,
+	['rpmsave'] = true,
+	['dpkg-bak'] = true,
+	['dpkg-new'] = true,
+	['dpkg-old'] = true,
+	['dpkg-dist'] = true,
+}
+
+--- Fallback filetype
+---
+--- @type string
+local fallback
+
+
 --- Lua implementation of the setfiletype builtin function.
 --- @see :help setf
 ---
@@ -63,6 +99,26 @@ local function try_lookup(query, map)
 	return set_filetype(map[query])
 end
 
+--- Replace an enviroment variable in a string with it's value
+---
+--- @param s string The string containg an enviroment variable. The variable must be enclosed by `${}` to be expanded
+--- @return string # The string after expansion
+--- @return boolean? # If the enviroment variable was defined or not
+local function expand_env_var(s)
+	local var_exists
+	s = s:gsub('%${(%S-)}', function(env)
+		-- If an environment variable is present in the pattern but not set, there is no match
+		if not vim.env[env] then
+			var_exists = false
+			return nil
+		end
+		var_exists = true
+		return vim.env[env]
+	end)
+
+	return s, var_exists
+end
+
 --- Loop through the pattern-filetype pairs in the map table and check if the absolute_path matches any of them
 ---
 --- @param absolute_path string the path of the file
@@ -74,6 +130,14 @@ local function try_pattern(absolute_path, map)
 	end
 
 	for pattern, ft in pairs(map) do
+		if complex_maps.contains_env_var[pattern] then
+			local var_exists
+			pattern, var_exists = expand_env_var(pattern)
+			if not var_exists then
+				return false
+			end
+		end
+
 		if absolute_path:find(pattern) then
 			return set_filetype(ft)
 		end
@@ -93,6 +157,14 @@ local function try_regex(absolute_path, map)
 	end
 
 	for pattern, ft in pairs(map) do
+		if complex_maps.contains_env_var[pattern] then
+			local var_exists
+			pattern, var_exists = expand_env_var(pattern)
+			if not var_exists then
+				return false
+			end
+		end
+
 		if util.match_vim_regex(absolute_path, pattern) then
 			return set_filetype(ft)
 		end
@@ -102,41 +174,6 @@ local function try_regex(absolute_path, map)
 end
 
 local M = {}
-
---- The default mappings
---- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
-
---- @type { [string]: filetype_mapping }
-local extension_map = require('filetype.mappings.extensions')
-
---- @type { [string]: filetype_mapping }
-local literal_map = require('filetype.mappings.literal')
-
---- @type table<string, { [string]: filetype_mapping }>
-local complex_maps = require('filetype.mappings.complex')
-
---- The extensions are stripped from the end of the file_path before it is processed
-local ignored_extensions = {
-	['bk'] = true,
-	['in'] = true,
-	['bak'] = true,
-	['new'] = true,
-	['old'] = true,
-	['orig'] = true,
-	['pacnew'] = true,
-	['rmpnew'] = true,
-	['pacsave'] = true,
-	['rpmsave'] = true,
-	['dpkg-bak'] = true,
-	['dpkg-new'] = true,
-	['dpkg-old'] = true,
-	['dpkg-dist'] = true,
-}
-
---- Fallback filetype
----
---- @type string
-local fallback
 
 --- Setup function
 ---
@@ -171,6 +208,8 @@ function M.setup(opts)
 		-- Add the user's complex maps
 		complex_maps.custom_complex = opts.overrides.complex
 		complex_maps.custom_vcomplex = opts.overrides.vim_regex
+		complex_maps.check_for_env_vars(complex_maps.custom_complex)
+		complex_maps.check_for_env_vars(complex_maps.custom_vcomplex)
 
 		fallback = opts.overrides.default_filetype
 
