@@ -297,6 +297,9 @@ M.fendswith = {
 	[util.to_case_insensitive('%.mod$')] = function()
 		return detect.mod()
 	end,
+	[util.to_case_insensitive('%.prg$')] = function()
+		return detect.prg()
+	end,
 }
 
 M.complex = {

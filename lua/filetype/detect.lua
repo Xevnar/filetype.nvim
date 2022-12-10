@@ -1342,6 +1342,23 @@ function M.mod()
 	return 'modsim3'
 end
 
+--- Check if prg files are rapid or clipper files
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.prg()
+	if vim.g.filetype_prg then
+		return vim.g.filetype_prg
+	end
+
+	if is_rapid() then
+		return 'rapid'
+	end
+
+	-- Nothing recognized, assume Clipper
+	return 'clipper'
+end
+
 --- Determine if a patch file is a regular diff file or a getsendmail file
 --- Taken from vim.filetype.detect
 ---
