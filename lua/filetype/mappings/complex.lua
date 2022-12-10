@@ -294,6 +294,9 @@ M.fendswith = {
 	[util.to_case_insensitive('%.sys$')] = function()
 		return detect.sys()
 	end,
+	[util.to_case_insensitive('%.mod$')] = function()
+		return detect.mod()
+	end,
 }
 
 M.complex = {

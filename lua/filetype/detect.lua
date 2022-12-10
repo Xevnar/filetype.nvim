@@ -1301,6 +1301,47 @@ function M.tf()
 	return 'tf'
 end
 
+--- Returns true if file content looks like LambdaProlog
+--- Taken from vim.filetype.detect
+---
+--- @return boolean? # If the file loocks like LambdaProlog
+local function is_lprolog()
+	-- Skip apparent comments and blank lines, what looks like
+	-- LambdaProlog comment may be RAPID header
+	for _, line in ipairs(util.getlines()) do
+		-- The second pattern matches a LambdaProlog comment
+		if not util.findany(line, { '^%s*$', '^%s*%%' }) then
+			-- The pattern must not catch a go.mod file
+			return util.match_vim_regex(line, [[\c\<module\s\+\w\+\s*\.\s*\(%\|$\)]]) ~= nil
+		end
+	end
+end
+
+--- Determine if *.mod is ABB RAPID, LambdaProlog, Modula-2, Modsim III or go.mod
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.mod()
+	if vim.g.filetype_mod then
+		return vim.g.filetype_mod
+	end
+
+	if is_lprolog() then
+		return 'lprolog'
+	end
+
+	if util.match_vim_regex(util.get_next_nonblank_line(), [[\%(\<MODULE\s\+\w\+\s*;\|^\s*(\*\)]]) then
+		return 'modula2'
+	end
+
+	if is_rapid() then
+		return 'rapid'
+	end
+
+	-- Nothing recognized, assume modsim3
+	return 'modsim3'
+end
+
 --- Determine if a patch file is a regular diff file or a getsendmail file
 --- Taken from vim.filetype.detect
 ---
