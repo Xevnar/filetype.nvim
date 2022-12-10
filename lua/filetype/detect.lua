@@ -1314,6 +1314,24 @@ function M.patch()
 	return 'diff'
 end
 
+--- Swift Intermediate Language or SILE
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.sil()
+	for _, line in ipairs(util.getlines(0, M.line_limit)) do
+		if line:find('^%s*[\\%%]') then
+			return 'sile'
+		end
+
+		if line:find('^%s*%S') then
+			return 'sil'
+		end
+	end
+
+	return 'sil'
+end
+
 --- Various patterns that might hint to the filetype
 --- Taken from vim.filetype.detect
 ---

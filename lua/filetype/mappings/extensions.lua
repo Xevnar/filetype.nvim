@@ -627,7 +627,6 @@ local extensions = {
 	['sexp'] = 'sexplib',
 	['siv'] = 'sieve',
 	['sieve'] = 'sieve',
-	['sil'] = 'sil',
 	['sim'] = 'simula',
 	['s85'] = 'sinda',
 	['sin'] = 'sinda',
@@ -1196,6 +1195,9 @@ local extensions = {
 	['mpxl'] = function()
 		vim.b.mp_metafun = 1
 		return 'mp'
+	end,
+	['sil'] = function()
+		return detect.sil()
 	end,
 }
 
