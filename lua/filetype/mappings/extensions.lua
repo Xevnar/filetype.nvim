@@ -1202,6 +1202,9 @@ local extensions = {
 	['scd'] = function()
 		return detect.scd()
 	end,
+	['hook'] = function()
+		return util.getline() == '[Trigger]' and 'conf'
+	end,
 }
 
 return extensions
