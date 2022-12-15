@@ -170,6 +170,7 @@ local function try_pattern(absolute_path, map)
 	end
 
 	for pattern, ft in pairs(map) do
+		logger.debug('Testing pattern: ', vim.inspect(pattern))
 		if complex_maps.contains_env_var[pattern] then
 			local var_exists
 			pattern, var_exists = expand_env_var(pattern)
@@ -317,6 +318,8 @@ function M.resolve()
 		vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
 	end
 
+	logger.debug('Buffer data: ', vim.inspect(callback_args))
+
 	if util.match_vim_regex(callback_args.file_path, vim.g.ft_ignore_pat) then
 		return -- Don't set the files filetype
 	end
@@ -345,31 +348,45 @@ function M.resolve()
 		return
 	end
 
+	logger.debug('========================================================================================================')
+	logger.debug('Testing file path (' .. tostring(callback_args.file_path) .. ')')
 	if try_pattern(callback_args.file_path, complex_maps.endswith) then
 		return
 	end
 
+	logger.debug('========================================================================================================')
+	logger.debug('Testing file name (' .. tostring(callback_args.file_name) .. ')')
 	if try_pattern(callback_args.file_name, complex_maps.fendswith) then
 		return
 	end
 
+	logger.debug('========================================================================================================')
+	logger.debug('Testing file path (' .. tostring(callback_args.file_path) .. ')')
 	if try_pattern(callback_args.file_path, complex_maps.complex) then
 		return
 	end
 
+	logger.debug('========================================================================================================')
+	logger.debug('Testing file name (' .. tostring(callback_args.file_name) .. ')')
 	if try_pattern(callback_args.file_name, complex_maps.fcomplex) then
 		return
 	end
 
+	logger.debug('========================================================================================================')
+	logger.debug('Test extension (' .. tostring(callback_args.file_ext) .. ')')
 	if try_lookup(callback_args.file_ext, extension_map) then
 		return
 	end
 
 	-- Starsets are always lower priority
+	logger.debug('========================================================================================================')
+	logger.debug('Testing file path (' .. tostring(callback_args.file_path) .. ')')
 	if try_pattern(callback_args.file_path, complex_maps.starsets) then
 		return
 	end
 
+	logger.debug('========================================================================================================')
+	logger.debug('Testing file name (' .. tostring(callback_args.file_name) .. ')')
 	if try_pattern(callback_args.file_name, complex_maps.fstarsets) then
 		return
 	end
