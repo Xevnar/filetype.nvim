@@ -1,5 +1,4 @@
 stages:
-  - build
   - test
 
 image: archlinux:base-devel-20221127.0.105785
@@ -7,22 +6,12 @@ image: archlinux:base-devel-20221127.0.105785
 before_script:
   - pacman -Syu --noconfirm base-devel git cmake unzip ninja tree-sitter curl lua51-lpeg lua51-mpack unibilium libluv libtermkey libuv libvterm luajit msgpack-c
 
-build_neovim:
-  stage: build
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - neovim/
-  script:
-    - .ci/build_neovim.sh
-
-run_test_filetype:
+run_test_filetype_comprehensive:
   stage: test
   artifacts:
     expire_in: 1 week
     untracked: true
   allow_failure: true
-  dependencies:
-    - build_neovim
   script:
+    - .ci/build_neovim.sh
     - .ci/run_test_filetype.sh
