@@ -2,17 +2,12 @@
 
 cp -vr ./lua ./filetype.lua ./neovim/runtime
 
-# Delet bash test from `Test_filetype_detection`
-sed -i -E -e "s/'\.bashrc', 'file\.bash', //g" neovim/src/nvim/testdir/test_filetype.vim
-
-# Delete shebang tests that we don't care about passing from `Test_script_detection`
-sed -i -E -e '\%.*#!/path/(bash|dash|ksh).*%d' -e "s%\[\['#!/path/sh'],%[['#!/path/sh']],%g" neovim/src/nvim/testdir/test_filetype.vim
-
-# Delete test from `Test_sig_file` that we don't care about
-sed -i -E -e '1807,1810d' neovim/src/nvim/testdir/test_filetype.vim
-
-# Delete the `Test_conf_file` test.
-sed -i -E -e '15,27d' neovim/src/nvim/testdir/test_filetype.vim
+# Only leave test_file_detection
+sed -i -E -e '697,2010d' neovim/src/nvim/testdir/test_filetype.vim
+sed -i -E -e '51,118d' neovim/src/nvim/testdir/test_filetype.vim
+sed -i -E -e '2,44d' neovim/src/nvim/testdir/test_filetype.vim
+sed -i -E -e '251,548d' neovim/src/nvim/testdir/test_filetype.vim
+sed -i -E -e '5,243d' neovim/src/nvim/testdir/test_filetype.vim
 
 cd neovim
 TEST_FILE='test_filetype.vim' make oldtest
