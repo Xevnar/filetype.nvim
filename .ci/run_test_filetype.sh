@@ -19,3 +19,5 @@ sed -i -E -e '296i logger.trace('\''Complex_maps: '\'', vim.inspect(complex_maps
 
 TEST_FILE='test_filetype.vim' make oldtest
 cat ./src/nvim/testdir/filetype.nvim_2.log
+
+mv -v ./src/nvim/testdir/*.log  ../
