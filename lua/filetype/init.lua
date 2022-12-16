@@ -4,6 +4,65 @@ local util = require('filetype.util')
 --- @module 'filetype.detect'
 local detect = require('filetype.detect')
 
+--- The default mappings
+--- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
+
+--- @type { [string]: filetype_mapping }
+local extension_map = require('filetype.mappings.extensions')
+
+--- @type { [string]: filetype_mapping }
+local literal_map = require('filetype.mappings.literal')
+
+--- @type table<string, { [string]: filetype_mapping }>
+local complex_maps = require('filetype.mappings.complex')
+
+--- The extensions are stripped from the end of the file_path before it is processed
+--- @type { [string]: boolean|string[] }
+local ignored_extensions = {
+	['bk'] = true,
+	['in'] = {
+		'cmake.in',
+		'configure.in',
+	},
+	['bak'] = true,
+	['new'] = true,
+	['old'] = true,
+	['orig'] = true,
+	['pacnew'] = true,
+	['rmpnew'] = true,
+	['pacsave'] = true,
+	['rpmsave'] = true,
+	['dpkg-bak'] = true,
+	['dpkg-new'] = true,
+	['dpkg-old'] = true,
+	['dpkg-dist'] = true,
+}
+
+--- This function strips all ignored_extensions from
+--- @param args filetype_mapping_argument
+local function strip_ignored_extensions(args)
+	while ignored_extensions[args.file_ext] do
+		if type(ignored_extensions[args.file_ext]) ~= 'table' then
+			goto continue
+		end
+
+		---@diagnostic disable-next-line: param-type-mismatch
+		for _, file in ipairs(ignored_extensions[args.file_ext]) do
+			if args.file_name == file then
+				return
+			end
+		end
+
+		::continue::
+		args:strip_ext():gen_from_path()
+	end
+end
+
+--- Fallback filetype
+---
+--- @type string
+local fallback
+
 --- Lua implementation of the setfiletype builtin function.
 --- @see :help setf
 ---
@@ -30,6 +89,23 @@ local callback_args = {
 	file_name = '',
 	file_ext = '',
 }
+
+--- Generate the rest of paramaters from the file_path
+---
+--- @return filetype_mapping_argument # Self
+function callback_args:gen_from_path()
+	self.file_name = self.file_path:match('.*[\\/]([^/]*)')
+	self.file_ext = self.file_name:match('.+%.([^./]+)$')
+	return self
+end
+
+--- Strip extension from file path, call gen_from_path after it
+---
+--- @return filetype_mapping_argument # Self
+function callback_args:strip_ext()
+	self.file_path = self.file_path:match('(.*)%.' .. self.file_ext)
+	return self
+end
 
 --- Set the buffer's filetype
 ---
@@ -63,6 +139,26 @@ local function try_lookup(query, map)
 	return set_filetype(map[query])
 end
 
+--- Replace an enviroment variable in a string with it's value
+---
+--- @param s string The string containg an enviroment variable. The variable must be enclosed by `${}` to be expanded
+--- @return string # The string after expansion
+--- @return boolean? # If the enviroment variable was defined or not
+local function expand_env_var(s)
+	local var_exists
+	s = s:gsub('%${(%S-)}', function(env)
+		-- If an environment variable is present in the pattern but not set, there is no match
+		if not vim.env[env] then
+			var_exists = false
+			return nil
+		end
+		var_exists = true
+		return vim.env[env]
+	end)
+
+	return s, var_exists
+end
+
 --- Loop through the pattern-filetype pairs in the map table and check if the absolute_path matches any of them
 ---
 --- @param absolute_path string the path of the file
@@ -74,6 +170,14 @@ local function try_pattern(absolute_path, map)
 	end
 
 	for pattern, ft in pairs(map) do
+		if complex_maps.contains_env_var[pattern] then
+			local var_exists
+			pattern, var_exists = expand_env_var(pattern)
+			if not var_exists then
+				return false
+			end
+		end
+
 		if absolute_path:find(pattern) then
 			return set_filetype(ft)
 		end
@@ -93,6 +197,14 @@ local function try_regex(absolute_path, map)
 	end
 
 	for pattern, ft in pairs(map) do
+		if complex_maps.contains_env_var[pattern] then
+			local var_exists
+			pattern, var_exists = expand_env_var(pattern)
+			if not var_exists then
+				return false
+			end
+		end
+
 		if util.match_vim_regex(absolute_path, pattern) then
 			return set_filetype(ft)
 		end
@@ -102,23 +214,6 @@ local function try_regex(absolute_path, map)
 end
 
 local M = {}
-
---- The default mappings
---- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
-
---- @type { [string]: filetype_mapping }
-local extension_map = require('filetype.mappings.extensions')
-
---- @type { [string]: filetype_mapping }
-local literal_map = require('filetype.mappings.literal')
-
---- @type table<string, { [string]: filetype_mapping }>
-local complex_maps = require('filetype.mappings.complex')
-
---- Fallback filetype
----
---- @type string
-local fallback
 
 --- Setup function
 ---
@@ -151,8 +246,8 @@ function M.setup(opts)
 		end
 
 		-- Add the user's complex maps
-		complex_maps.custom_complex = opts.overrides.complex
-		complex_maps.custom_vcomplex = opts.overrides.vim_regex
+		complex_maps:add_custom_map('custom_complex', opts.overrides.complex)
+		complex_maps:add_custom_map('custom_vcomplex', opts.overrides.vim_regex)
 
 		fallback = opts.overrides.default_filetype
 
@@ -206,10 +301,17 @@ function M.resolve()
 		callback_args.file_path = vim.fn.expand('<amatch>')
 	end
 
-	-- Special exception for *.orig files. We remove the .orig extensions to get the original filename
-	if callback_args.file_path:find('%.orig$') then
-		callback_args.file_path = callback_args.file_path:match('(.*)%.orig')
+	-- If this an empty buffer, skip to detecting from file contents
+	if #callback_args.file_path == 0 then
+		goto detect_from_contents
 	end
+
+	-- Normalize filepath
+	callback_args.file_path = vim.fs.normalize(callback_args.file_path)
+
+	-- Some extensions are tacked at the end of the filename to indicate that the file is a backup
+	callback_args:gen_from_path()
+	strip_ignored_extensions(callback_args)
 
 	if vim.g.ft_ignore_pat == nil then
 		vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
@@ -219,14 +321,6 @@ function M.resolve()
 		return -- Don't set the files filetype
 	end
 
-	-- If this an empty buffer, skip to detecting from file contents
-	if #callback_args.file_path == 0 then
-		goto detect_from_contents
-	end
-
-	callback_args.file_name = callback_args.file_path:match('.*[\\/](.*)')
-	callback_args.file_ext = callback_args.file_name:match('.+%.(%w+)')
-
 	if try_lookup(callback_args.file_path, literal_map) then
 		return
 	end
@@ -235,11 +329,11 @@ function M.resolve()
 		return
 	end
 
-	if try_lookup(callback_args.file_ext, extension_map) then
+	if try_pattern(callback_args.file_path, complex_maps.custom_complex) then
 		return
 	end
 
-	if try_pattern(callback_args.file_path, complex_maps.custom_complex) then
+	if try_pattern(callback_args.file_name, complex_maps.fcustom_complex) then
 		return
 	end
 
@@ -247,7 +341,15 @@ function M.resolve()
 		return
 	end
 
+	if try_regex(callback_args.file_name, complex_maps.fcustom_vcomplex) then
+		return
+	end
+
 	if try_pattern(callback_args.file_path, complex_maps.endswith) then
+		return
+	end
+
+	if try_pattern(callback_args.file_name, complex_maps.fendswith) then
 		return
 	end
 
@@ -255,7 +357,20 @@ function M.resolve()
 		return
 	end
 
-	if try_pattern(callback_args.file_path, complex_maps.star_sets) then
+	if try_pattern(callback_args.file_name, complex_maps.fcomplex) then
+		return
+	end
+
+	if try_lookup(callback_args.file_ext, extension_map) then
+		return
+	end
+
+	-- Starsets are always lower priority
+	if try_pattern(callback_args.file_path, complex_maps.starsets) then
+		return
+	end
+
+	if try_pattern(callback_args.file_name, complex_maps.fstarsets) then
 		return
 	end
 
@@ -268,7 +383,7 @@ function M.resolve()
 	::detect_from_contents::
 
 	-- Detect filetype from shebang
-	set_filetype(detect.sh(fallback, true))
+	set_filetype(detect.from_content() or fallback)
 end
 
 return M

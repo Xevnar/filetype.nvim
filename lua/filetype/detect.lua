@@ -53,8 +53,24 @@ end
 ---
 --- @type { [string]: string|shebang_map_table }
 M.shebang_map = {
-	['node'] = 'javascript',
+	['rsc'] = 'routeros',
+	['gawk'] = 'awk',
+	['guile'] = 'scheme',
+	['gforth'] = 'forth',
+	['escript'] = 'erlang',
+	['instantfpc'] = 'pascal',
+
+	['wish'] = 'tcl',
 	['tclsh'] = 'tcl',
+	['itclsh'] = 'tcl',
+	['expectk'] = 'tcl',
+	['itkwish'] = 'tcl',
+
+	['js'] = 'javascript',
+	['node'] = 'javascript',
+	['nodejs'] = 'javascript',
+	['rhino'] = 'javascript',
+
 	['ksh'] = {
 		on_detect = function()
 			vim.b.is_kornshell = 1
@@ -135,10 +151,26 @@ function M.analyze_shebang(shebang)
 		return -- Not a string, so don't bother
 	end
 
-	-- The regex requires that all binaries end in an alpha character, so that the same shell with different version
-	-- numbers as suffix are treated the same
+	-- The pattern extracs the everything after tha last path separateor
+	local tail = shebang:match('#!.*/env%s+(.*)') or shebang:match('#!.*/(.*)')
+	if not tail then
+		return -- Not a shebang, so don't bother
+	end
+
+	-- Loop over the tail of the shebang looking for the binary being used
+	local bin
+	for token in string.gmatch(tail, '%S+') do
+		-- Ignore any argument possible arguments to env (--flag | var=assignment)
+		if not util.findany(token, { '^%-%-?.*$', '^%S-%=[^=]*$' }) then
+			bin = token
+			break
+		end
+	end
+
+	-- The pattern extracts the binary name ignoring the version number at the end. The pattern requires that all
+	-- binaries end in an alpha character, so that shells with different version numbers as suffix are treated the same
 	-- (python3 => python | zsh-5.9 => zsh | test-b#in_sh2 => test-b#in_sh )
-	return shebang:match('#!.*/env%s+([^/%s]*%a)') or shebang:match('#!.*/([^/%s]*%a)')
+	return bin and bin:match('^(.*%a)')
 end
 
 --- For shell-like file types, check for an "exec" command hidden in a comment, as used for Tcl.
@@ -454,7 +486,7 @@ end
 --- @param file_path string The absolute path of the file
 --- @return string # The detected filetype
 function M.tex(file_path)
-	local format = M.getline():find('^%%&%s*(%a+)')
+	local format = util.getline():find('^%%&%s*(%a+)')
 	if format then
 		format = format:lower():gsub('pdf', '', 1)
 		if format == 'tex' then
@@ -558,12 +590,9 @@ function M.proto()
 	-- and "%translate"
 	local line = util.get_next_nonblank_line()
 	if
-		line
-		and (
-			line:find(':%-')
-			or util.match_vim_regex(line, [[\c\<prolog\>]])
-			or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
-		)
+		line:find(':%-')
+		or util.match_vim_regex(line, [[\c\<prolog\>]])
+		or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
 	then
 		return 'prolog'
 	end
@@ -801,7 +830,7 @@ function M.pp()
 	end
 
 	local line = util.get_next_nonblank_line()
-	if line and (util.findany(line, pascal_comments) or util.match_vim_regex(line, pascal_keywords)) then
+	if util.findany(line, pascal_comments) or util.match_vim_regex(line, pascal_keywords) then
 		return 'pascal'
 	end
 
@@ -821,12 +850,9 @@ function M.pl()
 	-- "%list" and "%translate"
 	local line = util.get_next_nonblank_line()
 	if
-		line
-		and (
-			line:find(':%-')
-			or util.match_vim_regex(line, [[\c\<prolog\>]])
-			or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
-		)
+		line:find(':%-')
+		or util.match_vim_regex(line, [[\c\<prolog\>]])
+		or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
 	then
 		return 'prolog'
 	end
@@ -1058,6 +1084,540 @@ function M.mc()
 	end
 
 	return 'm4'
+end
+
+--- Check the first nonblank line for RAPID markers
+--- Taken from vim.filetype.detect
+---
+--- @return boolean # If the file contains RAPID markers or not
+local function is_rapid()
+	-- Called from mod, prg or sys functions
+	local line = util.get_next_nonblank_line()
+	return util.match_vim_regex(line, [[\c\v^\s*%(\%{3}|module\s+\k+\s*%(\(|$))]]) ---@diagnostic disable-line
+end
+
+--- Read the file contents to identify if the file is RAPID or a cfg file
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.cfg()
+	if vim.g.filetype_cfg then
+		return vim.g.filetype_cfg
+	end
+
+	local line = util.getline():lower()
+	if util.findany(line, { 'eio:cfg', 'mmc:cfg', 'moc:cfg', 'proc:cfg', 'sio:cfg', 'sys:cfg' }) or is_rapid() then
+		return 'rapid'
+	end
+
+	return 'cfg'
+end
+
+--- Read the file contents to identify if the file is RAPID or a bat file
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.sys()
+	if vim.g.filetype_sys then
+		return vim.g.filetype_sys
+	end
+
+	if is_rapid() then
+		return 'rapid'
+	end
+
+	return 'bat'
+end
+
+--- Determine if a .dat file is Kuka Robot Language
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.dat()
+	if vim.g.filetype_dat then
+		return vim.g.filetype_dat
+	end
+
+	-- Determine if a *.dat file is Kuka Robot Language
+	local line = util.get_next_nonblank_line()
+	if util.match_vim_regex(line, [[\c\v^\s*%(\&\w+|defdat>)]]) then
+		return 'krl'
+	end
+end
+
+--- This function is called for all files under */debian/patches/*, make sure not to non-dep3patch files, such as README
+--- and other text files.
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.dep3patch()
+	for _, line in ipairs(util.getlines(0, M.line_limit)) do
+		if
+			util.findany(line, {
+				'^Description:',
+				'^Subject:',
+				'^Origin:',
+				'^Bug:',
+				'^Forwarded:',
+				'^Author:',
+				'^From:',
+				'^Reviewed%-by:',
+				'^Acked%-by:',
+				'^Last%-Updated:',
+				'^Applied%-Upstream:',
+			})
+		then
+			return 'dep3patch'
+		end
+
+		if line:find('^%-%-%-') then
+			-- End of headers found. stop processing
+			return
+		end
+	end
+end
+
+--- Read the file's content to differentiate between scala and SuperCollider files
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.sc()
+	for _, line in ipairs(util.getlines(0, M.line_limit)) do
+		if
+			util.findany(line, {
+				'[A-Za-z0-9]*%s:%s[A-Za-z0-9]',
+				'var%s<',
+				'classvar%s<',
+				'%^this.*',
+				'|%w*|',
+				'%+%s%w*%s{',
+				'%*ar%s',
+			})
+		then
+			return 'supercollider'
+		end
+	end
+
+	return 'scala'
+end
+
+--- LambdaProlog and Standard ML signature files are differentiated by the first non blank line
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.sig()
+	if vim.g.filetype_sig then
+		return vim.g.filetype_sig
+	end
+
+	local line = util.get_next_nonblank_line()
+	-- LambdaProlog comment or keyword
+	if util.findany(line, { '^%s*/%*', '^%s*%%', '^%s*sig%s+%a' }) then
+		return 'lprolog'
+	end
+
+	-- SML comment or keyword
+	if util.findany(line, { '^%s*%(%*', '^%s*signature%s+%a', '^%s*structure%s+%a' }) then
+		return 'sml'
+	end
+end
+
+--- Distinguish between Forth and F# based on the first nonblank line
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.fs()
+	if vim.g.filetype_fs then
+		return vim.g.filetype_fs
+	end
+
+	local line = util.get_next_nonblank_line()
+	if util.findany(line, { '^%s*%.?%( ', '^%s*\\G? ', '^\\$', '^%s*: %S' }) then
+		return 'forth'
+	end
+
+	return 'fsharp'
+end
+
+--- This function checks the file's contents for appearance of 'FoamFile' and then 'object' in a following line. In that
+--- case, it's probably an OpenFOAM file
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.foam()
+	local lines = util.getlines(0, M.line_limit)
+	for i, line in ipairs(lines) do
+		if line:find('^FoamFile') and string.find(lines[i + 1], '^%s*object') then
+			return 'foam'
+		end
+	end
+end
+
+--- Determine if a .src file is Kuka Robot Language
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.src()
+	if vim.g.filetype_src then
+		return vim.g.filetype_src
+	end
+
+	local line = util.get_next_nonblank_line()
+	if util.match_vim_regex(line, [[\c\v^\s*%(\&\w+|%(global\s+)?def%(fct)?>)]]) then
+		return 'krl'
+	end
+end
+
+--- Determine if an lsl file is an larch file or not
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.lsl()
+	if vim.g.filetype_lsl then
+		return vim.g.filetype_lsl
+	end
+
+	local line = util.get_next_nonblank_line()
+	if util.findany(line, { '^%s*%%', ':%s*trait%s*$' }) then
+		return 'larch'
+	end
+
+	return 'lsl'
+end
+
+--- Determine if a *.tf file is TF mud client or terraform
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.tf()
+	for _, line in ipairs(util.getlines(0, M.line_limit)) do
+		-- Assume terraform file on a non-empty line (not whitespace-only) and when the first non-whitespace character is
+		-- not a ; or /
+		if not line:find('^%s*$') and not line:find('^%s*[;/]') then
+			return 'terraform'
+		end
+	end
+
+	return 'tf'
+end
+
+--- Returns true if file content looks like LambdaProlog
+--- Taken from vim.filetype.detect
+---
+--- @return boolean? # If the file loocks like LambdaProlog
+local function is_lprolog()
+	-- Skip apparent comments and blank lines, what looks like
+	-- LambdaProlog comment may be RAPID header
+	for _, line in ipairs(util.getlines()) do
+		-- The second pattern matches a LambdaProlog comment
+		if not util.findany(line, { '^%s*$', '^%s*%%' }) then
+			-- The pattern must not catch a go.mod file
+			return util.match_vim_regex(line, [[\c\<module\s\+\w\+\s*\.\s*\(%\|$\)]]) ~= nil
+		end
+	end
+end
+
+--- Determine if *.mod is ABB RAPID, LambdaProlog, Modula-2, Modsim III or go.mod
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.mod()
+	if vim.g.filetype_mod then
+		return vim.g.filetype_mod
+	end
+
+	if is_lprolog() then
+		return 'lprolog'
+	end
+
+	if util.match_vim_regex(util.get_next_nonblank_line(), [[\%(\<MODULE\s\+\w\+\s*;\|^\s*(\*\)]]) then
+		return 'modula2'
+	end
+
+	if is_rapid() then
+		return 'rapid'
+	end
+
+	-- Nothing recognized, assume modsim3
+	return 'modsim3'
+end
+
+--- Check if prg files are rapid or clipper files
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.prg()
+	if vim.g.filetype_prg then
+		return vim.g.filetype_prg
+	end
+
+	if is_rapid() then
+		return 'rapid'
+	end
+
+	-- Nothing recognized, assume Clipper
+	return 'clipper'
+end
+
+--- This function checks the first line of file extension "scd" to resolve detection between scdoc and SuperCollider
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.scd()
+	local first = '^%S+%(%d[0-9A-Za-z]*%)'
+	local opt = [[%s+"[^"]*"]]
+
+	local line = util.getline()
+	if util.findany(line, { first .. '$', first .. opt .. '$', first .. opt .. opt .. '$' }) then
+		return 'scdoc'
+	end
+
+	return 'supercollider'
+end
+
+--- Determine if a patch file is a regular diff file or a getsendmail file
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.patch()
+	local line = util.getline()
+	if string.find(line, '^From ' .. string.rep('%x', 40) .. '+ Mon Sep 17 00:00:00 2001$') then
+		return 'gitsendemail'
+	end
+
+	return 'diff'
+end
+
+--- Swift Intermediate Language or SILE
+--- Taken from vim.filetype.detect
+---
+--- @return string? # The detected filetype
+function M.sil()
+	for _, line in ipairs(util.getlines(0, M.line_limit)) do
+		if line:find('^%s*[\\%%]') then
+			return 'sile'
+		end
+
+		if line:find('^%s*%S') then
+			return 'sil'
+		end
+	end
+
+	return 'sil'
+end
+
+--- Various patterns that might hint to the filetype
+--- Taken from vim.filetype.detect
+---
+--- @type { [string]:string|{ string, start_lnum:number, ignore_case:boolean } }
+local general_syntax_markers = {
+	['^%*%*%*%*  Purify'] = 'purifylog',
+	-- ELM Mail files
+	['^From [a-zA-Z][a-zA-Z_0-9%.=%-]*(@[^ ]*)? .* 19%d%d$'] = 'mail',
+	['^From [a-zA-Z][a-zA-Z_0-9%.=%-]*(@[^ ]*)? .* 20%d%d$'] = 'mail',
+	['^From %- .* 19%d%d$'] = 'mail',
+	['^From %- .* 20%d%d$'] = 'mail',
+	-- Mason
+	['^<[%%&].*>'] = 'mason',
+	-- Vim scripts (must have '" vim' as the first line to trigger this)
+	['^" *[vV]im$['] = 'vim',
+	-- libcxx and libstdc++ standard library headers like ["iostream["] do not have
+	-- an extension, recognize the Emacs file mode.
+	['%-%*%-.*[cC]%+%+.*%-%*%-'] = 'cpp',
+	-- PostScript Files (must have %!PS as the first line, like a2ps output)
+	['^%%![ \t]*PS'] = 'postscr',
+	-- XML
+	['<%?%s*xml.*%?>'] = 'xml',
+	-- YAML
+	['^%%YAML'] = 'yaml',
+	-- MikroTik RouterOS script
+	['^#.*by RouterOS'] = 'routeros',
+	-- Sed scripts
+	-- #ncomment is allowed but most likely a false positive so require a space before any trailing comment text
+	['^#n%s'] = 'sed',
+	['^#n$'] = 'sed',
+	-- PDF
+	['^%%PDF%-'] = 'pdf',
+	-- XXD output
+	['^%x%x%x%x%x%x%x: %x%x ?%x%x ?%x%x ?%x%x '] = 'xxd',
+	-- Prescribe
+	['^!R!'] = 'prescribe',
+	-- Send-pr
+	['^SEND%-PR:'] = 'sendpr',
+	-- SNNS files
+	['^SNNS network definition file'] = 'snnsnet',
+	['^SNNS pattern definition file'] = 'snnspat',
+	['^SNNS result file'] = 'snnsres',
+	-- strace files
+	['[0-9:%.]* *execve%('] = 'strace',
+	['^__libc_start_main'] = 'strace',
+	-- Go docs
+	['PACKAGE DOCUMENTATION$'] = 'godoc',
+	-- Renderman Interface Bytestream
+	['^##RenderMan'] = 'rib',
+	-- Valgrind
+	['^==%d+== valgrind'] = 'valgrind',
+	['^==%d+== Using valgrind'] = { 'valgrind', { start_lnum = 3 } },
+	-- TAK and SINDA
+	['K & K  Associates'] = { 'takout', start_lnum = 4 },
+	['TAK 2000'] = { 'takout', start_lnum = 2 },
+	['S Y S T E M S   I M P R O V E D '] = { 'syndaout', start_lnum = 3 },
+	['Run Date: '] = { 'takcmp', start_lnum = 6 },
+	['Node    File  1'] = { 'sindacmp', start_lnum = 9 },
+	-- Scheme scripts
+	['exec%s%+%S*scheme'] = { 'scheme', start_lnum = 1 },
+	-- virata files
+	['^%%.-[Vv]irata'] = { 'virata', start_lnum = 1 },
+	-- RCS/CVS log output
+	['^RCS file:'] = { 'rcslog', { start_lnum = 1 } },
+	-- CVS commit
+	['^CVS:'] = { 'cvs', start_lnum = 2 },
+	['^CVS: '] = { 'cvs', start_lnum = -1 }, -- The pattern is at the bottom of the file
+	-- SiCAD scripts (must have procn or procd as the first line to trigger this)
+	['^ *proc[nd] *$'] = { 'sicad', ignore_case = true },
+	-- Erlang terms
+	-- (See also: http://www.gnu.org/software/emacs/manual/html_node/emacs/Choosing-Modes.html#Choosing-Modes)
+	['%-%*%-.*erlang.*%-%*%-'] = { 'erlang', ignore_case = true },
+}
+
+--- Various vim regexes that might hint to the filetype
+--- Taken from vim.filetype.detect
+---
+--- @type { [string]:string }
+local general_syntax_regex_markers = {
+	[ [[^#compdef\>]] ] = 'zsh',
+	[ [[^#autoload\>]] ] = 'zsh',
+	[ [[^\*\* LambdaMOO Database, Format Version \%([1-3]\>\)\@!\d\+ \*\*$]] ] = 'moo',
+	-- Diff file:
+	-- - "diff" in first line (context diff)
+	-- - "Only in " in first line
+	-- - "--- " in first line and "+++ " in second line (unified diff).
+	-- - "*** " in first line and "--- " in second line (context diff).
+	-- - "# It was generated by makepatch " in the second line (makepatch diff).
+	-- - "Index: <filename>" in the first line (CVS file)
+	-- - "=== ", line of "=", "---", "+++ " (SVK diff)
+	-- - "=== ", "--- ", "+++ " (bzr diff, common case)
+	-- - "=== (removed|added|renamed|modified)" (bzr diff, alternative)
+	-- - "# HG changeset patch" in first line (Mercurial export format)
+	[ [[^\(diff\>\|Only in \|\d\+\(,\d\+\)\=[cda]\d\+\>\|# It was generated by makepatch \|Index:\s\+\f\+\r\=$\|===== \f\+ \d\+\.\d\+ vs edited\|==== //\f\+#\d\+\|# HG changeset patch\)]] ] = 'diff',
+	-- Git output
+	[ [[^\(commit\|tree\|object\) \x\{40,\}\>\|^tag \S\+$]] ] = 'git',
+	-- XHTML (e.g.: PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN")
+	[ [[\<DTD\s\+XHTML\s]] ] = 'xhtml',
+	-- HTML (e.g.: <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN")
+	-- Avoid "doctype html", used by slim.
+	[ [[\c<!DOCTYPE\s\+html\>]] ] = 'html',
+	-- VSE JCL
+	[ [[^\* $$ JOB\>]] ] = 'vsejcl',
+	[ [[^// *JOB\>]] ] = 'vsejcl',
+}
+
+--- This function checks the content for various markers that might hint to the filetype when there is no other way to
+--- determine it.
+---
+--- @return string? #The detetected filetype
+function M.from_content()
+	-- Check if the file is shell file or not
+	local ft = M.sh()
+	if ft then
+		return ft
+	end
+
+	local contents = util.getlines()
+
+	-- I don't know where the origin of this hint occurs
+	if contents[1]:find('^:$') then
+		-- Bourne-like shell scripts: sh ksh bash bash2
+		return M.sh('sh')
+	end
+
+	-- Z shell scripts
+	if util.match_vim_regex('\n' .. table.concat(contents, '\n'), [[\n\s*emulate\s\+\%(-[LR]\s\+\)\=[ckz]\=sh\>]]) then
+		return 'zsh'
+	end
+
+	-- Gprof (gnu profiler)
+	if
+		contents[1] == 'Flat profile:'
+		and contents[2] == ''
+		and contents[3]:find('^Each sample counts as .* seconds%.$')
+	then
+		return 'gprof'
+	end
+
+	-- Go over patters for spcecific file patterns
+	for pattern, val in pairs(general_syntax_markers) do
+		if type(val) == 'string' then
+			-- Check the first line only
+			if contents[1]:find(pattern) then
+				return val
+			end
+
+			goto continue
+		end
+
+		val.start_lnum = (val.start_lnum == -1 and #contents) or val.start_lnum or 1
+		for i = val.start_lnum, M.line_limit do
+			if not contents[i] then
+				goto continue
+			end
+
+			local line = val.ignore_case and contents[i]:lower() or contents[i]
+			if line:find(pattern) then
+				return val[1]
+			end
+		end
+
+		::continue::
+	end
+
+	-- Check if the ft has a defined regex
+	for regex, val in pairs(general_syntax_regex_markers) do
+		-- Check the first line only
+		if util.match_vim_regex(contents[1], regex) then
+			return val
+		end
+	end
+
+	-- Diff file:
+	-- - "diff" in first line (context diff)
+	-- - "Only in " in first line
+	-- - "--- " in first line and "+++ " in second line (unified diff).
+	-- - "*** " in first line and "--- " in second line (context diff).
+	-- - "# It was generated by makepatch " in the second line (makepatch diff).
+	-- - "Index: <filename>" in the first line (CVS file)
+	-- - "=== ", line of "=", "---", "+++ " (SVK diff)
+	-- - "=== ", "--- ", "+++ " (bzr diff, common case)
+	-- - "=== (removed|added|renamed|modified)" (bzr diff, alternative)
+	-- - "# HG changeset patch" in first line (Mercurial export format)
+	if
+		contents[1]:find('^%-%-%- ') and contents[2]:find('^%+%+%+ ')
+		or contents[1]:find('^%* looking for ') and contents[2]:find('^%* comparing to ')
+		or contents[1]:find('^%*%*%* ') and contents[2]:find('^%-%-%- ')
+		or contents[1]:find('^=== ') and ((contents[2]:find('^' .. string.rep('=', 66)) and contents[3]:find('^%-%-% ') and contents[4]:find(
+			'^%+%+%+'
+		)) or (contents[2]:find('^%-%-%- ') and contents[3]:find('^%+%+%+ ')))
+		or util.findany(contents[1], { '^=== removed', '^=== added', '^=== renamed', '^=== modified' })
+	then
+		return 'diff'
+	end
+
+	-- Check for cvs diff file
+	for _, line in ipairs(contents) do
+		if line:find('^%? ') then
+			goto continue
+		end
+
+		if util.match_vim_regex(line, [[^Index:\s\+\f\+$]]) then
+			-- CVS diff
+			return 'diff'
+		end
+
+		::continue::
+	end
+
+	-- Test are passed without them, so might not need them
+	--return M.m4(contents) or M.dns_zone(contents)
 end
 
 return M

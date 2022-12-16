@@ -84,7 +84,37 @@ require("filetype").setup({
 			["/bin/myscriptfile"] = "lua", -- This won't match '/usr/bin/myscriptfile'
 		},
 
-		-- The `literal` overrides are a higher priority over extensions, since extensions are more generalised
+		-- The following override uses lua patterns to match against the full file path
+		complex = {
+			-- Set the filetype of any config file inside a directory that ends with git to gitconfig
+			[".*git/config$"] = "gitconfig", -- Included in the plugin
+
+			-- Add an abbreviation to all files with an alphanumeric name in the .math_notes directory
+			[".*.math_notes/%w+"] = function()
+				vim.cmd("iabbrev $ $$")
+				return "markdown"
+			end,
+
+			-- Patterns can contain environment variable that will be expanded before matching.
+			-- The variables MUST be enclosed in `${}`
+			["^${XDG_CONFIG_HOME}/mydir/.*"] = 'toml',
+
+			-- Set the filetype to all files that have the word bin in their path to sh
+			-- Avoid doing this since it might obscure more concrete patterns you defined
+			["^.*bin.*$"] = "sh",
+		},
+
+		-- Same as complex, but use vim regex for path matching
+		-- It is lower priority than complex
+		vim_regex = {
+			-- Environment variables can be also used with vim regexes
+			[ [[^${XDG_CONFIG_HOME}/\(mydir\|notmydir\)/.*]] ] = 'toml',
+
+			-- This is how you can define a vim regex
+			[ [[\c.*\(foofile\|barfile\)]] ] = 'myfiletype'
+		},
+
+		-- This is the lowest priority override
 		extensions = {
 			-- Set the filetype of *.pn files to potion
 			pn = "potion",
@@ -107,26 +137,6 @@ require("filetype").setup({
 			end,
 		},
 
-		-- The following override uses lua patterns to match against the full file path
-		complex = {
-			-- Set the filetype of any config file inside a directory that ends with git to gitconfig
-			[".*git/config$"] = "gitconfig", -- Included in the plugin
-
-			-- Add an abbreviation to all files with an alphanumeric name in the .math_notes directory
-			[".*.math_notes/%w+"] = function()
-				vim.cmd("iabbrev $ $$")
-				return "markdown"
-			end,
-
-			-- Set the filetype to all files that have the word bin in their path to sh
-			-- Avoid doing this since it might obscure more concrete patterns you defined
-			["^.*bin.*$"] = "sh",
-		},
-
-		-- Same as complex, but use vim regex for path matching
-		-- It is lower priority than complex
-		vim_regex = {
-		},
 
 		-- Set a default filetype in the case no matching filetype is detected
 		default_filetype = "foo",
@@ -170,10 +180,49 @@ require("filetype").setup({
 })
 ```
 
-The `literal` and `extensions`  tables are orders faster than the other ones because they only require a table lookup.
+The `literal` and `extensions` tables are orders faster than the other ones because they only require a table lookup.
 Always try to use these before resorting to the `complex` and `vim_regex` tables, which require looping over the
 entries and running a regex for each one. Furthermore, always try to use `complex` over `vim_regex` since matching
 lua patterns is faster than vim regexes.
+
+Even though the `extensions` table is orders faster than the `complex` and `vim_regex` tables, its the last table
+checked for filetype matching. That is due to how general an extension can be. Take the following filetype for example:
+
+```lua
+-- The file 'file.t.html'
+overrides = {
+	extensions = {
+		['html'] = 'html',
+	},
+
+	complex = {
+		['%.t%.html$'] = 'tilde',
+	},
+}
+
+-- If extensions were higher priority
+--     file.t.html => html
+-- If complex were higher priority
+--     file.t.html => tilde
+```
+
+```lua
+-- Any cfg file in a specific directory
+overrides = {
+	extensions = {
+		['cfg'] = 'config',
+	},
+
+	complex = {
+		['/mydir/.*%.cfg$'] = 'toml',
+	},
+}
+
+-- If extensions were higher priority
+--     mydir/file.cfg => config
+-- If complex were higher priority
+--     mydir/file.cfg => toml
+```
 
 ## Performance Comparison
 

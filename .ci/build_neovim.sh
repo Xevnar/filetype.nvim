@@ -1,7 +1,6 @@
 #!/usr/bin/sh
 # Script to build neovim in the current directory
 
-git clone https://github.com/neovim/neovim.git
-rm -vf neovim/runtime/filetype.lua
+git clone --branch master https://github.com/neovim/neovim.git --depth 1
 cd neovim
-make > /dev/null 2>&1
+make
