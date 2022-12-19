@@ -337,7 +337,7 @@ function inspect.inspect(root, options)
 
 	local depth = options.depth or math.huge
 	local newline = options.newline or '\n'
-	local indent = options.indent or '  '
+	local indent = options.indent or '\t'
 	local process = options.process
 
 	if process then
