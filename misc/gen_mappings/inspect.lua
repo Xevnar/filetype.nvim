@@ -53,10 +53,10 @@ end
 -- Apostrophizes the string if it has quotes, but not aphostrophes
 -- Otherwise, it returns a regular quoted string
 local function smartQuote(str)
-	if match(str, '"') and not match(str, "'") then
+	if not match(str, "'") then
 		return "'" .. str .. "'"
 	end
-	return '"' .. gsub(str, '"', '\\"') .. '"'
+	return ' [[' .. str .. ']] '
 end
 
 -- \a => '\\a', \0 => '\\0', 31 => '\31'
