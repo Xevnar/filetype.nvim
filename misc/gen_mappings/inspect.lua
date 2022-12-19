@@ -83,40 +83,6 @@ local function escape(str)
 	return (gsub(gsub(gsub(str, '\\', '\\\\'), '(%c)%f[0-9]', longControlCharEscapes), '%c', shortControlCharEscapes))
 end
 
--- List of lua keywords
-local luaKeywords = {
-	['and'] = true,
-	['break'] = true,
-	['do'] = true,
-	['else'] = true,
-	['elseif'] = true,
-	['end'] = true,
-	['false'] = true,
-	['for'] = true,
-	['function'] = true,
-	['goto'] = true,
-	['if'] = true,
-	['in'] = true,
-	['local'] = true,
-	['nil'] = true,
-	['not'] = true,
-	['or'] = true,
-	['repeat'] = true,
-	['return'] = true,
-	['then'] = true,
-	['true'] = true,
-	['until'] = true,
-	['while'] = true,
-}
-
-local function isIdentifier(str)
-	return type(str) == 'string'
-		-- identifier must start with a letter and underscore, and be followed by letters, numbers, and underscores
-		and not not str:match('^[_%a][_%a%d]*$')
-		-- lua keywords are not valid identifiers
-		and not luaKeywords[str]
-end
-
 local flr = math.floor
 local function isSequenceKey(k, sequenceLength)
 	return type(k) == 'number' and flr(k) == k and 1 <= k and k <= sequenceLength
@@ -294,13 +260,11 @@ function Inspector:putValue(v)
 				else
 					local k = keys[i - seqLen]
 					tabify(self)
-					if isIdentifier(k) then
-						puts(buf, k)
-					else
-						puts(buf, '[')
-						self:putValue(k)
-						puts(buf, ']')
-					end
+
+					puts(buf, '[')
+					self:putValue(k)
+					puts(buf, ']')
+
 					puts(buf, ' = ')
 					self:putValue(t[k])
 				end
