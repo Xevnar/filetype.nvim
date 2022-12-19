@@ -254,18 +254,16 @@ function Inspector:putValue(v)
 	local tv = type(v)
 	if tv == 'string' then
 		puts(buf, smartQuote(escape(v)))
-	elseif
-		tv == 'number'
-		or tv == 'boolean'
-		or tv == 'nil'
-		or tv == 'cdata'
-		or tv == 'ctype'
-		or (vim and v == vim.NIL)
-	then
-		puts(buf, tostring(v))
-	elseif tv == 'table' and not self.ids[v] then
-		local t = v
+		return
+	end
 
+	if tv == 'number' or tv == 'boolean' or tv == 'nil' or tv == 'cdata' or tv == 'ctype' or (vim and v == vim.NIL) then
+		puts(buf, tostring(v))
+		return
+	end
+
+	if tv == 'table' and not self.ids[v] then
+		local t = v
 		if t == inspect.KEY or t == inspect.METATABLE then
 			puts(buf, tostring(t))
 		elseif self.level >= self.depth then
@@ -327,9 +325,11 @@ function Inspector:putValue(v)
 
 			puts(buf, '}')
 		end
-	else
-		puts(buf, fmt('<%s %d>', tv, self:getId(v)))
+
+		return
 	end
+
+	puts(buf, fmt('<%s %d>', tv, self:getId(v)))
 end
 
 function inspect.inspect(root, options)
