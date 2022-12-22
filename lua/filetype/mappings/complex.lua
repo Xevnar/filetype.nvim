@@ -476,7 +476,6 @@ M.fstarsets = {
 	['^Containerfile%.'] = 'dockerfile',
 	['^php%.ini%-'] = 'dosini',
 	['^drac%.'] = 'dracula',
-	['^%.gtkrc'] = 'gtkrc',
 	['^%.?gtkrc'] = 'gtkrc',
 	['^JAM.*%.'] = 'jam',
 	['^Prl.*%.'] = 'jam',
