@@ -455,7 +455,7 @@ local literal = {
 	['fvModels'] = function()
 		return detect.foam()
 	end,
-	['printcap.*'] = function()
+	['printcap'] = function()
 		vim.b.ptcap_type = 'print'
 		return 'ptcap'
 	end,
