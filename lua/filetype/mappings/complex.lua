@@ -260,7 +260,6 @@ M.fendswith = {
 	['%.html%.m4$'] = 'htmlm4',
 	['%.properties_..$'] = 'jproperties',
 	['%.properties_.._..$'] = 'jproperties',
-	[util.to_case_insensitive('%.sub$')] = 'krl',
 	['^snd%.%d+$'] = 'mail',
 	['^pico%.%d+$'] = 'mail',
 	['^ae%d+%.txt$'] = 'mail',
@@ -275,7 +274,6 @@ M.fendswith = {
 	['%.mli%.cppo$'] = 'ocaml',
 	['%.mli?%.cppo$'] = 'ocaml',
 	['%.opam%.template$'] = 'opam',
-	[util.to_case_insensitive('%.opl$')] = 'opl',
 	['^%.?gitolite%.rc$'] = 'perl',
 	['^example%.gitolite%.rc$'] = 'perl',
 	[',v$'] = 'rcs',
@@ -289,21 +287,6 @@ M.fendswith = {
 	['%.vbproj%.user$'] = 'xml',
 	['Xmodmap$'] = 'xmodmap',
 
-	[util.to_case_insensitive('%.src$')] = function()
-		return detect.src()
-	end,
-	[util.to_case_insensitive('%.dat$')] = function()
-		return detect.dat()
-	end,
-	[util.to_case_insensitive('%.sys$')] = function()
-		return detect.sys()
-	end,
-	[util.to_case_insensitive('%.mod$')] = function()
-		return detect.mod()
-	end,
-	[util.to_case_insensitive('%.prg$')] = function()
-		return detect.prg()
-	end,
 }
 
 M.complex = {
