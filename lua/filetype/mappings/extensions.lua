@@ -1114,9 +1114,6 @@ local extensions = {
 	['ksh'] = function()
 		return detect.sh('ksh')
 	end,
-	['etc/profile'] = function()
-		return detect.sh('sh', true)
-	end,
 	['sh'] = function()
 		return detect.sh('sh', true)
 	end,

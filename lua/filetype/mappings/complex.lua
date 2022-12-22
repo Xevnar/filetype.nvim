@@ -240,6 +240,10 @@ M.endswith = {
 	['/etc/blkid%.tab.old$'] = 'xml',
 	['/etc/blkid%.tab%.old$'] = 'xml',
 	['/etc/zprofile$'] = 'zsh',
+
+	['/etc/profile$'] = function()
+		return detect.sh('sh', true)
+	end
 }
 
 M.fendswith = {

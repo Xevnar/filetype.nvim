@@ -410,6 +410,9 @@ local literal = {
 	['.profile'] = function()
 		return detect.sh('sh', true)
 	end,
+	['/etc/profile$'] = function()
+		return detect.sh('sh', true)
+	end,
 	['.tcshrc'] = function()
 		return detect.sh('tcsh')
 	end,
