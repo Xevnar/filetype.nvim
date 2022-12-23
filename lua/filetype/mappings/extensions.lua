@@ -366,6 +366,7 @@ local extensions = {
 	['lrc'] = 'lyrics',
 	['quake'] = 'm3quake',
 	['at'] = 'm4',
+	['m4'] = 'm4',
 	['eml'] = 'mail',
 	['mk'] = 'make',
 	['dsp'] = 'make',
@@ -922,11 +923,6 @@ local extensions = {
 			return 'nroff'
 		end
 	end,
-	['m4'] = function(args)
-		if not util.findany(args.file_path, { 'html.m4$', 'fvwm2rc' }) then
-			return 'm4'
-		end
-	end,
 	['edn'] = function()
 		return (util.getline():find('^%s*%(%s*edif') and 'edif') or 'clojure'
 	end,
@@ -1332,6 +1328,14 @@ local extensions = {
 	end,
 	['PRG'] = function()
 		return detect.prg()
+	end,
+	['fvwmrc'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
+	['fvwm2rc'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
 	end,
 }
 

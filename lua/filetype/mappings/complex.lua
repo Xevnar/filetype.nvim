@@ -243,7 +243,7 @@ M.endswith = {
 
 	['/etc/profile$'] = function()
 		return detect.sh('sh', true)
-	end
+	end,
 }
 
 M.fendswith = {
@@ -285,6 +285,18 @@ M.fendswith = {
 	['%.vbproj%.user$'] = 'xml',
 	['Xmodmap$'] = 'xmodmap',
 
+	['fvwmrc$'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
+	['fvwm95%.hook$'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
+	['fvwm2rc$'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
+	end,
 }
 
 M.complex = {
@@ -388,6 +400,9 @@ M.fcomplex = {
 	['^[a-zA-Z].*Properties$'] = function()
 		return detect.foam()
 	end,
+	['fvwm2rc.*%.m4$'] = function()
+		return 'fvwm2m4'
+	end,
 }
 
 M.starsets = {
@@ -414,7 +429,6 @@ M.starsets = {
 	['/etc/cron%.d/'] = 'crontab',
 	['/etc/dnsmasq%.d/'] = 'dnsmasq',
 	['/etc/yum%.repos%.d/'] = 'dosini',
-	['/%.fvwm/'] = 'fvwm',
 	['/tmp/lltmp'] = 'gedcom',
 	['/%.gitconfig%.d/'] = 'gitconfig',
 	['/etc/gitconfig%.d/'] = 'gitconfig',
@@ -455,6 +469,10 @@ M.starsets = {
 	end,
 	['/0%.orig/'] = function()
 		return detect.foam()
+	end,
+	['/%.fvwm/'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
 	end,
 }
 
@@ -546,7 +564,14 @@ M.fstarsets = {
 	['^[cC]hange[lL]og'] = function()
 		return (util.getline():find('%; urgency%=') and 'debchangelog') or 'changelog'
 	end,
-
+	['fvwmrc'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
+	['fvwm2rc'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
+	end,
 	-- .cfg has many conflicting file patterns and names
 	[util.to_case_insensitive('%.cfg$')] = function()
 		return detect.cfg()

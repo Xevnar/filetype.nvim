@@ -467,6 +467,14 @@ local literal = {
 		vim.b.ptcap_type = 'term'
 		return 'ptcap'
 	end,
+	['fvwmrc'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
+	['fvwm2rc'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
+	end,
 }
 
 return literal
