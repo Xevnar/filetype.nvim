@@ -988,28 +988,6 @@ local udev_rules_pattern = '^%s*udev_rules%s*=%s*"([%^"]+)/*".*'
 --- @return string # The detected filetype
 function M.rules(path)
 	path = path:lower()
-	if
-		util.findany(path, {
-			'/etc/udev/.*%.rules$',
-			'/etc/udev/rules%.d/.*$.rules$',
-			'/usr/lib/udev/.*%.rules$',
-			'/usr/lib/udev/rules%.d/.*%.rules$',
-			'/lib/udev/.*%.rules$',
-			'/lib/udev/rules%.d/.*%.rules$',
-		})
-	then
-		return 'udevrules'
-	end
-
-	if path:find('^/etc/ufw/') then
-		-- Better than hog
-		return 'conf'
-	end
-
-	if util.findany(path, { '^/etc/polkit%-1/rules%.d', '/usr/share/polkit%-1/rules%.d' }) then
-		return 'javascript'
-	end
-
 	local ok, config_lines = pcall(vim.fn.readfile, '/etc/udev/udev.conf')
 	if not ok then
 		return 'hog'
