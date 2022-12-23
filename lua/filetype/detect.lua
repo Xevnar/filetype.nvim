@@ -485,7 +485,7 @@ end
 ---
 --- @param file_path string The absolute path of the file
 --- @return string # The detected filetype
-function M.tex(file_path)
+function M.tex()
 	local format = util.getline():find('^%%&%s*(%a+)')
 	if format then
 		format = format:lower():gsub('pdf', '', 1)
@@ -496,11 +496,6 @@ function M.tex(file_path)
 		if format == 'plaintex' then
 			return 'plaintex'
 		end
-	end
-
-	-- Early guarantee that the fileytpe is context
-	if file_path:lower():find('tex/context/.*/.*%.tex') then
-		return 'context'
 	end
 
 	local latex_pat = [[documentclass\>\|usepackage\>\|begin{\|newcommand\>\|renewcommand\>]]

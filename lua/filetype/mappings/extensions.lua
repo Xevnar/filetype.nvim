@@ -1140,7 +1140,7 @@ local extensions = {
 		return (vim.g.filetype_sql and vim.g.filetype_sql) or 'sql'
 	end,
 	['tex'] = function(args)
-		return detect.tex(args.file_path)
+		return detect.tex()
 	end,
 	['frm'] = function()
 		return detect.vbasic_form()
