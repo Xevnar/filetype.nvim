@@ -53,10 +53,15 @@ end
 -- Apostrophizes the string if it has quotes, but not aphostrophes
 -- Otherwise, it returns a regular quoted string
 local function smartQuote(str)
-	if not match(str, "'") then
+	if not (match(str, "'") or match(str, 'function')) then
 		return "'" .. str .. "'"
 	end
-	return ' [[' .. str .. ']] '
+
+	if match(str, '%[%[') then
+		return '[==[' .. str .. ']==]'
+	end
+
+	return '[[' .. str .. ']]'
 end
 
 -- \a => '\\a', \0 => '\\0', 31 => '\31'
@@ -80,6 +85,9 @@ for i = 0, 31 do
 end
 
 local function escape(str)
+	if match(str, 'function') then
+		return str
+	end
 	return (gsub(gsub(gsub(str, '\\', '\\\\'), '(%c)%f[0-9]', longControlCharEscapes), '%c', shortControlCharEscapes))
 end
 
