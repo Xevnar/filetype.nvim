@@ -4,7 +4,6 @@ local util = require('filetype.util')
 --- @module 'filetype.detect'
 local detect = require('filetype.detect')
 
---- @type table<string, { [string]: filetype_mapping }>
 local M = {}
 
 --- Add user defined map to module as two maps
@@ -354,14 +353,14 @@ M.extensions = {
 	['kt'] = 'kotlin',
 	['ktm'] = 'kotlin',
 	['kts'] = 'kotlin',
-	['sub'] = 'krl',
-	['suB'] = 'krl',
-	['sUb'] = 'krl',
-	['sUB'] = 'krl',
-	['Sub'] = 'krl',
-	['SuB'] = 'krl',
-	['SUb'] = 'krl',
 	['SUB'] = 'krl',
+	['SUb'] = 'krl',
+	['SuB'] = 'krl',
+	['Sub'] = 'krl',
+	['sUB'] = 'krl',
+	['sUb'] = 'krl',
+	['suB'] = 'krl',
+	['sub'] = 'krl',
 	['ks'] = 'kscript',
 	['k'] = 'kwt',
 	['ACE'] = 'lace',
@@ -465,9 +464,9 @@ M.extensions = {
 	['mu'] = 'mupad',
 	['mush'] = 'mush',
 	['mysql'] = 'mysql',
-	['nanorc'] = 'nanorc',
 	['nql'] = 'n1ql',
 	['n1ql'] = 'n1ql',
+	['nanorc'] = 'nanorc',
 	['ncf'] = 'ncf',
 	['nginx'] = 'nginx',
 	['nim'] = 'nim',
@@ -500,17 +499,17 @@ M.extensions = {
 	['xin'] = 'omnimark',
 	['xom'] = 'omnimark',
 	['opam'] = 'opam',
-	['opl'] = 'opl',
-	['opL'] = 'opl',
-	['oPl'] = 'opl',
-	['oPL'] = 'opl',
-	['Opl'] = 'opl',
-	['OpL'] = 'opl',
-	['OPl'] = 'opl',
-	['OPL'] = 'opl',
 	['or'] = 'openroad',
 	['scad'] = 'openscad',
 	['ovpn'] = 'openvpn',
+	['OPL'] = 'opl',
+	['OPl'] = 'opl',
+	['OpL'] = 'opl',
+	['Opl'] = 'opl',
+	['oPL'] = 'opl',
+	['oPl'] = 'opl',
+	['opL'] = 'opl',
+	['opl'] = 'opl',
 	['ora'] = 'ora',
 	['org'] = 'org',
 	['org_archive'] = 'org',
@@ -687,8 +686,8 @@ M.extensions = {
 	['ssi'] = 'sisu',
 	['ssm'] = 'sisu',
 	['sst'] = 'sisu',
-	['_sst'] = 'sisu',
 	['-sst'] = 'sisu',
+	['_sst'] = 'sisu',
 	['il'] = 'skill',
 	['cdf'] = 'skill',
 	['ils'] = 'skill',
@@ -874,102 +873,59 @@ M.extensions = {
 	['zut'] = 'zimbutempl',
 	['zir'] = 'zir',
 	['zsh'] = 'zsh',
-
-	['ms'] = function()
-		return detect.nroff() or 'xmath'
+	['sh'] = function()
+		return detect.sh('sh', true)
 	end,
-	['xpm'] = function()
-		return (util.getline():find('XPM2') and 'xpm2') or 'xpm'
+	['env'] = function()
+		return detect.sh('sh', true)
 	end,
-	['module'] = function()
-		return (util.getline():find('%<%?php') and 'php') or 'virata'
+	['bash'] = function()
+		return detect.sh('bash')
 	end,
-	['pkg'] = function()
-		return (util.getline():find('%<%?php') and 'php') or 'virata'
+	['ebuild'] = function()
+		return detect.sh('bash')
 	end,
-	['hw'] = function()
-		return (util.getline():find('%<%?php') and 'php') or 'virata'
+	['eclass'] = function()
+		return detect.sh('bash')
 	end,
-	['ts'] = function()
-		return (util.getline():find('<%?xml') and 'xml') or 'typescript'
+	['csh'] = function()
+		return detect.csh()
 	end,
-	['ttl'] = function()
-		local line = util.getline():lower()
-		if line:find('^@?prefix') or line:find('^@?base') then
-			return 'turtle'
-		end
-		return 'teraterm'
+	['ksh'] = function()
+		return detect.sh('ksh')
 	end,
-	['t'] = function(args)
-		return detect.nroff() or detect.perl(args.file_path, args.file_ext) or 'tads'
+	['tcsh'] = function()
+		return detect.sh('tcsh')
 	end,
-	['class'] = function()
-		-- Decimal escape sequence
-		-- The original was "^\xca\xfe\xba\xbe"
-		if util.getline():find('^\x202\x254\x186\x190') then
-			return 'stata'
-		end
+	['inp'] = function()
+		return detect.inp()
 	end,
-	['smi'] = function()
-		return (util.getline():find('smil') and 'smil') or 'mib'
+	['A'] = function()
+		return detect.asm()
 	end,
-	['smil'] = function()
-		return (util.getline():find('<?%s*xml.*?>') and 'xml') or 'smil'
+	['S'] = function()
+		return detect.asm()
 	end,
-	['cls'] = function()
-		if vim.g.filetype_cls then
-			return vim.g.filetype_cls
-		end
-
-		local line = util.getline()
-		if line:find('^[%%\\]') then
-			return 'tex'
-		end
-
-		if line:sub(1, 1) == '#' and line:find('rexx') then
-			return detect.sh('rexx')
-		end
-
-		if line == 'VERSION 1.0 CLASS' then
-			return 'vb'
-		end
-
-		return 'st'
+	['a'] = function()
+		return detect.asm()
 	end,
-	['install'] = function()
-		return (util.getline():find('%<%?php') and 'php') or detect.sh('bash')
+	['s'] = function()
+		return detect.asm()
 	end,
-	['decl'] = function()
-		return util.getlines_as_string(0, detect.line_limit, ' '):find('^%<%!SGML') and 'sgmldecl'
+	['asm'] = function()
+		return detect.asm()
 	end,
-	['sgm'] = function()
-		return detect.sgml()
+	['lst'] = function()
+		return detect.asm()
 	end,
-	['sgml'] = function()
-		return detect.sgml()
+	['mac'] = function()
+		return detect.asm()
 	end,
-	['reg'] = function()
-		if util.getline():find('^REGEDIT[0-9]*%s*$|^Windows Registry Editor Version %d*%.%d*%s*$') then
-			return 'registry'
-		end
+	['inc'] = function()
+		return detect.inc()
 	end,
-	['pm'] = function()
-		local line = util.getline()
-		return (line:find('XPM2') and 'xpm2') or (line:find('XPM') and 'xpm') or 'perl'
-	end,
-	['me'] = function(args)
-		if args.file_name ~= 'read.me' and args.file_name ~= 'click.me' then
-			return 'nroff'
-		end
-	end,
-	['edn'] = function()
-		return (util.getline():find('^%s*%(%s*edif') and 'edif') or 'clojure'
-	end,
-	['rul'] = function()
-		return (util.getlines_as_string(0, detect.line_limit):find('InstallShield') and 'ishd') or 'diva'
-	end,
-	['cpy'] = function()
-		return (util.getline():find('^%#%#') and 'python') or 'cobol'
+	['asa'] = function()
+		return (vim.g.filetype_asa and vim.g.filetype_asa) or 'aspvbs'
 	end,
 	['asp'] = function()
 		if vim.g.filetype_asp then
@@ -982,50 +938,11 @@ M.extensions = {
 
 		return 'aspvbs'
 	end,
-	['asa'] = function()
-		return (vim.g.filetype_asa and vim.g.filetype_asa) or 'aspvbs'
+	['db'] = function()
+		return detect.bindzone()
 	end,
-	['cmd'] = function()
-		return (util.getline():find('^%/%*') and 'rexx') or 'dosbatch'
-	end,
-	['cc'] = function()
-		return (vim.g.cynlib_syntax_for_cc and 'cynlib') or 'cpp'
-	end,
-	['cpp'] = function()
-		return (vim.g.cynlib_syntax_for_cc and 'cynlib') or 'cpp'
-	end,
-	['inp'] = function()
-		return detect.inp()
-	end,
-	['asm'] = function()
-		return detect.asm()
-	end,
-	['s'] = function()
-		return detect.asm()
-	end,
-	['S'] = function()
-		return detect.asm()
-	end,
-	['a'] = function()
-		return detect.asm()
-	end,
-	['A'] = function()
-		return detect.asm()
-	end,
-	['mac'] = function()
-		return detect.asm()
-	end,
-	['lst'] = function()
-		return detect.asm()
-	end,
-	['bi'] = function()
-		return detect.vbasic()
-	end,
-	['bm'] = function()
-		return detect.vbasic()
-	end,
-	['bas'] = function()
-		return detect.vbasic()
+	['com'] = function()
+		return detect.bindzone() or 'dcl'
 	end,
 	['btm'] = function()
 		if vim.g.dosbatch_syntax_for_btm and vim.g.dosbatch_syntax_for_btm ~= 0 then
@@ -1033,9 +950,6 @@ M.extensions = {
 		end
 
 		return 'btm'
-	end,
-	['db'] = function()
-		return detect.bindzone()
 	end,
 	['c'] = function()
 		return detect.lpc()
@@ -1046,152 +960,88 @@ M.extensions = {
 	['ch'] = function()
 		return detect.change()
 	end,
-	['ex'] = function()
-		return detect.elixir_check()
+	['cpy'] = function()
+		return (util.getline():find('^##') and 'python') or 'cobol'
 	end,
-	['eu'] = function()
-		return detect.euphoria_check()
+	['hook'] = function()
+		return util.getline() == '[Trigger]' and 'conf'
 	end,
-	['ew'] = function()
-		return detect.euphoria_check()
+	['cc'] = function()
+		return (vim.g.cynlib_syntax_for_cc and 'cynlib') or 'cpp'
 	end,
-	['exu'] = function()
-		return detect.euphoria_check()
+	['cpp'] = function()
+		return (vim.g.cynlib_syntax_for_cc and 'cynlib') or 'cpp'
 	end,
-	['exw'] = function()
-		return detect.euphoria_check()
+	['pro'] = function()
+		return detect.proto() or 'idlang'
 	end,
-	['EU'] = function()
-		return detect.euphoria_check()
+	['d'] = function()
+		return detect.dtrace()
 	end,
-	['EW'] = function()
-		return detect.euphoria_check()
+	['patch'] = function()
+		return detect.patch()
 	end,
-	['EX'] = function()
-		return detect.euphoria_check()
+	['rul'] = function()
+		return (util.getlines_as_string(0, detect.line_limit):find('InstallShield') and 'ishd') or 'diva'
 	end,
-	['EXU'] = function()
-		return detect.euphoria_check()
+	['dsl'] = function()
+		return (util.getline():find('^%s*<!') and 'dsl') or 'structurizr'
 	end,
-	['EXW'] = function()
-		return detect.euphoria_check()
-	end,
-	['e'] = function()
-		return detect.eiffel_check()
+	['edn'] = function()
+		return (util.getline():find('^%s*%(%s*edif') and 'edif') or 'clojure'
 	end,
 	['E'] = function()
+		return detect.eiffel_check()
+	end,
+	['e'] = function()
 		return detect.eiffel_check()
 	end,
 	['ent'] = function()
 		return detect.eiffel_check()
 	end,
-	['d'] = function()
-		return detect.dtrace()
+	['ex'] = function()
+		return detect.elixir_check()
 	end,
-	['com'] = function()
-		return detect.bindzone() or 'dcl'
+	['EU'] = function()
+		return (vim.g.filetype_euphoria and vim.g.filetype_euphoria) or 'euphoria3'
 	end,
-	['html'] = function()
-		return detect.html()
+	['EW'] = function()
+		return (vim.g.filetype_euphoria and vim.g.filetype_euphoria) or 'euphoria3'
 	end,
-	['htm'] = function()
-		return detect.html()
+	['EX'] = function()
+		return (vim.g.filetype_euphoria and vim.g.filetype_euphoria) or 'euphoria3'
 	end,
-	['shtml'] = function()
-		return detect.html()
+	['eu'] = function()
+		return (vim.g.filetype_euphoria and vim.g.filetype_euphoria) or 'euphoria3'
 	end,
-	['stm'] = function()
-		return detect.html()
+	['ew'] = function()
+		return (vim.g.filetype_euphoria and vim.g.filetype_euphoria) or 'euphoria3'
 	end,
-	['idl'] = function()
-		return detect.idl()
+	['EXU'] = function()
+		return (vim.g.filetype_euphoria and vim.g.filetype_euphoria) or 'euphoria3'
 	end,
-	['pro'] = function()
-		return detect.proto() or 'idlang'
+	['EXW'] = function()
+		return (vim.g.filetype_euphoria and vim.g.filetype_euphoria) or 'euphoria3'
 	end,
-	['m'] = function()
-		return detect.m()
+	['exu'] = function()
+		return (vim.g.filetype_euphoria and vim.g.filetype_euphoria) or 'euphoria3'
 	end,
-	['mm'] = function()
-		return detect.mm()
+	['exw'] = function()
+		return (vim.g.filetype_euphoria and vim.g.filetype_euphoria) or 'euphoria3'
 	end,
-	['mms'] = function()
-		return detect.mms()
+	['fs'] = function()
+		return detect.fs()
 	end,
-	['pp'] = function()
-		return detect.pp()
+	['fvwmrc'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
 	end,
-	['pl'] = function()
-		return detect.pl()
-	end,
-	['PL'] = function()
-		return detect.pl()
-	end,
-	['inc'] = function()
-		return detect.inc()
-	end,
-	['w'] = function()
-		return detect.progress_cweb()
-	end,
-	['i'] = function()
-		return detect.progress_asm()
-	end,
-	['p'] = function()
-		return detect.progress_pascal()
-	end,
-	['r'] = function()
-		return detect.r()
-	end,
-	['R'] = function()
-		return detect.r()
-	end,
-	['mc'] = function()
-		return detect.mc()
-	end,
-	['ebuild'] = function()
-		return detect.sh('bash')
-	end,
-	['bash'] = function()
-		return detect.sh('bash')
-	end,
-	['eclass'] = function()
-		return detect.sh('bash')
-	end,
-	['ksh'] = function()
-		return detect.sh('ksh')
-	end,
-	['sh'] = function()
-		return detect.sh('sh', true)
-	end,
-	['env'] = function()
-		return detect.sh('sh', true)
-	end,
-	['tcsh'] = function()
-		return detect.sh('tcsh')
-	end,
-	['csh'] = function()
-		return detect.csh()
+	['fvwm2rc'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
 	end,
 	['rules'] = function(args)
 		return detect.rules(args.file_path)
-	end,
-	['sql'] = function()
-		return (vim.g.filetype_sql and vim.g.filetype_sql) or 'sql'
-	end,
-	['tex'] = function(args)
-		return detect.tex()
-	end,
-	['frm'] = function()
-		return detect.vbasic_form()
-	end,
-	['xml'] = function()
-		return detect.xml()
-	end,
-	['y'] = function()
-		return detect.y()
-	end,
-	['dtml'] = function()
-		return detect.html()
 	end,
 	['pt'] = function()
 		return detect.html()
@@ -1199,29 +1049,86 @@ M.extensions = {
 	['cpt'] = function()
 		return detect.html()
 	end,
-	['zsql'] = function()
-		return (vim.g.filetype_sql and vim.g.filetype_sql) or 'sql'
+	['htm'] = function()
+		return detect.html()
 	end,
-	['dsl'] = function()
-		return (util.getline():find('^%s*<!') and 'dsl') or 'structurizr'
+	['stm'] = function()
+		return detect.html()
 	end,
-	['sc'] = function()
-		return detect.sc()
+	['dtml'] = function()
+		return detect.html()
 	end,
-	['sig'] = function()
-		return detect.sig()
+	['html'] = function()
+		return detect.html()
 	end,
-	['fs'] = function()
-		return detect.fs()
+	['shtml'] = function()
+		return detect.html()
+	end,
+	['idl'] = function()
+		return detect.idl()
+	end,
+	['SRC'] = function()
+		return detect.src()
+	end,
+	['SRc'] = function()
+		return detect.src()
+	end,
+	['SrC'] = function()
+		return detect.src()
+	end,
+	['Src'] = function()
+		return detect.src()
+	end,
+	['sRC'] = function()
+		return detect.src()
+	end,
+	['sRc'] = function()
+		return detect.src()
+	end,
+	['srC'] = function()
+		return detect.src()
+	end,
+	['src'] = function()
+		return detect.src()
+	end,
+	['DAT'] = function()
+		return detect.dat()
+	end,
+	['DAt'] = function()
+		return detect.dat()
+	end,
+	['DaT'] = function()
+		return detect.dat()
+	end,
+	['Dat'] = function()
+		return detect.dat()
+	end,
+	['dAT'] = function()
+		return detect.dat()
+	end,
+	['dAt'] = function()
+		return detect.dat()
+	end,
+	['daT'] = function()
+		return detect.dat()
+	end,
+	['dat'] = function()
+		return detect.dat()
 	end,
 	['lsl'] = function()
 		return detect.lsl()
 	end,
-	['tf'] = function()
-		return detect.tf()
+	['mc'] = function()
+		return detect.mc()
 	end,
-	['patch'] = function()
-		return detect.patch()
+	['mms'] = function()
+		return detect.mms()
+	end,
+	['smi'] = function()
+		return (util.getline():find('smil') and 'smil') or 'mib'
+	end,
+	['m'] = function()
+		return detect.m()
 	end,
 	['mp'] = function()
 		vim.b.mp_metafun = 1
@@ -1239,142 +1146,239 @@ M.extensions = {
 		vim.b.mp_metafun = 1
 		return 'mp'
 	end,
-	['sil'] = function()
-		return detect.sil()
+	['me'] = function(args)
+		if args.file_name ~= 'read.me' and args.file_name ~= 'click.me' then
+			return 'nroff'
+		end
 	end,
-	['scd'] = function()
-		return detect.scd()
+	['ms'] = function()
+		return detect.nroff() or 'xmath'
 	end,
-	['hook'] = function()
-		return util.getline() == '[Trigger]' and 'conf'
+	['mm'] = function()
+		return detect.mm()
 	end,
-	['src'] = function()
-		return detect.src()
+	['t'] = function(args)
+		return detect.nroff() or detect.perl(args.file_path, args.file_ext) or 'tads'
 	end,
-	['srC'] = function()
-		return detect.src()
+	['pp'] = function()
+		return detect.pp()
 	end,
-	['sRc'] = function()
-		return detect.src()
+	['PL'] = function()
+		return detect.pl()
 	end,
-	['sRC'] = function()
-		return detect.src()
+	['pl'] = function()
+		return detect.pl()
 	end,
-	['Src'] = function()
-		return detect.src()
+	['install'] = function()
+		return (util.getline():find('%<%?php') and 'php') or detect.sh('bash')
 	end,
-	['SrC'] = function()
-		return detect.src()
+	['hw'] = function()
+		return (util.getline():find('%<%?php') and 'php') or 'virata'
 	end,
-	['SRc'] = function()
-		return detect.src()
+	['pkg'] = function()
+		return (util.getline():find('%<%?php') and 'php') or 'virata'
 	end,
-	['SRC'] = function()
-		return detect.src()
+	['module'] = function()
+		return (util.getline():find('%<%?php') and 'php') or 'virata'
 	end,
-	['dat'] = function()
-		return detect.dat()
+	['w'] = function()
+		return detect.progress_cweb()
 	end,
-	['daT'] = function()
-		return detect.dat()
+	['i'] = function()
+		return detect.progress_asm()
 	end,
-	['dAt'] = function()
-		return detect.dat()
+	['p'] = function()
+		return detect.progress_pascal()
 	end,
-	['dAT'] = function()
-		return detect.dat()
+	['R'] = function()
+		return detect.r()
 	end,
-	['Dat'] = function()
-		return detect.dat()
+	['r'] = function()
+		return detect.r()
 	end,
-	['DaT'] = function()
-		return detect.dat()
+	['y'] = function()
+		return detect.y()
 	end,
-	['DAt'] = function()
-		return detect.dat()
-	end,
-	['DAT'] = function()
-		return detect.dat()
-	end,
-	['sys'] = function()
-		return detect.sys()
-	end,
-	['syS'] = function()
-		return detect.sys()
-	end,
-	['sYs'] = function()
-		return detect.sys()
-	end,
-	['sYS'] = function()
-		return detect.sys()
-	end,
-	['Sys'] = function()
-		return detect.sys()
-	end,
-	['SyS'] = function()
-		return detect.sys()
-	end,
-	['SYs'] = function()
-		return detect.sys()
-	end,
-	['SYS'] = function()
-		return detect.sys()
-	end,
-	['mod'] = function()
-		return detect.mod()
-	end,
-	['moD'] = function()
-		return detect.mod()
-	end,
-	['mOd'] = function()
-		return detect.mod()
-	end,
-	['mOD'] = function()
-		return detect.mod()
-	end,
-	['Mod'] = function()
-		return detect.mod()
-	end,
-	['MoD'] = function()
+	['MOD'] = function()
 		return detect.mod()
 	end,
 	['MOd'] = function()
 		return detect.mod()
 	end,
-	['MOD'] = function()
+	['MoD'] = function()
 		return detect.mod()
 	end,
-	['prg'] = function()
-		return detect.prg()
+	['Mod'] = function()
+		return detect.mod()
 	end,
-	['prG'] = function()
-		return detect.prg()
+	['mOD'] = function()
+		return detect.mod()
 	end,
-	['pRg'] = function()
-		return detect.prg()
+	['mOd'] = function()
+		return detect.mod()
 	end,
-	['pRG'] = function()
-		return detect.prg()
+	['moD'] = function()
+		return detect.mod()
 	end,
-	['Prg'] = function()
-		return detect.prg()
+	['mod'] = function()
+		return detect.mod()
 	end,
-	['PrG'] = function()
+	['PRG'] = function()
 		return detect.prg()
 	end,
 	['PRg'] = function()
 		return detect.prg()
 	end,
-	['PRG'] = function()
+	['PrG'] = function()
 		return detect.prg()
 	end,
-	['fvwmrc'] = function()
-		vim.b.fvwm_version = 1
-		return 'fvwm'
+	['Prg'] = function()
+		return detect.prg()
 	end,
-	['fvwm2rc'] = function()
-		vim.b.fvwm_version = 2
-		return 'fvwm'
+	['pRG'] = function()
+		return detect.prg()
+	end,
+	['pRg'] = function()
+		return detect.prg()
+	end,
+	['prG'] = function()
+		return detect.prg()
+	end,
+	['prg'] = function()
+		return detect.prg()
+	end,
+	['reg'] = function()
+		if util.getline():find('^REGEDIT[0-9]*%s*$|^Windows Registry Editor Version %d*%.%d*%s*$') then
+			return 'registry'
+		end
+	end,
+	['cmd'] = function()
+		return (util.getline():find('^%/%*') and 'rexx') or 'dosbatch'
+	end,
+	['sc'] = function()
+		return detect.sc()
+	end,
+	['scd'] = function()
+		return detect.scd()
+	end,
+	['sgm'] = function()
+		return detect.sgml()
+	end,
+	['sgml'] = function()
+		return detect.sgml()
+	end,
+	['decl'] = function()
+		return util.getlines_as_string(0, detect.line_limit, ' '):find('^%<%!SGML') and 'sgmldecl'
+	end,
+	['sil'] = function()
+		return detect.sil()
+	end,
+	['sig'] = function()
+		return detect.sig()
+	end,
+	['cls'] = function()
+		if vim.g.filetype_cls then
+			return vim.g.filetype_cls
+		end
+
+		local line = util.getline()
+		if line == 'VERSION 1.0 CLASS' then
+			return 'vb'
+		end
+
+		if line:find('^[%%\\]') then
+			return 'tex'
+		end
+
+		if line:sub(1, 1) == '#' and line:find('rexx') then
+			return detect.sh('rexx')
+		end
+
+		return 'st'
+	end,
+	['class'] = function()
+		-- Decimal escape sequence
+		-- The original was "^\xca\xfe\xba\xbe"
+		if util.getline():find('^\x202\x254\x186\x190') then
+			return 'stata'
+		end
+	end,
+	['sql'] = function()
+		return (vim.g.filetype_sql and vim.g.filetype_sql) or 'sql'
+	end,
+	['zsql'] = function()
+		return (vim.g.filetype_sql and vim.g.filetype_sql) or 'sql'
+	end,
+	['SYS'] = function()
+		return detect.sys()
+	end,
+	['SYs'] = function()
+		return detect.sys()
+	end,
+	['SyS'] = function()
+		return detect.sys()
+	end,
+	['Sys'] = function()
+		return detect.sys()
+	end,
+	['sYS'] = function()
+		return detect.sys()
+	end,
+	['sYs'] = function()
+		return detect.sys()
+	end,
+	['syS'] = function()
+		return detect.sys()
+	end,
+	['sys'] = function()
+		return detect.sys()
+	end,
+	['tex'] = function(args)
+		return detect.tex()
+	end,
+	['tf'] = function()
+		return detect.tf()
+	end,
+	['ttl'] = function()
+		local line = util.getline():lower()
+		if line:find('^@?prefix') or line:find('^@?base') then
+			return 'turtle'
+		end
+		return 'teraterm'
+	end,
+	['bi'] = function()
+		return detect.vbasic()
+	end,
+	['bm'] = function()
+		return detect.vbasic()
+	end,
+	['bas'] = function()
+		return detect.vbasic()
+	end,
+	['frm'] = function()
+		return detect.vbasic_form()
+	end,
+	['xbl'] = function()
+		return detect.xml()
+	end,
+	['xml'] = function()
+		return detect.xml()
+	end,
+	['docbk'] = function()
+		return detect.xml()
+	end,
+	['smil'] = function()
+		return (util.getline():find('<?%s*xml.*?>') and 'xml') or 'smil'
+	end,
+	['ts'] = function()
+		return (util.getline():find('<%?xml') and 'xml') or 'typescript'
+	end,
+	['xpm'] = function()
+		return (util.getline():find('XPM2') and 'xpm2') or 'xpm'
+	end,
+	['pm'] = function()
+		local line = util.getline()
+		return (line:find('XPM2') and 'xpm2') or (line:find('XPM') and 'xpm') or 'perl'
 	end,
 }
 
@@ -1392,8 +1396,8 @@ M.literals = {
 	['/.aptitude/config'] = 'aptconf',
 	['.arch-inventory'] = 'arch',
 	['=tagging-method'] = 'arch',
-	['makefile.am'] = 'automake',
 	['Makefile.am'] = 'automake',
+	['makefile.am'] = 'automake',
 	['GNUmakefile.am'] = 'automake',
 	['named.root'] = 'bindzone',
 	['BUILD'] = 'bzl',
@@ -1411,7 +1415,6 @@ M.literals = {
 	['cmake.in'] = 'cmake',
 	['CMakeLists.txt'] = 'cmake',
 	['auto.master'] = 'conf',
-	['Pipfile'] = 'toml',
 	['configure.ac'] = 'config',
 	['configure.in'] = 'config',
 	['mpv.conf'] = 'confini',
@@ -1614,10 +1617,10 @@ M.literals = {
 	['irbrc'] = 'ruby',
 	['.irbrc'] = 'ruby',
 	['Gemfile'] = 'ruby',
-	['rakefile'] = 'ruby',
-	['rantfile'] = 'ruby',
 	['Rakefile'] = 'ruby',
 	['Rantfile'] = 'ruby',
+	['rakefile'] = 'ruby',
+	['rantfile'] = 'ruby',
 	['Puppetfile'] = 'ruby',
 	['Vagrantfile'] = 'ruby',
 	['smb.conf'] = 'samba',
@@ -1659,6 +1662,7 @@ M.literals = {
 	['tidy.conf'] = 'tidy',
 	['t.html'] = 'tilde',
 	['.tmux.conf'] = 'tmux',
+	['Pipfile'] = 'toml',
 	['Cargo.lock'] = 'toml',
 	['Gopkg.lock'] = 'toml',
 	['/.cargo/config'] = 'toml',
@@ -1697,117 +1701,61 @@ M.literals = {
 	['.zcompdump'] = 'zsh',
 	['.zfbfmarks'] = 'zsh',
 	['/etc/zprofile'] = 'zsh',
-
-	['xorg.conf-4'] = function()
-		vim.b.xf86conf_xfree86_version = 4
-		return 'xf86conf'
+	['.profile'] = function()
+		return detect.sh('sh', true)
 	end,
-	['xorg.conf'] = function()
-		vim.b.xf86conf_xfree86_version = 4
-		return 'xf86conf'
+	['/etc/profile'] = function()
+		return detect.sh('sh', true)
 	end,
-	['XF86Config'] = function()
-		if util.getline():find('XConfigurator') then
-			vim.b.xf86conf_xfree86_version = 3
-		end
-		return 'xf86conf'
-	end,
-	['INDEX'] = function()
-		if
-			util.findand(util.getline(), {
-				'^%s*distribution%s*$',
-				'^%s*installed_software%s*$',
-				'^%s*root%s*$',
-				'^%s*bundle%s*$',
-				'^%s*product%s*$',
-			})
-		then
-			return 'psf'
-		end
-	end,
-	['INFO'] = function()
-		if
-			util.findand(util.getline(), {
-				'^%s*distribution%s*$',
-				'^%s*installed_software%s*$',
-				'^%s*root%s*$',
-				'^%s*bundle%s*$',
-				'^%s*product%s*$',
-			})
-		then
-			return 'psf'
-		end
-	end,
-	['control'] = function()
-		return util.getline():find('^Source%:') and 'debcontrol'
-	end,
-	['NEWS'] = function()
-		return util.getline():find('%; urgency%=') and 'debchangelog'
-	end,
-	['indent.pro'] = function()
-		return detect.proto() or 'indent'
-	end,
-	['.bashrc'] = function()
+	['.d'] = function()
 		return detect.sh('bash')
 	end,
 	['bashrc'] = function()
 		return detect.sh('bash')
 	end,
-	['.bash_profile'] = function()
-		return detect.sh('bash')
-	end,
-	['.bash-profile'] = function()
-		return detect.sh('bash')
-	end,
-	['.bash_logout'] = function()
-		return detect.sh('bash')
-	end,
-	['.bash-logout'] = function()
-		return detect.sh('bash')
-	end,
-	['.bash_aliases'] = function()
-		return detect.sh('bash')
-	end,
-	['.bash-aliases'] = function()
-		return detect.sh('bash')
-	end,
-	['.bash-fc_'] = function()
-		return detect.sh('bash')
-	end,
-	['.bash-fc-'] = function()
-		return detect.sh('bash')
-	end,
-	['bash.bashrc'] = function()
-		return detect.sh('bash')
-	end,
-	['PKGBUILD'] = function()
+	['.bashrc'] = function()
 		return detect.sh('bash')
 	end,
 	['APKBUILD'] = function()
 		return detect.sh('bash')
 	end,
-	['.kshrc'] = function()
-		return detect.sh('ksh')
+	['PKGBUILD'] = function()
+		return detect.sh('bash')
 	end,
-	['.profile'] = function()
-		return detect.sh('sh', true)
+	['.bash-fc-'] = function()
+		return detect.sh('bash')
 	end,
-	['/etc/profile$'] = function()
-		return detect.sh('sh', true)
+	['.bash-fc_'] = function()
+		return detect.sh('bash')
 	end,
-	['.tcshrc'] = function()
-		return detect.sh('tcsh')
+	['bash.bashrc'] = function()
+		return detect.sh('bash')
 	end,
-	['tcsh.tcshrc'] = function()
-		return detect.sh('tcsh')
+	['.bash-logout'] = function()
+		return detect.sh('bash')
 	end,
-	['tcsh.login'] = function()
-		return detect.sh('tcsh')
+	['.bash_logout'] = function()
+		return detect.sh('bash')
 	end,
-	['.login'] = function()
+	['.bash-aliases'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash-profile'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash_aliases'] = function()
+		return detect.sh('bash')
+	end,
+	['.bash_profile'] = function()
+		return detect.sh('bash')
+	end,
+	['.alias'] = function()
 		return detect.csh()
 	end,
 	['.cshrc'] = function()
+		return detect.csh()
+	end,
+	['.login'] = function()
 		return detect.csh()
 	end,
 	['csh.cshrc'] = function()
@@ -1819,11 +1767,29 @@ M.literals = {
 	['csh.logout'] = function()
 		return detect.csh()
 	end,
-	['.alias'] = function()
-		return detect.csh()
+	['.kshrc'] = function()
+		return detect.sh('ksh')
 	end,
-	['.d'] = function()
-		return detect.sh('bash')
+	['.tcshrc'] = function()
+		return detect.sh('tcsh')
+	end,
+	['tcsh.login'] = function()
+		return detect.sh('tcsh')
+	end,
+	['tcsh.tcshrc'] = function()
+		return detect.sh('tcsh')
+	end,
+	['NEWS'] = function()
+		return (util.getline():find('%; urgency%=') and 'debchangelog') or 'changelog'
+	end,
+	['indent.pro'] = function()
+		return detect.proto() or 'indent'
+	end,
+	['control'] = function()
+		return util.getline():find('^Source%:') and 'debcontrol'
+	end,
+	['fvModels'] = function()
+		return detect.foam()
 	end,
 	['fvSchemes'] = function()
 		return detect.foam()
@@ -1834,8 +1800,39 @@ M.literals = {
 	['fvConstraints'] = function()
 		return detect.foam()
 	end,
-	['fvModels'] = function()
-		return detect.foam()
+	['fvwmrc'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
+	['fvwm2rc'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
+	end,
+	['INFO'] = function()
+		if
+			util.findany(util.getline(), {
+				'^%s*distribution%s*$',
+				'^%s*installed_software%s*$',
+				'^%s*root%s*$',
+				'^%s*bundle%s*$',
+				'^%s*product%s*$',
+			})
+		then
+			return 'psf'
+		end
+	end,
+	['INDEX'] = function()
+		if
+			util.findany(util.getline(), {
+				'^%s*distribution%s*$',
+				'^%s*installed_software%s*$',
+				'^%s*root%s*$',
+				'^%s*bundle%s*$',
+				'^%s*product%s*$',
+			})
+		then
+			return 'psf'
+		end
 	end,
 	['printcap'] = function()
 		vim.b.ptcap_type = 'print'
@@ -1845,13 +1842,19 @@ M.literals = {
 		vim.b.ptcap_type = 'term'
 		return 'ptcap'
 	end,
-	['fvwmrc'] = function()
-		vim.b.fvwm_version = 1
-		return 'fvwm'
+	['xorg.conf'] = function()
+		vim.b.xf86conf_xfree86_version = 4
+		return 'xf86conf'
 	end,
-	['fvwm2rc'] = function()
-		vim.b.fvwm_version = 2
-		return 'fvwm'
+	['xorg.conf-4'] = function()
+		vim.b.xf86conf_xfree86_version = 4
+		return 'xf86conf'
+	end,
+	['XF86Config'] = function()
+		if util.getline():find('XConfigurator') then
+			vim.b.xf86conf_xfree86_version = 3
+		end
+		return 'xf86conf'
 	end,
 }
 
@@ -1860,15 +1863,16 @@ M.literals = {
 ---
 --- @type { [string]: boolean } A table of lua pattern mappings
 M.contains_env_var = {
+	['^${GNUPGHOME}/gpg%.conf$'] = true,
+	['^${GNUPGHOME}/options$'] = true,
 	['^${HOME}/cabal%.config$'] = true,
+	['^${VIMRUNTIME}/doc/.*%.txt$'] = true,
 	['^${XDG_CONFIG_HOME}/git/attributes$'] = true,
 	['^${XDG_CONFIG_HOME}/git/config$'] = true,
 	['^${XDG_CONFIG_HOME}/git/ignore$'] = true,
-	['^${GNUPGHOME}/options$'] = true,
-	['^${GNUPGHOME}/gpg%.conf$'] = true,
-	['^${VIMRUNTIME}/doc/.*%.txt$'] = true,
 }
 
+--- @type { [string]: filetype_mapping }
 M.endswith = {
 	['/debian/patches/series$'] = '',
 	['/etc/a2ps%.cfg$'] = 'a2ps',
@@ -2053,12 +2057,12 @@ M.endswith = {
 	['/etc/blkid%.tab.old$'] = 'xml',
 	['/etc/blkid%.tab%.old$'] = 'xml',
 	['/etc/zprofile$'] = 'zsh',
-
 	['/etc/profile$'] = function()
 		return detect.sh('sh', true)
 	end,
 }
 
+--- @type { [string]: filetype_mapping }
 M.fendswith = {
 	['hgrc$'] = 'cfg',
 	['%.%.ch$'] = 'chill',
@@ -2097,7 +2101,6 @@ M.fendswith = {
 	['%.fsproj%.user$'] = 'xml',
 	['%.vbproj%.user$'] = 'xml',
 	['Xmodmap$'] = 'xmodmap',
-
 	['fvwmrc$'] = function()
 		vim.b.fvwm_version = 1
 		return 'fvwm'
@@ -2112,6 +2115,7 @@ M.fendswith = {
 	end,
 }
 
+--- @type { [string]: filetype_mapping }
 M.complex = {
 	['/etc/a2ps/.*%.cfg$'] = 'a2ps',
 	['/etc/httpd/.*%.conf$'] = 'apache',
@@ -2176,16 +2180,16 @@ M.complex = {
 	['/%.config/upstart/.*%.override$'] = 'upstart',
 	['/usr/share/upstart/.*%.override$'] = 'upstart',
 	['/etc/xdg/menus/.*%.menu$'] = 'xml',
-
+	['/constant/g$'] = function()
+		return detect.foam()
+	end,
 	['/xorg%.conf%.d/.*%.conf$'] = function()
 		vim.b.xf86conf_xfree86_version = 4
 		return 'xf86conf'
 	end,
-	['/constant/g$'] = function()
-		return detect.foam()
-	end,
 }
 
+--- @type { [string]: filetype_mapping }
 M.fcomplex = {
 	['^dictd.*%.conf$'] = 'dictdconf',
 	['^hg%-editor%-.*%.txt$'] = 'hgcommit',
@@ -2201,18 +2205,17 @@ M.fcomplex = {
 	['^svn%-commit.*%.tmp$'] = 'svn',
 	['^%.tmux.*%.conf$'] = 'tmux',
 	['^%.?tmux.*%.conf$'] = 'tmux',
-	[util.to_case_insensitive('%.?upstream%.dat$')] = 'upstreamdat',
-	[util.to_case_insensitive('upstream%..*%.dat$')] = 'upstreamdat',
-	[util.to_case_insensitive('%.?upstreaminstall%.log$')] = 'upstreaminstalllog',
-	[util.to_case_insensitive('upstreaminstall%..*%.log$')] = 'upstreaminstalllog',
-	[util.to_case_insensitive('upstream%-.*%.log$')] = 'upstreamlog',
-	[util.to_case_insensitive('%.?upstream%.log$')] = 'upstreamlog',
-	[util.to_case_insensitive('upstream%..*%.log$')] = 'upstreamlog',
-	[util.to_case_insensitive('%.?usserver%.log$')] = 'usserverlog',
-	[util.to_case_insensitive('usserver%..*%.log$')] = 'usserverlog',
-	[util.to_case_insensitive('%.?usw2kagt%.log$')] = 'usw2kagtlog',
-	[util.to_case_insensitive('usw2kagt%..*%.log$')] = 'usw2kagtlog',
-
+	['%.?[uU][pP][sS][tT][rR][eE][aA][mM]%.[dD][aA][tT]$'] = 'upstreamdat',
+	['[uU][pP][sS][tT][rR][eE][aA][mM]%..*%.[dD][aA][tT]$'] = 'upstreamdat',
+	['%.?[uU][pP][sS][tT][rR][eE][aA][mM][iI][nN][sS][tT][aA][lL][lL]%.[lL][oO][gG]$'] = 'upstreaminstalllog',
+	['[uU][pP][sS][tT][rR][eE][aA][mM][iI][nN][sS][tT][aA][lL][lL]%..*%.[lL][oO][gG]$'] = 'upstreaminstalllog',
+	['%.?[uU][pP][sS][tT][rR][eE][aA][mM]%.[lL][oO][gG]$'] = 'upstreamlog',
+	['[uU][pP][sS][tT][rR][eE][aA][mM]%-.*%.[lL][oO][gG]$'] = 'upstreamlog',
+	['[uU][pP][sS][tT][rR][eE][aA][mM]%..*%.[lL][oO][gG]$'] = 'upstreamlog',
+	['%.?[uU][sS][sS][eE][rR][vV][eE][rR]%.[lL][oO][gG]$'] = 'usserverlog',
+	['[uU][sS][sS][eE][rR][vV][eE][rR]%..*%.[lL][oO][gG]$'] = 'usserverlog',
+	['%.?[uU][sS][wW]2[kK][aA][gG][tT]%.[lL][oO][gG]$'] = 'usw2kagtlog',
+	['[uU][sS][wW]2[kK][aA][gG][tT]%..*%.[lL][oO][gG]$'] = 'usw2kagtlog',
 	['^[a-zA-Z0-9].*Dict$'] = function()
 		return detect.foam()
 	end,
@@ -2224,6 +2227,7 @@ M.fcomplex = {
 	end,
 }
 
+--- @type { [string]: filetype_mapping }
 M.starsets = {
 	['/etc/httpd/conf%..*/'] = 'apache',
 	['/etc/httpd/mods%-.*/'] = 'apache',
@@ -2273,15 +2277,8 @@ M.starsets = {
 	['/app-defaults/'] = 'xdefaults',
 	['/app%-defaults/'] = 'xdefaults',
 	['/etc/xinetd%.d/'] = 'xinetd',
-
 	['/debian/patches/'] = function()
 		return detect.dep3patch()
-	end,
-	['%.git/'] = function()
-		local line = util.getline()
-		if util.match_vim_regex(line, [[^\x\{40,\}\>\|^ref: ]]) then
-			return 'git'
-		end
 	end,
 	['/0/'] = function()
 		return detect.foam()
@@ -2293,8 +2290,15 @@ M.starsets = {
 		vim.b.fvwm_version = 1
 		return 'fvwm'
 	end,
+	['%.git/'] = function()
+		local line = util.getline()
+		if util.match_vim_regex(line, [[^\x\{40,\}\>\|^ref: ]]) then
+			return 'git'
+		end
+	end,
 }
 
+--- @type { [string]: filetype_mapping }
 M.fstarsets = {
 	['^srm%.conf'] = 'apache',
 	['^httpd%.conf'] = 'apache',
@@ -2338,50 +2342,41 @@ M.fstarsets = {
 	['^%.?zsh'] = 'zsh',
 	['^%.?zlog'] = 'zsh',
 	['^%.?zcompdump'] = 'zsh',
-
-	['^%.bashrc'] = function()
-		return detect.sh('bash')
+	['^%.profile'] = function()
+		return detect.sh('sh', true)
 	end,
-	['^PKGBUILD'] = function()
+	['^%.bashrc'] = function()
 		return detect.sh('bash')
 	end,
 	['^APKBUILD'] = function()
 		return detect.sh('bash')
 	end,
-	['^%.kshrc'] = function()
-		return detect.sh('ksh')
+	['^PKGBUILD'] = function()
+		return detect.sh('bash')
 	end,
-	['^%.profile'] = function()
-		return detect.sh('sh', true)
-	end,
-	['^%.tcshrc'] = function()
-		return detect.sh('tcsh')
+	['^%.cshrc'] = function()
+		return detect.csh()
 	end,
 	['^%.login'] = function()
 		return detect.csh()
 	end,
-	['^%.cshrc'] = function()
-		return detect.csh()
+	['^%.kshrc'] = function()
+		return detect.sh('ksh')
+	end,
+	['^%.tcshrc'] = function()
+		return detect.sh('tcsh')
+	end,
+	['^[cC]hange[lL]og'] = function()
+		return (util.getline():find('%; urgency%=') and 'debchangelog') or 'changelog'
+	end,
+	['Transport%.'] = function()
+		return detect.foam()
 	end,
 	['^[a-zA-Z0-9].*Dict%.'] = function()
 		return detect.foam()
 	end,
 	['^[a-zA-Z].*Properties%.'] = function()
 		return detect.foam()
-	end,
-	['Transport%.'] = function()
-		return detect.foam()
-	end,
-	['printcap'] = function()
-		vim.b.ptcap_type = 'print'
-		return 'ptcap'
-	end,
-	['termcap'] = function()
-		vim.b.ptcap_type = 'term'
-		return 'ptcap'
-	end,
-	['^[cC]hange[lL]og'] = function()
-		return (util.getline():find('%; urgency%=') and 'debchangelog') or 'changelog'
 	end,
 	['fvwmrc'] = function()
 		vim.b.fvwm_version = 1
@@ -2391,8 +2386,15 @@ M.fstarsets = {
 		vim.b.fvwm_version = 2
 		return 'fvwm'
 	end,
-	-- .cfg has many conflicting file patterns and names
-	[util.to_case_insensitive('%.cfg$')] = function()
+	['printcap'] = function()
+		vim.b.ptcap_type = 'print'
+		return 'ptcap'
+	end,
+	['termcap'] = function()
+		vim.b.ptcap_type = 'term'
+		return 'ptcap'
+	end,
+	['%.[cC][fF][gG]$'] = function()
 		return detect.cfg()
 	end,
 }
