@@ -377,6 +377,7 @@ M.fcomplex = {
 	['^dictd.*%.conf$'] = 'dictdconf',
 	['^hg%-editor%-.*%.txt$'] = 'hgcommit',
 	['^org%.eclipse%..*%.prefs$'] = 'jproperties',
+	['^[jt]sconfig.*%.json$'] = 'jsonc',
 	['^mutt%-.*%-%w+$'] = 'mail',
 	['^muttng%-.*%-%w+$'] = 'mail',
 	['^neomutt%-.*%-%w+$'] = 'mail',
