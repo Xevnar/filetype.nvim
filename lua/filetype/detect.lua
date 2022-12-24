@@ -485,7 +485,7 @@ end
 ---
 --- @param file_path string The absolute path of the file
 --- @return string # The detected filetype
-function M.tex(file_path)
+function M.tex()
 	local format = util.getline():find('^%%&%s*(%a+)')
 	if format then
 		format = format:lower():gsub('pdf', '', 1)
@@ -496,11 +496,6 @@ function M.tex(file_path)
 		if format == 'plaintex' then
 			return 'plaintex'
 		end
-	end
-
-	-- Early guarantee that the fileytpe is context
-	if file_path:lower():find('tex/context/.*/.*%.tex') then
-		return 'context'
 	end
 
 	local latex_pat = [[documentclass\>\|usepackage\>\|begin{\|newcommand\>\|renewcommand\>]]
@@ -988,28 +983,6 @@ local udev_rules_pattern = '^%s*udev_rules%s*=%s*"([%^"]+)/*".*'
 --- @return string # The detected filetype
 function M.rules(path)
 	path = path:lower()
-	if
-		util.findany(path, {
-			'/etc/udev/.*%.rules$',
-			'/etc/udev/rules%.d/.*$.rules$',
-			'/usr/lib/udev/.*%.rules$',
-			'/usr/lib/udev/rules%.d/.*%.rules$',
-			'/lib/udev/.*%.rules$',
-			'/lib/udev/rules%.d/.*%.rules$',
-		})
-	then
-		return 'udevrules'
-	end
-
-	if path:find('^/etc/ufw/') then
-		-- Better than hog
-		return 'conf'
-	end
-
-	if util.findany(path, { '^/etc/polkit%-1/rules%.d', '/usr/share/polkit%-1/rules%.d' }) then
-		return 'javascript'
-	end
-
 	local ok, config_lines = pcall(vim.fn.readfile, '/etc/udev/udev.conf')
 	if not ok then
 		return 'hog'
@@ -1183,17 +1156,7 @@ end
 --- @return string? # The detected filetype
 function M.sc()
 	for _, line in ipairs(util.getlines(0, M.line_limit)) do
-		if
-			util.findany(line, {
-				'[A-Za-z0-9]*%s:%s[A-Za-z0-9]',
-				'var%s<',
-				'classvar%s<',
-				'%^this.*',
-				'|%w*|',
-				'%+%s%w*%s{',
-				'%*ar%s',
-			})
-		then
+		if util.findany(line, { 'var%s<', 'classvar%s<', '%^this.*', '|%w+|', '%+%s%w*%s{', '%*ar%s', }) then
 			return 'supercollider'
 		end
 	end

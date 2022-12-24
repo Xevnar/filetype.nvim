@@ -136,13 +136,17 @@ local literal = {
 	['ipf.conf'] = 'ipfilter',
 	['ipf.rules'] = 'ipfilter',
 	['ipf6.conf'] = 'ipfilter',
-	['.babelrc'] = 'json',
-	['.eslintrc'] = 'json',
 	['json-patch'] = 'json',
 	['.firebaserc'] = 'json',
 	['.prettierrc'] = 'json',
 	['.stylelintrc'] = 'json',
 	['Pipfile.lock'] = 'json',
+	['.swrc'] = 'jsonc',
+	['.hintrc'] = 'jsonc',
+	['.babelrc'] = 'jsonc',
+	['.jsfmtrc'] = 'jsonc',
+	['.eslintrc'] = 'jsonc',
+	['.jshintrc'] = 'jsonc',
 	['Kconfig'] = 'kconfig',
 	['Kconfig.debug'] = 'kconfig',
 	['.lftprc'] = 'lftp',
@@ -236,6 +240,10 @@ local literal = {
 	['irbrc'] = 'ruby',
 	['.irbrc'] = 'ruby',
 	['Gemfile'] = 'ruby',
+	['rakefile'] = 'ruby',
+	['rantfile'] = 'ruby',
+	['Rakefile'] = 'ruby',
+	['Rantfile'] = 'ruby',
 	['Puppetfile'] = 'ruby',
 	['Vagrantfile'] = 'ruby',
 	['smb.conf'] = 'samba',
@@ -410,6 +418,9 @@ local literal = {
 	['.profile'] = function()
 		return detect.sh('sh', true)
 	end,
+	['/etc/profile$'] = function()
+		return detect.sh('sh', true)
+	end,
 	['.tcshrc'] = function()
 		return detect.sh('tcsh')
 	end,
@@ -452,13 +463,21 @@ local literal = {
 	['fvModels'] = function()
 		return detect.foam()
 	end,
-	['printcap.*'] = function()
+	['printcap'] = function()
 		vim.b.ptcap_type = 'print'
 		return 'ptcap'
 	end,
 	['termcap'] = function()
 		vim.b.ptcap_type = 'term'
 		return 'ptcap'
+	end,
+	['fvwmrc'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
+	['fvwm2rc'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
 	end,
 }
 

@@ -240,14 +240,18 @@ M.endswith = {
 	['/etc/blkid%.tab.old$'] = 'xml',
 	['/etc/blkid%.tab%.old$'] = 'xml',
 	['/etc/zprofile$'] = 'zsh',
+
+	['/etc/profile$'] = function()
+		return detect.sh('sh', true)
+	end,
 }
 
 M.fendswith = {
 	['hgrc$'] = 'cfg',
 	['%.%.ch$'] = 'chill',
 	['%.cmake%.in$'] = 'cmake',
-	['^%.desktop$'] = 'desktop',
-	['^%.directory$'] = 'desktop',
+	['%.desktop$'] = 'desktop',
+	['%.directory$'] = 'desktop',
 	['lpe$'] = 'dracula',
 	['lvs$'] = 'dracula',
 	['esmtprc$'] = 'esmtprc',
@@ -256,7 +260,6 @@ M.fendswith = {
 	['%.html%.m4$'] = 'htmlm4',
 	['%.properties_..$'] = 'jproperties',
 	['%.properties_.._..$'] = 'jproperties',
-	[util.to_case_insensitive('%.sub$')] = 'krl',
 	['^snd%.%d+$'] = 'mail',
 	['^pico%.%d+$'] = 'mail',
 	['^ae%d+%.txt$'] = 'mail',
@@ -271,12 +274,9 @@ M.fendswith = {
 	['%.mli%.cppo$'] = 'ocaml',
 	['%.mli?%.cppo$'] = 'ocaml',
 	['%.opam%.template$'] = 'opam',
-	[util.to_case_insensitive('%.opl$')] = 'opl',
 	['^%.?gitolite%.rc$'] = 'perl',
 	['^example%.gitolite%.rc$'] = 'perl',
 	[',v$'] = 'rcs',
-	['^[rR]akefile$'] = 'ruby',
-	['^[rR]antfile$'] = 'ruby',
 	['%.[_%-]?sst%.meta$'] = 'sisu',
 	['%.swift%.gyb$'] = 'swiftgyb',
 	['%.t%.html$'] = 'tilde',
@@ -285,20 +285,17 @@ M.fendswith = {
 	['%.vbproj%.user$'] = 'xml',
 	['Xmodmap$'] = 'xmodmap',
 
-	[util.to_case_insensitive('%.src$')] = function()
-		return detect.src()
+	['fvwmrc$'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
 	end,
-	[util.to_case_insensitive('%.dat$')] = function()
-		return detect.dat()
+	['fvwm95%.hook$'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
 	end,
-	[util.to_case_insensitive('%.sys$')] = function()
-		return detect.sys()
-	end,
-	[util.to_case_insensitive('%.mod$')] = function()
-		return detect.mod()
-	end,
-	[util.to_case_insensitive('%.prg$')] = function()
-		return detect.prg()
+	['fvwm2rc$'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
 	end,
 }
 
@@ -311,7 +308,8 @@ M.complex = {
 	['/meta%-.*/conf/.*%.conf$'] = 'bitbake',
 	['enlightenment/.*%.cfg$'] = 'c',
 	['/%.?cmus/.*%.theme$'] = 'cmusrc',
-	['/tex/context/.*/.*%.tex$'] = 'context',
+	['/etc/ufw/.*%.rules'] = 'conf',
+	['/tex/context/.*%.tex$'] = 'context',
 	['/etc/apt/sources%.list%.d/.*%.list$'] = 'debsources',
 	['/dtrace/.*%.d$'] = 'dtrace',
 	['Eterm/.*%.cfg$'] = 'eterm',
@@ -321,6 +319,8 @@ M.complex = {
 	['/usr/.*/gnupg/options%.skel$'] = 'gpg',
 	['^${VIMRUNTIME}/doc/.*%.txt$'] = 'help',
 	['/etc/initng/.*/.*%.i$'] = 'initng',
+	['/etc/polkit%-1/rules%.d/.*%.rules'] = 'javascript',
+	['/usr/share/polkit%-1/rules%.d/.*%.rules'] = 'javascript',
 	['/etc/.*limits%.conf$'] = 'limits',
 	['/etc/.*limits%.d/.*%.conf$'] = 'limits',
 	['/LiteStep/.*/.*%.rc$'] = 'litestep',
@@ -352,6 +352,8 @@ M.complex = {
 	['/etc/systemd/system/.*%.d/.*%.conf$'] = 'systemd',
 	['/%.config/systemd/user/.*%.d/.*%.conf$'] = 'systemd',
 	['/etc/udev/permissions%.d/.*%.permissions$'] = 'udevperm',
+	['/etc/udev/.*%.rules$'] = 'udevrules',
+	['/lib/udev/.*%.rules$'] = 'udevrules',
 	['/%.init/.*%.conf$'] = 'upstart',
 	['/etc/init/.*%.conf$'] = 'upstart',
 	['/%.init/.*%.override$'] = 'upstart',
@@ -375,6 +377,7 @@ M.fcomplex = {
 	['^dictd.*%.conf$'] = 'dictdconf',
 	['^hg%-editor%-.*%.txt$'] = 'hgcommit',
 	['^org%.eclipse%..*%.prefs$'] = 'jproperties',
+	['^[jt]sconfig.*%.json$'] = 'jsonc',
 	['^mutt%-.*%-%w+$'] = 'mail',
 	['^muttng%-.*%-%w+$'] = 'mail',
 	['^neomutt%-.*%-%w+$'] = 'mail',
@@ -403,6 +406,9 @@ M.fcomplex = {
 	['^[a-zA-Z].*Properties$'] = function()
 		return detect.foam()
 	end,
+	['fvwm2rc.*%.m4$'] = function()
+		return 'fvwm2m4'
+	end,
 }
 
 M.starsets = {
@@ -429,7 +435,6 @@ M.starsets = {
 	['/etc/cron%.d/'] = 'crontab',
 	['/etc/dnsmasq%.d/'] = 'dnsmasq',
 	['/etc/yum%.repos%.d/'] = 'dosini',
-	['/%.fvwm/'] = 'fvwm',
 	['/tmp/lltmp'] = 'gedcom',
 	['/%.gitconfig%.d/'] = 'gitconfig',
 	['/etc/gitconfig%.d/'] = 'gitconfig',
@@ -471,6 +476,10 @@ M.starsets = {
 	['/0%.orig/'] = function()
 		return detect.foam()
 	end,
+	['/%.fvwm/'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
 }
 
 M.fstarsets = {
@@ -489,7 +498,6 @@ M.fstarsets = {
 	['^Containerfile%.'] = 'dockerfile',
 	['^php%.ini%-'] = 'dosini',
 	['^drac%.'] = 'dracula',
-	['^%.gtkrc'] = 'gtkrc',
 	['^%.?gtkrc'] = 'gtkrc',
 	['^JAM.*%.'] = 'jam',
 	['^Prl.*%.'] = 'jam',
@@ -562,7 +570,14 @@ M.fstarsets = {
 	['^[cC]hange[lL]og'] = function()
 		return (util.getline():find('%; urgency%=') and 'debchangelog') or 'changelog'
 	end,
-
+	['fvwmrc'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
+	['fvwm2rc'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
+	end,
 	-- .cfg has many conflicting file patterns and names
 	[util.to_case_insensitive('%.cfg$')] = function()
 		return detect.cfg()

@@ -135,7 +135,6 @@ local extensions = {
 	['Dockerfile'] = 'dockerfile',
 	['dockerfile'] = 'dockerfile',
 	['bat'] = 'dosbatch',
-	['sys'] = 'dosbatch',
 	['ini'] = 'dosini',
 	['wrap'] = 'dosini',
 	['gv'] = 'dot',
@@ -204,6 +203,7 @@ local extensions = {
 	['fpc'] = 'fpcmake',
 	['fsl'] = 'framescript',
 	['fb'] = 'freebasic',
+	['fsh'] = 'fsh',
 	['fsi'] = 'fsharp',
 	['fsx'] = 'fsharp',
 	['fusion'] = 'fusion',
@@ -316,6 +316,14 @@ local extensions = {
 	['kt'] = 'kotlin',
 	['ktm'] = 'kotlin',
 	['kts'] = 'kotlin',
+	['sub'] = 'krl',
+	['suB'] = 'krl',
+	['sUb'] = 'krl',
+	['sUB'] = 'krl',
+	['Sub'] = 'krl',
+	['SuB'] = 'krl',
+	['SUb'] = 'krl',
+	['SUB'] = 'krl',
 	['ks'] = 'kscript',
 	['k'] = 'kwt',
 	['ACE'] = 'lace',
@@ -359,6 +367,7 @@ local extensions = {
 	['lrc'] = 'lyrics',
 	['quake'] = 'm3quake',
 	['at'] = 'm4',
+	['m4'] = 'm4',
 	['eml'] = 'mail',
 	['mk'] = 'make',
 	['dsp'] = 'make',
@@ -401,7 +410,6 @@ local extensions = {
 	['m2'] = 'modula2',
 	['mi'] = 'modula2',
 	['DEF'] = 'modula2',
-	['MOD'] = 'modula2',
 	['i3'] = 'modula3',
 	['ig'] = 'modula3',
 	['m3'] = 'modula3',
@@ -454,6 +462,14 @@ local extensions = {
 	['xin'] = 'omnimark',
 	['xom'] = 'omnimark',
 	['opam'] = 'opam',
+	['opl'] = 'opl',
+	['opL'] = 'opl',
+	['oPl'] = 'opl',
+	['oPL'] = 'opl',
+	['Opl'] = 'opl',
+	['OpL'] = 'opl',
+	['OPl'] = 'opl',
+	['OPL'] = 'opl',
 	['or'] = 'openroad',
 	['scad'] = 'openscad',
 	['ovpn'] = 'openvpn',
@@ -908,19 +924,11 @@ local extensions = {
 			return 'nroff'
 		end
 	end,
-	['m4'] = function(args)
-		if not util.findany(args.file_path, { 'html.m4$', 'fvwm2rc' }) then
-			return 'm4'
-		end
-	end,
 	['edn'] = function()
 		return (util.getline():find('^%s*%(%s*edif') and 'edif') or 'clojure'
 	end,
 	['rul'] = function()
 		return (util.getlines_as_string(0, detect.line_limit):find('InstallShield') and 'ishd') or 'diva'
-	end,
-	['prg'] = function()
-		return (vim.g.filetype_prg and vim.g.filetype_prg) or 'clipper'
 	end,
 	['cpy'] = function()
 		return (util.getline():find('^%#%#') and 'python') or 'cobol'
@@ -1114,9 +1122,6 @@ local extensions = {
 	['ksh'] = function()
 		return detect.sh('ksh')
 	end,
-	['etc/profile'] = function()
-		return detect.sh('sh', true)
-	end,
 	['sh'] = function()
 		return detect.sh('sh', true)
 	end,
@@ -1136,7 +1141,7 @@ local extensions = {
 		return (vim.g.filetype_sql and vim.g.filetype_sql) or 'sql'
 	end,
 	['tex'] = function(args)
-		return detect.tex(args.file_path)
+		return detect.tex()
 	end,
 	['frm'] = function()
 		return detect.vbasic_form()
@@ -1204,6 +1209,134 @@ local extensions = {
 	end,
 	['hook'] = function()
 		return util.getline() == '[Trigger]' and 'conf'
+	end,
+	['src'] = function()
+		return detect.src()
+	end,
+	['srC'] = function()
+		return detect.src()
+	end,
+	['sRc'] = function()
+		return detect.src()
+	end,
+	['sRC'] = function()
+		return detect.src()
+	end,
+	['Src'] = function()
+		return detect.src()
+	end,
+	['SrC'] = function()
+		return detect.src()
+	end,
+	['SRc'] = function()
+		return detect.src()
+	end,
+	['SRC'] = function()
+		return detect.src()
+	end,
+	['dat'] = function()
+		return detect.dat()
+	end,
+	['daT'] = function()
+		return detect.dat()
+	end,
+	['dAt'] = function()
+		return detect.dat()
+	end,
+	['dAT'] = function()
+		return detect.dat()
+	end,
+	['Dat'] = function()
+		return detect.dat()
+	end,
+	['DaT'] = function()
+		return detect.dat()
+	end,
+	['DAt'] = function()
+		return detect.dat()
+	end,
+	['DAT'] = function()
+		return detect.dat()
+	end,
+	['sys'] = function()
+		return detect.sys()
+	end,
+	['syS'] = function()
+		return detect.sys()
+	end,
+	['sYs'] = function()
+		return detect.sys()
+	end,
+	['sYS'] = function()
+		return detect.sys()
+	end,
+	['Sys'] = function()
+		return detect.sys()
+	end,
+	['SyS'] = function()
+		return detect.sys()
+	end,
+	['SYs'] = function()
+		return detect.sys()
+	end,
+	['SYS'] = function()
+		return detect.sys()
+	end,
+	['mod'] = function()
+		return detect.mod()
+	end,
+	['moD'] = function()
+		return detect.mod()
+	end,
+	['mOd'] = function()
+		return detect.mod()
+	end,
+	['mOD'] = function()
+		return detect.mod()
+	end,
+	['Mod'] = function()
+		return detect.mod()
+	end,
+	['MoD'] = function()
+		return detect.mod()
+	end,
+	['MOd'] = function()
+		return detect.mod()
+	end,
+	['MOD'] = function()
+		return detect.mod()
+	end,
+	['prg'] = function()
+		return detect.prg()
+	end,
+	['prG'] = function()
+		return detect.prg()
+	end,
+	['pRg'] = function()
+		return detect.prg()
+	end,
+	['pRG'] = function()
+		return detect.prg()
+	end,
+	['Prg'] = function()
+		return detect.prg()
+	end,
+	['PrG'] = function()
+		return detect.prg()
+	end,
+	['PRg'] = function()
+		return detect.prg()
+	end,
+	['PRG'] = function()
+		return detect.prg()
+	end,
+	['fvwmrc'] = function()
+		vim.b.fvwm_version = 1
+		return 'fvwm'
+	end,
+	['fvwm2rc'] = function()
+		vim.b.fvwm_version = 2
+		return 'fvwm'
 	end,
 }
 
