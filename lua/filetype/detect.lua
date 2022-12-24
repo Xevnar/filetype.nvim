@@ -1156,7 +1156,7 @@ end
 --- @return string? # The detected filetype
 function M.sc()
 	for _, line in ipairs(util.getlines(0, M.line_limit)) do
-		if util.findany(line, { 'var%s<', 'classvar%s<', '%^this.*', '|%w+|', '%+%s%w*%s{', '%*ar%s', }) then
+		if util.findany(line, { 'var%s<', 'classvar%s<', '%^this.*', '|%w+|', '%+%s%w*%s{', '%*ar%s' }) then
 			return 'supercollider'
 		end
 	end
