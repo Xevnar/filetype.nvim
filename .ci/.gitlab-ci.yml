@@ -1,7 +1,7 @@
 stages:
   - test
 
-image: archlinux:base-devel-20221127.0.105785
+image: archlinux:base-devel
 
 before_script:
   - pacman -Syu --noconfirm base-devel git cmake unzip ninja tree-sitter curl lua51-lpeg lua51-mpack unibilium libluv libtermkey libuv libvterm luajit msgpack-c
