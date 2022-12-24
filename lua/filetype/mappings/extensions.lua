@@ -203,6 +203,7 @@ local extensions = {
 	['fpc'] = 'fpcmake',
 	['fsl'] = 'framescript',
 	['fb'] = 'freebasic',
+	['fsh'] = 'fsh',
 	['fsi'] = 'fsharp',
 	['fsx'] = 'fsharp',
 	['fusion'] = 'fusion',
