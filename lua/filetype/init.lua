@@ -7,14 +7,8 @@ local detect = require('filetype.detect')
 --- The default mappings
 --- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
 
---- @type { [string]: filetype_mapping }
-local extension_map = require('filetype.mappings.extensions')
-
---- @type { [string]: filetype_mapping }
-local literal_map = require('filetype.mappings.literal')
-
---- @type table<string, { [string]: filetype_mapping }>
-local complex_maps = require('filetype.mappings.complex')
+--- @type { [string]: { [string]: filetype_mapping } }
+local mappings = require('filetype.mappings')
 
 --- The extensions are stripped from the end of the file_path before it is processed
 --- @type { [string]: boolean|string[] }
@@ -170,7 +164,7 @@ local function try_pattern(absolute_path, map)
 	end
 
 	for pattern, ft in pairs(map) do
-		if complex_maps.contains_env_var[pattern] then
+		if mappings.contains_env_var[pattern] then
 			local var_exists
 			pattern, var_exists = expand_env_var(pattern)
 			if not var_exists then
@@ -197,7 +191,7 @@ local function try_regex(absolute_path, map)
 	end
 
 	for pattern, ft in pairs(map) do
-		if complex_maps.contains_env_var[pattern] then
+		if mappings.contains_env_var[pattern] then
 			local var_exists
 			pattern, var_exists = expand_env_var(pattern)
 			if not var_exists then
@@ -235,19 +229,19 @@ function M.setup(opts)
 		-- Extend the shebang_map with users map and override already existing values
 		if opts.overrides.extensions then
 			for ext, ft in pairs(opts.overrides.extensions) do
-				extension_map[ext] = ft
+				mappings.extensions[ext] = ft
 			end
 		end
 
 		if opts.overrides.literal then
 			for literal, ft in pairs(opts.overrides.literal) do
-				literal_map[literal] = ft
+				mappings.literals[literal] = ft
 			end
 		end
 
 		-- Add the user's complex maps
-		complex_maps:add_custom_map('custom_complex', opts.overrides.complex)
-		complex_maps:add_custom_map('custom_vcomplex', opts.overrides.vim_regex)
+		mappings:add_custom_map('custom_complex', opts.overrides.complex)
+		mappings:add_custom_map('custom_vcomplex', opts.overrides.vim_regex)
 
 		fallback = opts.overrides.default_filetype
 
@@ -321,56 +315,56 @@ function M.resolve()
 		return -- Don't set the files filetype
 	end
 
-	if try_lookup(callback_args.file_path, literal_map) then
+	if try_lookup(callback_args.file_path, mappings.literals) then
 		return
 	end
 
-	if try_lookup(callback_args.file_name, literal_map) then
+	if try_lookup(callback_args.file_name, mappings.literals) then
 		return
 	end
 
-	if try_pattern(callback_args.file_path, complex_maps.custom_complex) then
+	if try_pattern(callback_args.file_path, mappings.custom_complex) then
 		return
 	end
 
-	if try_pattern(callback_args.file_name, complex_maps.fcustom_complex) then
+	if try_pattern(callback_args.file_name, mappings.fcustom_complex) then
 		return
 	end
 
-	if try_regex(callback_args.file_path, complex_maps.custom_vcomplex) then
+	if try_regex(callback_args.file_path, mappings.custom_vcomplex) then
 		return
 	end
 
-	if try_regex(callback_args.file_name, complex_maps.fcustom_vcomplex) then
+	if try_regex(callback_args.file_name, mappings.fcustom_vcomplex) then
 		return
 	end
 
-	if try_pattern(callback_args.file_path, complex_maps.endswith) then
+	if try_pattern(callback_args.file_path, mappings.endswith) then
 		return
 	end
 
-	if try_pattern(callback_args.file_name, complex_maps.fendswith) then
+	if try_pattern(callback_args.file_name, mappings.fendswith) then
 		return
 	end
 
-	if try_pattern(callback_args.file_path, complex_maps.complex) then
+	if try_pattern(callback_args.file_path, mappings.complex) then
 		return
 	end
 
-	if try_pattern(callback_args.file_name, complex_maps.fcomplex) then
+	if try_pattern(callback_args.file_name, mappings.fcomplex) then
 		return
 	end
 
-	if try_lookup(callback_args.file_ext, extension_map) then
+	if try_lookup(callback_args.file_ext, mappings.extensions) then
 		return
 	end
 
 	-- Starsets are always lower priority
-	if try_pattern(callback_args.file_path, complex_maps.starsets) then
+	if try_pattern(callback_args.file_path, mappings.starsets) then
 		return
 	end
 
-	if try_pattern(callback_args.file_name, complex_maps.fstarsets) then
+	if try_pattern(callback_args.file_name, mappings.fstarsets) then
 		return
 	end
 
