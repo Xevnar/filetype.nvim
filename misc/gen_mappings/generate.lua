@@ -180,7 +180,16 @@ function M:add_custom_map(key, map)
 	-- validate args
 	vim.validate({ key = { key, 'string' }, map = { map, 'table' } })
 
+	-- Create user maps if they don't exist
+	if not self[key] then
+		self[key] = {}
+	end
+
 	local fkey = 'f' .. key
+	if not self[fkey] then
+		self[fkey] = {}
+	end
+
 	for pat, val in pairs(map) do
 		-- Check if pattern contains an env var
 		if M.contains_env_var[pat] == nil then
@@ -188,20 +197,50 @@ function M:add_custom_map(key, map)
 		end
 
 		if pat:find('/') then
-			if not self[key] then
-				self[key] = {}
-			end
-
 			self[key][pat] = val
 		else
-			if not self[fkey] then
-				self[fkey] = {}
-			end
-
 			self[fkey][pat] = val
 		end
 	end
 end
+
+--- Add user defined list to module as two maps
+---
+--- @param key string The name of the new maps in the module
+--- @param list string[] The user's filetype keys
+--- @param res filetype_mapping The user's filetype mapping
+function M:add_custom_list(key, list, res)
+	if not list then
+		return
+	end
+
+	-- validate args
+	vim.validate({ key = { key, 'string' }, list = { list, 'table' } })
+
+	-- Create user lists if they don't exist
+	if not self[key] then
+		self[key] = {}
+	end
+
+	local fkey = 'f' .. key
+	if not self[fkey] then
+		self[fkey] = {}
+	end
+
+	for _, pat in ipairs(list) do
+		-- Check if pattern contains an env var
+		if M.contains_env_var[pat] == nil then
+			M.contains_env_var[pat] = pat:find('%${') ~= nil
+		end
+
+		if pat:find('/') then
+			self[key][pat] = res
+		else
+			self[fkey][pat] = res
+		end
+	end
+end
+
 ]])
 
 print()

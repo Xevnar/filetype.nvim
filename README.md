@@ -137,6 +137,37 @@ require("filetype").setup({
 			end,
 		},
 
+		-- A more concise way of defining a filetype that has varying amounts of indicators
+		--   - The record segment of this table defines filetype indicators that directly maps to single filetype
+		--   - The list segment defines filetype indicators that might conflict against multiple filetypes
+		filetypes = {
+			-- The record segment
+			['myfiletype'] = {
+				-- The values each table MUST be string
+				extensions = { 'myfiletype', 'myft', 'mft', 'my', 'mine' };
+				literals = { '/etc/myproject.cfg', '${XDG_CONFIG_HOME}/myproject/config' },
+				complex = { '/myproject/.*%.cfg$' },
+				vim_regex = { [[\c/\(myproject\|notmyproject\)/.*%.cfg$]] },
+			};
+
+			-- The list segment
+			{
+				-- The values each table MUST be string
+				extensions = { 'myfiletype', 'myft', 'mft', 'my', 'mine' };
+				literals = { '/etc/myproject.cfg', '${XDG_CONFIG_HOME}/myproject/config' },
+				complex = { '/myproject/.*%.cfg$' },
+				vim_regex = { [[\c/\(myproject\|notmyproject\)/.*%.cfg$]] },
+
+				-- The resolution function is applied to all the indicators above
+				resolution = function(args)
+					if args.path:find('/foo/') then
+						vim.b.myfiletype_is_in_foo = true
+					end
+
+					return 'myfiletype'
+				end
+			}
+		}
 
 		-- Set a default filetype in the case no matching filetype is detected
 		default_filetype = "foo",

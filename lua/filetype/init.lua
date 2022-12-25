@@ -222,6 +222,7 @@ local M = {}
 --- @field complex { [string]: filetype_mapping } Table of lua patterns that are tested against the full file path
 --- @field vim_regex { [string]: filetype_mapping } Table of vim regexes that are tested against the full file path
 --- @field default_filetype string The default filetype if no filetype is detected
+--- @field filetypes { [string]: table }
 ---
 --- @param opts filetype_opts
 function M.setup(opts)
@@ -244,6 +245,33 @@ function M.setup(opts)
 		mappings:add_custom_map('custom_vcomplex', opts.overrides.vim_regex)
 
 		fallback = opts.overrides.default_filetype
+
+		if opts.overrides.filetypes then
+			local function process_map(map, res)
+				if map.extensions then
+					for _, ext in ipairs(map.extensions) do
+						mappings.extensions[ext] = res
+					end
+				end
+
+				if map.literals then
+					for _, literal in ipairs(map.literals) do
+						mappings.literals[literal] = res
+					end
+				end
+
+				mappings:add_custom_list('custom_complex', map.complex, res)
+				mappings:add_custom_list('custom_vcomplex', map.vim_regex, res)
+			end
+
+			for ft, map in pairs(opts.overrides.filetypes) do
+				process_map(map, ft)
+			end
+
+			for _, map in ipairs(opts.overrides.filetypes) do
+				process_map(map, map.resolution)
+			end
+		end
 
 		if opts.overrides.shebang then
 			util.deprecated_option_warning('overrides.shebang', 'detection_settings.shebang_map')
