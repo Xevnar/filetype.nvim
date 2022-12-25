@@ -241,42 +241,44 @@ function M:add_custom_list(key, list, res)
 	end
 end
 
-]])
+--- @type { [string]: filetype_mapping }
+M.extensions = ]] .. inspect(extensions) .. [[
 
-print()
-print([[--- @type { [string]: filetype_mapping }]])
-print('M.extensions = ', inspect(extensions))
-print()
-print([[--- @type { [string]: filetype_mapping }]])
-print('M.literals = ', inspect(literals))
 
-print()
-print([[
+--- @type { [string]: filetype_mapping }
+M.literals = ]] .. inspect(literals) .. [[
+
+
 --- Cache table that stores if the pattern contains an en enviroment variable that must
 --- be expanded
 ---
---- @type { [string]: boolean } A table of lua pattern mappings]])
-print('M.contains_env_var =', inspect(patterns_with_env))
+--- @type { [string]: boolean } A table of lua pattern mappings
+M.contains_env_var =]] .. inspect(patterns_with_env) .. [[
 
-print()
-print([[--- @type { [string]: filetype_mapping }]])
-print('M.endswith = ', inspect(endswith))
-print()
-print([[--- @type { [string]: filetype_mapping }]])
-print('M.fendswith = ', inspect(fendswith))
 
-print()
-print([[--- @type { [string]: filetype_mapping }]])
-print('M.complex = ', inspect(complex))
-print()
-print([[--- @type { [string]: filetype_mapping }]])
-print('M.fcomplex = ', inspect(fcomplex))
+--- @type { [string]: filetype_mapping }
+M.endswith = ]] .. inspect(endswith) .. [[
 
-print()
-print([[--- @type { [string]: filetype_mapping }]])
-print('M.starsets = ', inspect(starsets))
-print()
-print([[--- @type { [string]: filetype_mapping }]])
-print('M.fstarsets = ', inspect(fstarsets))
 
-print('\nreturn M\n')
+--- @type { [string]: filetype_mapping }
+M.fendswith = ]] .. inspect(fendswith) .. [[
+
+
+--- @type { [string]: filetype_mapping }
+M.complex = ]] .. inspect(complex) .. [[
+
+
+--- @type { [string]: filetype_mapping }
+M.fcomplex = ]] .. inspect(fcomplex) .. [[
+
+
+--- @type { [string]: filetype_mapping }
+M.starsets = ]] .. inspect(starsets) .. [[
+
+
+--- @type { [string]: filetype_mapping }
+M.fstarsets = ]] .. inspect(fstarsets) .. [[
+
+
+return M
+]])
