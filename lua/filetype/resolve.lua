@@ -301,12 +301,7 @@ function M.setup(opts)
 
 	-- Source runtime ftdetect files if the user so wishes
 	if opts.source_ftdetect then
-		vim.cmd([[
-			augroup filetypedetect
-			runtime! ftdetect/*.vim
-			runtime! ftdetect/*.lua
-			augroup END
-		]])
+		util.deprecated_option_warning('opts.source_ftdetect', 'vim.g.source_ftdetect')
 	end
 end
 

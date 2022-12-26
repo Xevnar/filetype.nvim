@@ -48,11 +48,20 @@ First, install using your favorite package manager. Using [packer](https://githu
 use("nathom/filetype.nvim")
 ```
 
+If you want source ftdetect files then add the following to you `init.lua`
+
+```lua
+vim.g.source_ftdetect = true
+```
+
 If using a Neovim version earlier than 0.6.0, add the following to `init.lua`
 
 ```lua
--- Do not source the default filetype.vim
-vim.g.did_load_filetypes = 1
+-- Must be set before sourcing the filetype.lua file
+--vim.g.source_ftdetect = true
+
+-- Source our filetype
+require('filetype')
 ```
 
 That's it! You should now have a much snappier neovim experience!
