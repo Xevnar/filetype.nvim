@@ -1629,6 +1629,7 @@ M.literals = {
 	['.latexmkrc'] = 'perl',
 	['pf.conf'] = 'pf',
 	['main.cf'] = 'pfmain',
+	['main.cf.proto'] = 'pfmain',
 	['pinerc'] = 'pine',
 	['.pinerc'] = 'pine',
 	['pinercex'] = 'pine',

@@ -1419,7 +1419,7 @@ M.filetypes = {
 		literals = { 'pf.conf' },
 	},
 	['pfmain'] = {
-		literals = { 'main.cf' },
+		literals = { 'main.cf', 'main.cf.proto' },
 	},
 	['php'] = {
 		extensions = {
