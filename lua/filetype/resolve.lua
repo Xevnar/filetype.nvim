@@ -96,7 +96,6 @@ function callback_args:strip_ignored_ext()
 	end
 end
 
-
 --- Set the buffer's filetype
 ---
 --- @param filetype? filetype_mapping The filetype to set for the buffer it can
@@ -263,6 +262,17 @@ function M.add(overrides)
 		for ft, map in pairs(overrides.filetypes) do
 			process_map(map, ft)
 		end
+	end
+end
+
+--- This function adds extensions that will be stripped from the file path before attempting to resolve the filetype.
+--- If the value of the extension is string list, then all files that match any of strings won't have their extensions
+--- stripped.
+---
+--- @param extensions { [string]: boolean|string[] }
+function M.add_ignored_extension(extensions)
+	for ext, v in pairs(extensions) do
+		ignored_extensions[ext] = v
 	end
 end
 

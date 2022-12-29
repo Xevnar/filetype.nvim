@@ -6,6 +6,7 @@ vim.g.did_load_filetypes = 1
 -- Re export specific properties
 local re_export = {}
 re_export.add = require('filetype.resolve').add
+re_export.add_ignored_extension = require('filetype.resolve').add_ignored_extension
 re_export.resolve = require('filetype.resolve').resolve
 
 -- Create filetypedetect augroup
