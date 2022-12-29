@@ -42,20 +42,6 @@ local function set_filetype(filetype, callback_args)
 	return false
 end
 
---- Look up a query in the map
----
---- @param query string The pattern to lookup in  `map`
---- @param map filetype_map A table of literal mappings
---- @param callback_args filetype_mapping_argument
---- @return boolean # Whether the the filetype was set or not
-local function try_lookup(query, map, callback_args)
-	if not query or not map then
-		return false
-	end
-
-	return set_filetype(map[query], callback_args)
-end
-
 --- Replace an enviroment variable in a string with it's value
 ---
 --- @param s string The string containg an enviroment variable. The variable must be enclosed by `${}` to be expanded
@@ -283,11 +269,11 @@ function M.resolve(args)
 		return -- Don't set the files filetype
 	end
 
-	if try_lookup(callback_args.file_path, mappings.literals, callback_args) then
+	if set_filetype(mappings.literals[callback_args.file_path], callback_args) then
 		return
 	end
 
-	if try_lookup(callback_args.file_name, mappings.literals, callback_args) then
+	if set_filetype(mappings.literals[callback_args.file_name], callback_args) then
 		return
 	end
 
@@ -307,7 +293,7 @@ function M.resolve(args)
 		return
 	end
 
-	if try_lookup(callback_args.file_ext, mappings.extensions, callback_args) then
+	if set_filetype(mappings.extensions[callback_args.file_ext], callback_args) then
 		return
 	end
 
