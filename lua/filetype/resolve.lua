@@ -4,19 +4,11 @@ vim.deprecate('setup', 'add', '')
 --- @module 'filetype.util'
 local util = require('filetype.util')
 
---- @module 'filetype.detect'
-local detect = require('filetype.detect')
-
 --- The default mappings
 --- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
 
 --- @type { [string]: filetype_map }
 local mappings = require('filetype.mappings')
-
---- Fallback filetype
----
---- @type string
-local fallback
 
 --- Lua implementation of the setfiletype builtin function.
 --- @see :help setf
@@ -382,7 +374,7 @@ function M.resolve(args)
 	::detect_from_contents::
 
 	-- Detect filetype from shebang
-	set_filetype(detect.from_content() or fallback)
+	set_filetype(require('filetype.detect').from_content())
 end
 
 return M

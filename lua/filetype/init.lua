@@ -22,3 +22,11 @@ if vim.g.source_ftdetect and not vim.g.did_load_ftdetect then
 	]])
 	vim.g.did_load_ftdetect = 1
 end
+
+-- If no filetype is set, then use the user's default filetype
+if vim.g.default_filetype then
+	vim.api.nvim_create_autocmd('BufEnter', {
+		group = 'filetypedetect',
+		command = [[setf ']] .. vim.g.default_filetype .. [[']],
+	})
+end
