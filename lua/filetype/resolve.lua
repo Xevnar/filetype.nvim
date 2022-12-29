@@ -13,48 +13,6 @@ local detect = require('filetype.detect')
 --- @type { [string]: filetype_map }
 local mappings = require('filetype.mappings')
 
---- The extensions are stripped from the end of the file_path before it is processed
---- @type { [string]: boolean|string[] }
-local ignored_extensions = {
-	['bk'] = true,
-	['in'] = {
-		'cmake.in',
-		'configure.in',
-	},
-	['bak'] = true,
-	['new'] = true,
-	['old'] = true,
-	['orig'] = true,
-	['pacnew'] = true,
-	['rmpnew'] = true,
-	['pacsave'] = true,
-	['rpmsave'] = true,
-	['dpkg-bak'] = true,
-	['dpkg-new'] = true,
-	['dpkg-old'] = true,
-	['dpkg-dist'] = true,
-}
-
---- This function strips all ignored_extensions from
---- @param args filetype_mapping_argument
-local function strip_ignored_extensions(args)
-	while ignored_extensions[args.file_ext] do
-		if type(ignored_extensions[args.file_ext]) ~= 'table' then
-			goto continue
-		end
-
-		---@diagnostic disable-next-line: param-type-mismatch
-		for _, file in ipairs(ignored_extensions[args.file_ext]) do
-			if args.file_name == file then
-				return
-			end
-		end
-
-		::continue::
-		args:strip_ext():gen_from_path()
-	end
-end
-
 --- Fallback filetype
 ---
 --- @type string
@@ -103,6 +61,49 @@ function callback_args:strip_ext()
 	self.file_path = self.file_path:match('(.*)%.' .. self.file_ext)
 	return self
 end
+
+--- The extensions are stripped from the end of the file_path before it is processed
+--- @type { [string]: boolean|string[] }
+local ignored_extensions = {
+	['bk'] = true,
+	['in'] = {
+		'cmake.in',
+		'configure.in',
+	},
+	['bak'] = true,
+	['new'] = true,
+	['old'] = true,
+	['orig'] = true,
+	['pacnew'] = true,
+	['rmpnew'] = true,
+	['pacsave'] = true,
+	['rpmsave'] = true,
+	['dpkg-bak'] = true,
+	['dpkg-new'] = true,
+	['dpkg-old'] = true,
+	['dpkg-dist'] = true,
+}
+
+--- This function strips all ignored_extensions from
+--- @param self filetype_mapping_argument
+function callback_args:strip_ignored_ext()
+	while ignored_extensions[self.file_ext] do
+		if type(ignored_extensions[self.file_ext]) ~= 'table' then
+			goto continue
+		end
+
+		---@diagnostic disable-next-line: param-type-mismatch
+		for _, file in ipairs(ignored_extensions[self.file_ext]) do
+			if self.file_name == file then
+				return
+			end
+		end
+
+		::continue::
+		self:strip_ext():gen_from_path()
+	end
+end
+
 
 --- Set the buffer's filetype
 ---
@@ -296,7 +297,7 @@ function M.resolve()
 
 	-- Some extensions are tacked at the end of the filename to indicate that the file is a backup
 	callback_args:gen_from_path()
-	strip_ignored_extensions(callback_args)
+	callback_args:strip_ignored_ext()
 
 	if vim.g.ft_ignore_pat == nil then
 		vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
