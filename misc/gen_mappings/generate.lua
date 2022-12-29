@@ -168,6 +168,88 @@ local detect = require('filetype.detect')
 
 local M = {}
 
+--- Arguments to pass to function callbacks. The argements should be set when the resolve function is called
+---
+--- @class filetype_mapping_argument
+--- @field file_path string The file's aboslute path (includes filename)
+--- @field file_name string The file's name (includes extension)
+--- @field file_ext string The file's extension
+---
+--- @type filetype_mapping_argument
+M.callback_args = {}
+
+--- Create a new callback_args table
+---
+--- @param file_path string
+--- @return filetype_mapping_argument # New callback_args
+function M.callback_args:new(file_path)
+	local o = { file_path = file_path }
+	setmetatable(o, self)
+	self.__index = self
+	return o
+end
+
+--- Generate the rest of paramaters from the file_path
+---
+--- @return filetype_mapping_argument # Self
+function M.callback_args:gen_from_path()
+	self.file_name = self.file_path:match('([^/]*)$')
+	self.file_ext = self.file_name:match('.+%.([^./]+)$')
+	return self
+end
+
+--- Strip extension from file path, call gen_from_path after it
+---
+--- @return filetype_mapping_argument # Self
+function M.callback_args:strip_ext()
+	self.file_path = self.file_path:match('(.*)%.' .. self.file_ext)
+	return self
+end
+
+--- The extensions are stripped from the end of the file_path before it is processed
+---
+--- @type { [string]: boolean|string[] }
+M.ignored_extensions = {
+	['bk'] = true,
+	['in'] = {
+		'cmake.in',
+		'configure.in',
+	},
+	['bak'] = true,
+	['new'] = true,
+	['old'] = true,
+	['orig'] = true,
+	['pacnew'] = true,
+	['rmpnew'] = true,
+	['pacsave'] = true,
+	['rpmsave'] = true,
+	['dpkg-bak'] = true,
+	['dpkg-new'] = true,
+	['dpkg-old'] = true,
+	['dpkg-dist'] = true,
+}
+
+--- This function strips all ignored_extensions from the file path
+---
+--- @param self filetype_mapping_argument
+function M.callback_args:strip_ignored_ext()
+	while M.ignored_extensions[self.file_ext] do
+		if type(M.ignored_extensions[self.file_ext]) ~= 'table' then
+			goto continue
+		end
+
+		---@diagnostic disable-next-line: param-type-mismatch
+		for _, file in ipairs(M.ignored_extensions[self.file_ext]) do
+			if self.file_name == file then
+				return
+			end
+		end
+
+		::continue::
+		self:strip_ext():gen_from_path()
+	end
+end
+
 --- Add user defined map to module as two maps
 ---
 --- @param key string The name of the new maps in the module

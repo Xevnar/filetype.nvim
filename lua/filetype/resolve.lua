@@ -7,7 +7,6 @@ local util = require('filetype.util')
 --- The default mappings
 --- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
 
---- @type { [string]: filetype_map }
 local mappings = require('filetype.mappings')
 
 --- Lua implementation of the setfiletype builtin function.
@@ -23,86 +22,14 @@ local function setf(filetype)
 	return true
 end
 
---- Arguments to pass to function callbacks. The argements should be set when the resolve function is called
----
---- @class filetype_mapping_argument
---- @field file_path string The file's aboslute path (includes filename)
---- @field file_name string The file's name (includes extension)
---- @field file_ext string The file's extension
----
---- @type filetype_mapping_argument
-local callback_args = {
-	file_path = '',
-	file_name = '',
-	file_ext = '',
-}
-
---- Generate the rest of paramaters from the file_path
----
---- @return filetype_mapping_argument # Self
-function callback_args:gen_from_path()
-	self.file_name = self.file_path:match('([^/]*)$')
-	self.file_ext = self.file_name:match('.+%.([^./]+)$')
-	return self
-end
-
---- Strip extension from file path, call gen_from_path after it
----
---- @return filetype_mapping_argument # Self
-function callback_args:strip_ext()
-	self.file_path = self.file_path:match('(.*)%.' .. self.file_ext)
-	return self
-end
-
---- The extensions are stripped from the end of the file_path before it is processed
---- @type { [string]: boolean|string[] }
-local ignored_extensions = {
-	['bk'] = true,
-	['in'] = {
-		'cmake.in',
-		'configure.in',
-	},
-	['bak'] = true,
-	['new'] = true,
-	['old'] = true,
-	['orig'] = true,
-	['pacnew'] = true,
-	['rmpnew'] = true,
-	['pacsave'] = true,
-	['rpmsave'] = true,
-	['dpkg-bak'] = true,
-	['dpkg-new'] = true,
-	['dpkg-old'] = true,
-	['dpkg-dist'] = true,
-}
-
---- This function strips all ignored_extensions from
---- @param self filetype_mapping_argument
-function callback_args:strip_ignored_ext()
-	while ignored_extensions[self.file_ext] do
-		if type(ignored_extensions[self.file_ext]) ~= 'table' then
-			goto continue
-		end
-
-		---@diagnostic disable-next-line: param-type-mismatch
-		for _, file in ipairs(ignored_extensions[self.file_ext]) do
-			if self.file_name == file then
-				return
-			end
-		end
-
-		::continue::
-		self:strip_ext():gen_from_path()
-	end
-end
-
 --- Set the buffer's filetype
 ---
 --- @param filetype? filetype_mapping The filetype to set for the buffer it can
 ---                                   either be a string or a function that
 ---                                   returns a string
+--- @param callback_args filetype_mapping_argument
 --- @return boolean # Whether the filetype was set or not
-local function set_filetype(filetype)
+local function set_filetype(filetype, callback_args)
 	if type(filetype) == 'string' then
 		return setf(filetype)
 	end
@@ -119,13 +46,14 @@ end
 ---
 --- @param query string The pattern to lookup in  `map`
 --- @param map filetype_map A table of literal mappings
+--- @param callback_args filetype_mapping_argument
 --- @return boolean # Whether the the filetype was set or not
-local function try_lookup(query, map)
+local function try_lookup(query, map, callback_args)
 	if not query or not map then
 		return false
 	end
 
-	return set_filetype(map[query])
+	return set_filetype(map[query], callback_args)
 end
 
 --- Replace an enviroment variable in a string with it's value
@@ -150,15 +78,17 @@ end
 
 --- Loop through the pattern-filetype pairs in the map table and check if the absolute_path matches any of them
 ---
---- @param absolute_path string the path of the file
---- @param map filetype_map A table of lua pattern mappings
+--- @param callback_args filetype_mapping_argument
+--- @param map_name string The name of the map in `filetype.mappings`
 --- @return boolean # Whether the the filetype was set or not
-local function try_pattern(absolute_path, map)
-	if not map then
+local function try_pattern(callback_args, map_name)
+	-- If mappings[map_name] doesn't exsit then mappings['f' .. map_name] also doesn't exist
+	if not mappings[map_name] then
 		return false
 	end
 
-	for pattern, ft in pairs(map) do
+	-- Test against path
+	for pattern, ft in pairs(mappings[map_name]) do
 		if mappings.contains_env_var[pattern] then
 			local var_exists
 			pattern, var_exists = expand_env_var(pattern)
@@ -167,8 +97,23 @@ local function try_pattern(absolute_path, map)
 			end
 		end
 
-		if absolute_path:find(pattern) then
-			return set_filetype(ft)
+		if callback_args.file_path:find(pattern) then
+			return set_filetype(ft, callback_args)
+		end
+	end
+
+	-- Test against file
+	for pattern, ft in pairs(mappings['f' .. map_name]) do
+		if mappings.contains_env_var[pattern] then
+			local var_exists
+			pattern, var_exists = expand_env_var(pattern)
+			if not var_exists then
+				return false
+			end
+		end
+
+		if callback_args.file_name:find(pattern) then
+			return set_filetype(ft, callback_args)
 		end
 	end
 
@@ -177,15 +122,17 @@ end
 
 --- Loop through the regex-filetype pairs in the map table and check if the absolute_path matches any of them
 ---
---- @param absolute_path string the path of the file
---- @param map filetype_map A table of vim regex mappings
+--- @param callback_args filetype_mapping_argument
+--- @param map_name string The name of the map in `filetype.mappings`
 --- @return boolean # Whether the the filetype was set or not
-local function try_regex(absolute_path, map)
-	if not map then
+local function try_regex(callback_args, map_name)
+	-- If mappings[map_name] doesn't exsit then mappings['f' .. map_name] also doesn't exist
+	if not mappings[map_name] then
 		return false
 	end
 
-	for pattern, ft in pairs(map) do
+	-- Test against path
+	for pattern, ft in pairs(mappings[map_name]) do
 		if mappings.contains_env_var[pattern] then
 			local var_exists
 			pattern, var_exists = expand_env_var(pattern)
@@ -194,8 +141,23 @@ local function try_regex(absolute_path, map)
 			end
 		end
 
-		if util.match_vim_regex(absolute_path, pattern) then
-			return set_filetype(ft)
+		if util.match_vim_regex(callback_args.file_path, pattern) then
+			return set_filetype(ft, callback_args)
+		end
+	end
+
+	-- Test against file
+	for pattern, ft in pairs(mappings['f' .. map_name]) do
+		if mappings.contains_env_var[pattern] then
+			local var_exists
+			pattern, var_exists = expand_env_var(pattern)
+			if not var_exists then
+				return false
+			end
+		end
+
+		if util.match_vim_regex(callback_args.file_name, pattern) then
+			return set_filetype(ft, callback_args)
 		end
 	end
 
@@ -272,7 +234,7 @@ end
 --- @param extensions { [string]: boolean|string[] }
 function M.add_ignored_extension(extensions)
 	for ext, v in pairs(extensions) do
-		ignored_extensions[ext] = v
+		mappings.ignored_extensions[ext] = v
 	end
 end
 
@@ -296,8 +258,7 @@ function M.resolve(args)
 	-- Just in case
 	vim.g.did_load_filetypes = 1
 
-	callback_args.file_path = args.file
-
+	local callback_args = mappings.callback_args:new(args.file)
 	if vim.bo.filetype == 'bqfpreview' then
 		callback_args.file_path = args.match
 	end
@@ -322,61 +283,41 @@ function M.resolve(args)
 		return -- Don't set the files filetype
 	end
 
-	if try_lookup(callback_args.file_path, mappings.literals) then
+	if try_lookup(callback_args.file_path, mappings.literals, callback_args) then
 		return
 	end
 
-	if try_lookup(callback_args.file_name, mappings.literals) then
+	if try_lookup(callback_args.file_name, mappings.literals, callback_args) then
 		return
 	end
 
-	if try_pattern(callback_args.file_path, mappings.custom_complex) then
+	if try_pattern(callback_args, 'custom_complex') then
 		return
 	end
 
-	if try_pattern(callback_args.file_name, mappings.fcustom_complex) then
+	if try_regex(callback_args, 'custom_vcomplex') then
 		return
 	end
 
-	if try_regex(callback_args.file_path, mappings.custom_vcomplex) then
+	if try_pattern(callback_args, 'endswith') then
 		return
 	end
 
-	if try_regex(callback_args.file_name, mappings.fcustom_vcomplex) then
+	if try_pattern(callback_args, 'complex') then
 		return
 	end
 
-	if try_pattern(callback_args.file_path, mappings.endswith) then
-		return
-	end
-
-	if try_pattern(callback_args.file_name, mappings.fendswith) then
-		return
-	end
-
-	if try_pattern(callback_args.file_path, mappings.complex) then
-		return
-	end
-
-	if try_pattern(callback_args.file_name, mappings.fcomplex) then
-		return
-	end
-
-	if try_lookup(callback_args.file_ext, mappings.extensions) then
+	if try_lookup(callback_args.file_ext, mappings.extensions, callback_args) then
 		return
 	end
 
 	-- Starsets are always lower priority
-	if try_pattern(callback_args.file_path, mappings.starsets) then
-		return
-	end
-
-	if try_pattern(callback_args.file_name, mappings.fstarsets) then
+	if try_pattern(callback_args, 'starsets') then
 		return
 	end
 
 	-- At this point, no filetype has been detected so let's just default to the extension, if it has one
-	if callback_args.file_ext and set_filetype(callback_args.file_ext) then
+	if callback_args.file_ext and set_filetype(callback_args.file_ext, callback_args) then
 		return
 	end
 
@@ -384,7 +325,7 @@ function M.resolve(args)
 	::detect_from_contents::
 
 	-- Detect filetype from shebang
-	set_filetype(require('filetype.detect').from_content())
+	set_filetype(require('filetype.detect').from_content(), callback_args)
 end
 
 return M
