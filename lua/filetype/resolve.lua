@@ -1,3 +1,6 @@
+-- Deprecate the setup function
+vim.deprecate('setup', 'add', '')
+
 --- @module 'filetype.util'
 local util = require('filetype.util')
 
@@ -7,7 +10,7 @@ local detect = require('filetype.detect')
 --- The default mappings
 --- @alias filetype_mapping string|fun(args: filetype_mapping_argument): string?
 
---- @type { [string]: { [string]: filetype_mapping } }
+--- @type { [string]: filetype_map }
 local mappings = require('filetype.mappings')
 
 --- The extensions are stripped from the end of the file_path before it is processed
@@ -123,7 +126,7 @@ end
 --- Look up a query in the map
 ---
 --- @param query string The pattern to lookup in  `map`
---- @param map { [string]: filetype_mapping } A table of literal mappings
+--- @param map filetype_map A table of literal mappings
 --- @return boolean # Whether the the filetype was set or not
 local function try_lookup(query, map)
 	if not query or not map then
@@ -156,7 +159,7 @@ end
 --- Loop through the pattern-filetype pairs in the map table and check if the absolute_path matches any of them
 ---
 --- @param absolute_path string the path of the file
---- @param map { [string]: filetype_mapping } A table of lua pattern mappings
+--- @param map filetype_map A table of lua pattern mappings
 --- @return boolean # Whether the the filetype was set or not
 local function try_pattern(absolute_path, map)
 	if not map then
@@ -183,7 +186,7 @@ end
 --- Loop through the regex-filetype pairs in the map table and check if the absolute_path matches any of them
 ---
 --- @param absolute_path string the path of the file
---- @param map { [string]: filetype_mapping } A table of vim regex mappings
+--- @param map filetype_map A table of vim regex mappings
 --- @return boolean # Whether the the filetype was set or not
 local function try_regex(absolute_path, map)
 	if not map then
@@ -209,99 +212,64 @@ end
 
 local M = {}
 
---- Setup function
----
---- @class filetype_opts
---- @field overrides filetype_overrides Overiddes for the default filetype mappings
---- @field detection_settings filetype_detect_opts Options to override the behaviour of detection functions
---- @field source_ftdetect boolean Whether to source runtime ftdetect files or not
----
+--- The class defines how each filetype indicator is resolved to file type
 --- @class filetype_overrides
---- @field extensions { [string]: filetype_mapping } Lookup table that maps file extensions to filetypes
---- @field literal { [string]: filetype_mapping } Lookup table that maps file names to filetypes
---- @field complex { [string]: filetype_mapping } Table of lua patterns that are tested against the full file path
---- @field vim_regex { [string]: filetype_mapping } Table of vim regexes that are tested against the full file path
---- @field default_filetype string The default filetype if no filetype is detected
---- @field filetypes { [string]: table }
+--- @field literals filetype_map Lookup table that maps file names to filetypes
+--- @field extensions filetype_map Lookup table that maps file extensions to filetypes
+--- @field complex filetype_map Table of lua patterns that are tested against the full file path
+--- @field vim_regex filetype_map Table of vim regexes that are tested against the full file path
+--- @field filetypes { [string]: filetype_indicators, [integer]: filetype_conflict_map }
 ---
---- @param opts filetype_opts
-function M.setup(opts)
-	if opts.overrides then
-		-- Extend the shebang_map with users map and override already existing values
-		if opts.overrides.extensions then
-			for ext, ft in pairs(opts.overrides.extensions) do
-				mappings.extensions[ext] = ft
-			end
-		end
+--- @alias filetype_map { [string]: filetype_mapping }
+--- @alias filetype_indicators { extensions: string[], literals: string[], complex: string[], vim_regex: string[] }
+--- @alias filetype_conflict_map { extensions: string[], literals: string[], complex: string[], vim_regex: string[], resolution: filetype_mapping }
 
-		if opts.overrides.literal then
-			for literal, ft in pairs(opts.overrides.literal) do
-				mappings.literals[literal] = ft
-			end
-		end
-
-		-- Add the user's complex maps
-		mappings:add_custom_map('custom_complex', opts.overrides.complex)
-		mappings:add_custom_map('custom_vcomplex', opts.overrides.vim_regex)
-
-		fallback = opts.overrides.default_filetype
-
-		if opts.overrides.filetypes then
-			local function process_map(map, res)
-				if map.extensions then
-					for _, ext in ipairs(map.extensions) do
-						mappings.extensions[ext] = res
-					end
-				end
-
-				if map.literals then
-					for _, literal in ipairs(map.literals) do
-						mappings.literals[literal] = res
-					end
-				end
-
-				mappings:add_custom_list('custom_complex', map.complex, res)
-				mappings:add_custom_list('custom_vcomplex', map.vim_regex, res)
-			end
-
-			for ft, map in pairs(opts.overrides.filetypes) do
-				process_map(map, ft)
-			end
-
-			for _, map in ipairs(opts.overrides.filetypes) do
-				process_map(map, map.resolution)
-			end
-		end
-
-		if opts.overrides.shebang then
-			util.deprecated_option_warning('overrides.shebang', 'detection_settings.shebang_map')
-		end
-
-		if opts.overrides.force_shebang_check then
-			util.deprecated_option_warning('overrides.force_shebang_check')
-		end
-
-		if opts.overrides.function_extensions then
-			util.deprecated_option_warning('overrides.function_extensions', 'overrides.extensions')
-		end
-
-		if opts.overrides.function_literal then
-			util.deprecated_option_warning('overrides.function_literal', 'overrides.literal')
-		end
-
-		if opts.overrides.function_complex then
-			util.deprecated_option_warning(
-				'overrides.function_complex',
-				{ 'overrides.complex', 'overrides.complex_ft_ignore' }
-			)
+--- This function adds the filetype indicators into the builtin tables
+---
+--- @param overrides filetype_overrides
+function M.add(overrides)
+	-- Extend the shebang_map with users map and override already existing values
+	if overrides.extensions then
+		for ext, ft in pairs(overrides.extensions) do
+			mappings.extensions[ext] = ft
 		end
 	end
 
-	detect.setup(opts.detection_settings)
+	if overrides.literals then
+		for literal, ft in pairs(overrides.literals) do
+			mappings.literals[literal] = ft
+		end
+	end
 
-	-- Source runtime ftdetect files if the user so wishes
-	if opts.source_ftdetect then
-		util.deprecated_option_warning('opts.source_ftdetect', 'vim.g.source_ftdetect')
+	-- Add the user's complex maps
+	mappings:add_custom_map('custom_complex', overrides.complex)
+	mappings:add_custom_map('custom_vcomplex', overrides.vim_regex)
+
+	if overrides.filetypes then
+		local function process_map(map, res)
+			if map.extensions then
+				for _, ext in ipairs(map.extensions) do
+					mappings.extensions[ext] = res
+				end
+			end
+
+			if map.literals then
+				for _, literal in ipairs(map.literals) do
+					mappings.literals[literal] = res
+				end
+			end
+
+			mappings:add_custom_list('custom_complex', map.complex, res)
+			mappings:add_custom_list('custom_vcomplex', map.vim_regex, res)
+		end
+
+		for _, map in ipairs(overrides.filetypes) do
+			process_map(map, map.resolution)
+		end
+
+		for ft, map in pairs(overrides.filetypes) do
+			process_map(map, ft)
+		end
 	end
 end
 
