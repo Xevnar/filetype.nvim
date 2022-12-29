@@ -276,15 +276,28 @@ end
 
 --- The function tries to resolve the filetype of the current buffer, either from the file name or through the file's
 --- contents
+--- The args passed to this function are the same as the ones passed by |nvim_create_autocommand()| to callbacks:
 ---
-function M.resolve()
+---     * id number # Autocommand id
+---     * event string # Name of the triggered event |autocmd-events|
+---     * group number|nil autocommand group id, if any
+---     * match string # Expanded value of |<amatch>|
+---     * buf number # Expanded value of |<abuf>|
+---     * file string # expanded value of |<afile>|
+---     * data any # Arbitrary data passed to |nvim_exec_autocmds()|
+
+---
+--- @see :help autocmd-events
+--- @see :help nvim_create_autocommand()
+--- @see :help nvim_exec_autocmds()
+function M.resolve(args)
 	-- Just in case
 	vim.g.did_load_filetypes = 1
 
-	callback_args.file_path = vim.api.nvim_buf_get_name(0)
+	callback_args.file_path = args.file
 
 	if vim.bo.filetype == 'bqfpreview' then
-		callback_args.file_path = vim.fn.expand('<amatch>')
+		callback_args.file_path = args.match
 	end
 
 	-- If this an empty buffer, skip to detecting from file contents
