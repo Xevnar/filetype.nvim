@@ -62,6 +62,16 @@ local function expand_env_var(s)
 	return s, var_exists
 end
 
+local function expand_pattern(pattern)
+	if not mappings.contains_env_var[pattern] then
+		return pattern
+	end
+
+	local var_exists
+	pattern, var_exists = expand_env_var(pattern)
+	return var_exists and pattern
+end
+
 --- Loop through the pattern-filetype pairs in the map table and check if the absolute_path matches any of them
 ---
 --- @param callback_args filetype_mapping_argument
@@ -75,12 +85,9 @@ local function try_pattern(callback_args, map_name)
 
 	-- Test against path
 	for pattern, ft in pairs(mappings[map_name]) do
-		if mappings.contains_env_var[pattern] then
-			local var_exists
-			pattern, var_exists = expand_env_var(pattern)
-			if not var_exists then
-				return false
-			end
+		pattern = expand_pattern(pattern)
+		if not pattern then
+			break
 		end
 
 		if callback_args.file_path:find(pattern) then
@@ -90,12 +97,9 @@ local function try_pattern(callback_args, map_name)
 
 	-- Test against file
 	for pattern, ft in pairs(mappings['f' .. map_name]) do
-		if mappings.contains_env_var[pattern] then
-			local var_exists
-			pattern, var_exists = expand_env_var(pattern)
-			if not var_exists then
-				return false
-			end
+		pattern = expand_pattern(pattern)
+		if not pattern then
+			break
 		end
 
 		if callback_args.file_name:find(pattern) then
@@ -119,12 +123,9 @@ local function try_regex(callback_args, map_name)
 
 	-- Test against path
 	for pattern, ft in pairs(mappings[map_name]) do
-		if mappings.contains_env_var[pattern] then
-			local var_exists
-			pattern, var_exists = expand_env_var(pattern)
-			if not var_exists then
-				return false
-			end
+		pattern = expand_pattern(pattern)
+		if not pattern then
+			break
 		end
 
 		if util.match_vim_regex(callback_args.file_path, pattern) then
@@ -134,12 +135,9 @@ local function try_regex(callback_args, map_name)
 
 	-- Test against file
 	for pattern, ft in pairs(mappings['f' .. map_name]) do
-		if mappings.contains_env_var[pattern] then
-			local var_exists
-			pattern, var_exists = expand_env_var(pattern)
-			if not var_exists then
-				return false
-			end
+		pattern = expand_pattern(pattern)
+		if not pattern then
+			break
 		end
 
 		if util.match_vim_regex(callback_args.file_name, pattern) then
