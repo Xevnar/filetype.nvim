@@ -41,7 +41,7 @@ local callback_args = {
 ---
 --- @return filetype_mapping_argument # Self
 function callback_args:gen_from_path()
-	self.file_name = self.file_path:match('.*[\\/]([^/]*)')
+	self.file_name = self.file_path:match('([^/]*)$')
 	self.file_ext = self.file_name:match('.+%.([^./]+)$')
 	return self
 end
