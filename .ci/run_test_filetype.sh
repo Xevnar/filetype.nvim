@@ -3,7 +3,7 @@
 cp -vr ./lua ./filetype.lua ./neovim/runtime
 
 # Delete test from `Test_sig_file` that we don't care about
-sed -i -E -e '1807d' neovim/src/nvim/testdir/test_filetype.vim
+sed -i -E -e '1808d' neovim/src/nvim/testdir/test_filetype.vim
 
 # Delete the `Test_conf_file` test.
 sed -i -E -e '15,27d' neovim/src/nvim/testdir/test_filetype.vim

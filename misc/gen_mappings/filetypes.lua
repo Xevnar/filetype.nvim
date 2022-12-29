@@ -885,6 +885,9 @@ M.filetypes = {
 		extensions = { 'properties' },
 		starsets = { '%.properties_.._.._', '%.properties_??_??_' },
 	},
+	['jq'] = {
+		extensions = { 'jq' },
+	},
 	['json'] = {
 		extensions = { 'json', 'slnf', 'ipynb', 'jsonp', 'json-patch', 'webmanifest' },
 		literals = {

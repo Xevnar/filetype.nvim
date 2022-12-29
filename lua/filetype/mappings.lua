@@ -374,6 +374,7 @@ M.extensions = {
 	['jov'] = 'jovial',
 	['jovial'] = 'jovial',
 	['properties'] = 'jproperties',
+	['jq'] = 'jq',
 	['json'] = 'json',
 	['slnf'] = 'json',
 	['ipynb'] = 'json',
