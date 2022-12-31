@@ -1,6 +1,3 @@
--- Deprecate the setup function
-vim.deprecate('setup', 'add', '')
-
 --- @module 'filetype.util'
 local util = require('filetype.util')
 
