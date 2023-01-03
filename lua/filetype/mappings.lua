@@ -71,7 +71,8 @@ M.ignored_extensions = {
 ---
 --- @param self filetype_mapping_argument
 function M.callback_args:strip_ignored_ext()
-	while M.ignored_extensions[self.file_ext] do
+	-- Also ignore `mv`'s numbered backup suffixes
+	while M.ignored_extensions[self.file_ext] or self.file_ext:find('%~%d+%~') do
 		if type(M.ignored_extensions[self.file_ext]) ~= 'table' then
 			goto continue
 		end
