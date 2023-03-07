@@ -411,7 +411,7 @@ M.filetypes = {
 	['dosini'] = {
 		endswith = { '/etc/yum%.conf$' },
 		extensions = { 'ini', 'wrap' },
-		literals = { 'npmrc', '.npmrc', '.editorconfig', '/etc/yum.conf' },
+		literals = { 'npmrc', '.npmrc', '/etc/yum.conf' },
 		starsets = { '^php%.ini%-', '/etc/yum%.repos%.d/' },
 	},
 	['dot'] = {
@@ -450,6 +450,9 @@ M.filetypes = {
 	},
 	['edif'] = {
 		extensions = { 'edf', 'edo', 'edif' },
+	},
+	['editorconfig'] = {
+		literals = { '.editorconfig' },
 	},
 	['eelixir'] = {
 		extensions = { 'eex', 'leex' },
