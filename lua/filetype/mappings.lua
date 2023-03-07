@@ -198,6 +198,7 @@ M.extensions = {
 	['imp'] = 'b',
 	['mch'] = 'b',
 	['ref'] = 'b',
+	['bass'] = 'bass',
 	['bc'] = 'bc',
 	['bdf'] = 'bdf',
 	['beancount'] = 'beancount',

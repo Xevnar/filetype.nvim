@@ -128,6 +128,9 @@ M.filetypes = {
 	['b'] = {
 		extensions = { 'imp', 'mch', 'ref' },
 	},
+	['bass'] = {
+		extensions = { 'bass' },
+	},
 	['bc'] = {
 		extensions = { 'bc' },
 	},
