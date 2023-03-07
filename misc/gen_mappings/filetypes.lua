@@ -1793,6 +1793,9 @@ M.filetypes = {
 	['sm'] = {
 		literals = { 'sendmail.cf' },
 	},
+	['smali'] = {
+		extensions = { 'smali' },
+	},
 	['smarty'] = {
 		extensions = { 'tpl' },
 	},

@@ -818,6 +818,7 @@ M.extensions = {
 	['sl'] = 'slang',
 	['ice'] = 'slice',
 	['score'] = 'slrnsc',
+	['smali'] = 'smali',
 	['tpl'] = 'smarty',
 	['hlp'] = 'smcl',
 	['ihlp'] = 'smcl',
