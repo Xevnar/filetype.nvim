@@ -324,6 +324,9 @@ M.filetypes = {
 	['cuda'] = {
 		extensions = { 'cu', 'cuh' },
 	},
+	['cue'] = {
+		extensions = { 'cue' },
+	},
 	['cupl'] = {
 		extensions = { 'pld' },
 	},

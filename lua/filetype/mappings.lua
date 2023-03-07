@@ -278,6 +278,7 @@ M.extensions = {
 	['feature'] = 'cucumber',
 	['cu'] = 'cuda',
 	['cuh'] = 'cuda',
+	['cue'] = 'cue',
 	['pld'] = 'cupl',
 	['si'] = 'cuplsim',
 	['cyn'] = 'cynpp',
