@@ -338,6 +338,7 @@ M.extensions = {
 	['4gh'] = 'fgl',
 	['4gl'] = 'fgl',
 	['m4gl'] = 'fgl',
+	['fir'] = 'firrtl',
 	['fish'] = 'fish',
 	['wiki'] = 'flexwiki',
 	['fex'] = 'focexec',

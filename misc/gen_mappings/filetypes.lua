@@ -528,6 +528,9 @@ M.filetypes = {
 	['fgl'] = {
 		extensions = { '4gh', '4gl', 'm4gl' },
 	},
+	['firrtl'] = {
+		extensions = { 'fir' },
+	},
 	['fish'] = {
 		extensions = { 'fish' },
 	},
