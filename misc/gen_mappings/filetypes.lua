@@ -196,6 +196,9 @@ M.filetypes = {
 		literals = { 'catalog' },
 		starsets = { '^sgml%.catalog' },
 	},
+	['capnp'] = {
+		extensions = { 'capnp' },
+	},
 	['cdl'] = {
 		extensions = { 'cdl' },
 	},
