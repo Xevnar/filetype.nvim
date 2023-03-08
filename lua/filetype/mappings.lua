@@ -895,6 +895,7 @@ M.extensions = {
 	['texinfo'] = 'texinfo',
 	['txt'] = 'text',
 	['text'] = 'text',
+	['thrift'] = 'thrift',
 	['tla'] = 'tla',
 	['tli'] = 'tli',
 	['lock'] = 'toml',

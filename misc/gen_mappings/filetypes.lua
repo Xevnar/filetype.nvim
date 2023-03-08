@@ -1993,6 +1993,9 @@ M.filetypes = {
 	['tf'] = {
 		literals = { 'tfrc', '.tfrc' },
 	},
+	['thrift'] = {
+		extensions = { 'thrift' },
+	},
 	['tidy'] = {
 		literals = { 'tidyrc', '.tidyrc', 'tidy.conf' },
 	},
