@@ -371,6 +371,7 @@ M.extensions = {
 	['fsh'] = 'fsh',
 	['fsi'] = 'fsharp',
 	['fsx'] = 'fsharp',
+	['fc'] = 'func',
 	['fusion'] = 'fusion',
 	['gdb'] = 'gdb',
 	['mo'] = 'gdmo',

@@ -587,6 +587,9 @@ M.filetypes = {
 	['fstab'] = {
 		literals = { 'mtab', 'fstab' },
 	},
+	['func'] = {
+		extensions = { 'fc' },
+	},
 	['fusion'] = {
 		extensions = { 'fusion' },
 	},
