@@ -2312,6 +2312,9 @@ M.filetypes = {
 	['yang'] = {
 		extensions = { 'yang' },
 	},
+	['yuck'] = {
+		extensions = { 'yuck' },
+	},
 	['z8a'] = {
 		extensions = { 'z8a' },
 	},

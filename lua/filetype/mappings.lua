@@ -1004,6 +1004,7 @@ M.extensions = {
 	['yml'] = 'yaml',
 	['yaml'] = 'yaml',
 	['yang'] = 'yang',
+	['yuck'] = 'yuck',
 	['z8a'] = 'z8a',
 	['zig'] = 'zig',
 	['zu'] = 'zimbu',
