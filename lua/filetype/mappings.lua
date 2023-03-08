@@ -255,6 +255,7 @@ M.extensions = {
 	['mkvi'] = 'context',
 	['mkxl'] = 'context',
 	['cook'] = 'cook',
+	['cpon'] = 'cpon',
 	['C'] = 'cpp',
 	['H'] = 'cpp',
 	['hh'] = 'cpp',

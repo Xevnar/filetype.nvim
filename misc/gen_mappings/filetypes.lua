@@ -291,6 +291,9 @@ M.filetypes = {
 	['cook'] = {
 		extensions = { 'cook' },
 	},
+	['cpon'] = {
+		extensions = { 'cpon' },
+	},
 	['cpp'] = {
 		extensions = { 'C', 'H', 'hh', 'c++', 'cxx', 'hpp', 'hxx', 'inl', 'ipp', 'moc', 'tcc', 'tlh' },
 	},
