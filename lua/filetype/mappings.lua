@@ -1528,6 +1528,7 @@ M.literals = {
 	['named.root'] = 'bindzone',
 	['BUILD'] = 'bzl',
 	['WORKSPACE'] = 'bzl',
+	['WORKSPACE.bzlmod'] = 'bzl',
 	['cabal.config'] = 'cabalconfig',
 	['cabal.project'] = 'cabalproject',
 	['calendar'] = 'calendar',

@@ -168,7 +168,7 @@ M.filetypes = {
 	},
 	['bzl'] = {
 		extensions = { 'bzl', 'BUILD', 'bazel' },
-		literals = { 'BUILD', 'WORKSPACE' },
+		literals = { 'BUILD', 'WORKSPACE', 'WORKSPACE.bzlmod' },
 	},
 	['bzr'] = {
 		starsets = { '^bzr_log%.' },
