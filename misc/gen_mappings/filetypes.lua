@@ -945,6 +945,9 @@ M.filetypes = {
 		literals = { 'Kconfig', 'Kconfig.debug' },
 		starsets = { '^Kconfig%.' },
 	},
+	['kdl'] = {
+		extensions = { 'kdl' },
+	},
 	['kivy'] = {
 		extensions = { 'kv' },
 	},

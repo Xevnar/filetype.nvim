@@ -475,6 +475,7 @@ M.extensions = {
 	['libsonnet'] = 'jsonnet',
 	['jsp'] = 'jsp',
 	['jl'] = 'julia',
+	['kdl'] = 'kdl',
 	['kv'] = 'kivy',
 	['kix'] = 'kix',
 	['kt'] = 'kotlin',
