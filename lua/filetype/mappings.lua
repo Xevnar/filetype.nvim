@@ -928,6 +928,7 @@ M.extensions = {
 	['uc'] = 'uc',
 	['uil'] = 'uil',
 	['uit'] = 'uil',
+	['ungram'] = 'ungrammar',
 	['vala'] = 'vala',
 	['vb'] = 'vb',
 	['ctl'] = 'vb',

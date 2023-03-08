@@ -2102,6 +2102,9 @@ M.filetypes = {
 	['uil'] = {
 		extensions = { 'uil', 'uit' },
 	},
+	['ungrammar'] = {
+		extensions = { 'ungram' },
+	},
 	['updatedb'] = {
 		endswith = { '/etc/updatedb%.conf$' },
 		literals = { '/etc/updatedb.conf' },
