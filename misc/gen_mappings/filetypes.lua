@@ -1554,6 +1554,9 @@ M.filetypes = {
 		endswith = { '/etc/protocols$' },
 		literals = { '/etc/protocols' },
 	},
+	['prql'] = {
+		extensions = { 'prql' },
+	},
 	['ps1'] = {
 		extensions = { 'ps1', 'psd1', 'psm1', 'pssc' },
 	},

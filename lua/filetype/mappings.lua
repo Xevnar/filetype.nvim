@@ -706,6 +706,7 @@ M.extensions = {
 	['pdb'] = 'prolog',
 	['pml'] = 'promela',
 	['proto'] = 'proto',
+	['prql'] = 'prql',
 	['ps1'] = 'ps1',
 	['psd1'] = 'ps1',
 	['psm1'] = 'ps1',
