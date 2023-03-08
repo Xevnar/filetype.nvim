@@ -199,6 +199,9 @@ M.filetypes = {
 	['capnp'] = {
 		extensions = { 'capnp' },
 	},
+	['cdc'] = {
+		extensions = { 'cdc' },
+	},
 	['cdl'] = {
 		extensions = { 'cdl' },
 	},
