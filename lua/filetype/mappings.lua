@@ -825,6 +825,7 @@ M.extensions = {
 	['smcl'] = 'smcl',
 	['smt'] = 'smith',
 	['smith'] = 'smith',
+	['smithy'] = 'smithy',
 	['sml'] = 'sml',
 	['sno'] = 'snobol4',
 	['spt'] = 'snobol4',

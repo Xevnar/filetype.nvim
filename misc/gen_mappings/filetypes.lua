@@ -1805,6 +1805,9 @@ M.filetypes = {
 	['smith'] = {
 		extensions = { 'smt', 'smith' },
 	},
+	['smithy'] = {
+		extensions = { 'smithy' },
+	},
 	['sml'] = {
 		extensions = { 'sml' },
 	},
