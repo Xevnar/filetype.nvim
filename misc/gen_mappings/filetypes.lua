@@ -2289,7 +2289,7 @@ M.filetypes = {
 	},
 	['yaml'] = {
 		extensions = { 'bu', 'yml', 'yaml' },
-		literals = { '.clang-tidy', '.clang-format', '_clang-format' },
+		literals = { '.clangd', '.clang-tidy', '.clang-format', '_clang-format' },
 	},
 	['yang'] = {
 		extensions = { 'yang' },

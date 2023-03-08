@@ -1824,6 +1824,7 @@ M.literals = {
 	['fglrxrc'] = 'xml',
 	['/etc/blkid.tab'] = 'xml',
 	['/etc/blkid.tab.old'] = 'xml',
+	['.clangd'] = 'yaml',
 	['.clang-tidy'] = 'yaml',
 	['.clang-format'] = 'yaml',
 	['_clang-format'] = 'yaml',
