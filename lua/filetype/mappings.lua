@@ -318,6 +318,7 @@ M.extensions = {
 	['leex'] = 'eelixir',
 	['exs'] = 'elixir',
 	['elm'] = 'elm',
+	['lc'] = 'elsa',
 	['elv'] = 'elvish',
 	['epp'] = 'epuppet',
 	['erl'] = 'erlang',

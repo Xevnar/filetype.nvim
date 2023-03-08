@@ -474,6 +474,9 @@ M.filetypes = {
 	['elmfilt'] = {
 		literals = { 'filter-rules' },
 	},
+	['elsa'] = {
+		extensions = { 'lc' },
+	},
 	['elvish'] = {
 		extensions = { 'elv' },
 	},
