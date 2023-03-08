@@ -1656,6 +1656,9 @@ M.filetypes = {
 	['robots'] = {
 		literals = { 'robots.txt' },
 	},
+	['ron'] = {
+		extensions = { 'ron' },
+	},
 	['routeros'] = {
 		extensions = { 'rsc' },
 	},

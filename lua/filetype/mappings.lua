@@ -765,6 +765,7 @@ M.extensions = {
 	['snw'] = 'rnoweb',
 	['robot'] = 'robot',
 	['resource'] = 'robot',
+	['ron'] = 'ron',
 	['rsc'] = 'routeros',
 	['x'] = 'rpcgen',
 	['rpl'] = 'rpl',
