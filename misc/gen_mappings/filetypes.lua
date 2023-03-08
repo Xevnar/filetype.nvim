@@ -666,6 +666,9 @@ M.filetypes = {
 	['gomod'] = {
 		literals = { 'go.mod' },
 	},
+	['gosum'] = {
+		literals = { 'go.sum' },
+	},
 	['gowork'] = {
 		literals = { 'go.work' },
 	},

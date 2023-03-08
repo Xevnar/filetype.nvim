@@ -1608,6 +1608,7 @@ M.literals = {
 	['.gnashpluginrc'] = 'gnash',
 	['.gnuplot'] = 'gnuplot',
 	['go.mod'] = 'gomod',
+	['go.sum'] = 'gosum',
 	['go.work'] = 'gowork',
 	['.gprc'] = 'gp',
 	['/.gnupg/options'] = 'gpg',
