@@ -294,6 +294,7 @@ M.extensions = {
 	['desc'] = 'desc',
 	['desktop'] = 'desktop',
 	['directory'] = 'desktop',
+	['dhall'] = 'dhall',
 	['rej'] = 'diff',
 	['diff'] = 'diff',
 	['Dockerfile'] = 'dockerfile',

@@ -391,6 +391,9 @@ M.filetypes = {
 		endswith = { '%.desktop$', '%.directory$' },
 		extensions = { 'desktop', 'directory' },
 	},
+	['dhall'] = {
+		extensions = { 'dhall' },
+	},
 	['dictconf'] = {
 		literals = { '.dictrc', 'dict.conf' },
 	},
