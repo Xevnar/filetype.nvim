@@ -589,6 +589,7 @@ M.extensions = {
 	['monk'] = 'monk',
 	['moo'] = 'moo',
 	['moon'] = 'moonscript',
+	['move'] = 'move',
 	['mof'] = 'msidl',
 	['odl'] = 'msidl',
 	['msql'] = 'msql',

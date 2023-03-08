@@ -1267,6 +1267,9 @@ M.filetypes = {
 	['moonscript'] = {
 		extensions = { 'moon' },
 	},
+	['move'] = {
+		extensions = { 'move' },
+	},
 	['mplayerconf'] = {
 		endswith = { '/%.mplayer/config$' },
 		literals = { 'mplayer.conf', '/.mplayer/config' },
