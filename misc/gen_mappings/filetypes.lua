@@ -1902,6 +1902,9 @@ M.filetypes = {
 	['st'] = {
 		extensions = { 'st' },
 	},
+	['starlark'] = {
+		extensions = { 'ipd', 'star', 'starlark' },
+	},
 	['stata'] = {
 		extensions = { 'do', 'ado', 'mata', 'imata' },
 	},
