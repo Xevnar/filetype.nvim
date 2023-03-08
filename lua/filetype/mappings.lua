@@ -247,6 +247,7 @@ M.extensions = {
 	['lib'] = 'cobol',
 	['atg'] = 'coco',
 	['recipe'] = 'conaryrecipe',
+	['nmconnection'] = 'confini',
 	['mkii'] = 'context',
 	['mkiv'] = 'context',
 	['mklx'] = 'context',

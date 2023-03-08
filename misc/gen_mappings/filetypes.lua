@@ -278,6 +278,7 @@ M.filetypes = {
 	},
 	['confini'] = {
 		endswith = { '/%.aws/config$', '/etc/pacman%.conf$', '/%.aws/credentials$' },
+		extensions = { 'nmconnection' },
 		literals = { 'mpv.conf', '/etc/pacman.conf' },
 	},
 	['context'] = {
