@@ -677,7 +677,7 @@ M.filetypes = {
 		literals = { 'go.mod' },
 	},
 	['gosum'] = {
-		literals = { 'go.sum' },
+		literals = { 'go.sum', 'go.work.sum' },
 	},
 	['gowork'] = {
 		literals = { 'go.work' },

@@ -1616,6 +1616,7 @@ M.literals = {
 	['.gnuplot'] = 'gnuplot',
 	['go.mod'] = 'gomod',
 	['go.sum'] = 'gosum',
+	['go.work.sum'] = 'gosum',
 	['go.work'] = 'gowork',
 	['.gprc'] = 'gp',
 	['/.gnupg/options'] = 'gpg',
