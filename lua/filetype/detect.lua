@@ -483,53 +483,46 @@ end
 ---     3. Default to "plain" or to g:tex_flavor, can be set in user's vimrc.
 --- Taken from vim.filetype.detect
 ---
---- @param file_path string The absolute path of the file
 --- @return string # The detected filetype
 function M.tex()
-	local format = util.getline():find('^%%&%s*(%a+)')
-	if format then
-		format = format:lower():gsub('pdf', '', 1)
-		if format == 'tex' then
-			return 'tex'
-		end
+	local did_match, _, capture = util.getline():find('^%%&%s*(%a+)')
+	if did_match then
+		capture = capture:lower():gsub('pdf', '', 1)
+	else
+		-- Set the default capture in case the regex matching fails
+		capture = vim.g.tex_flavor or 'plaintex'
 
-		if format == 'plaintex' then
-			return 'plaintex'
-		end
-	end
-
-	local latex_pat = [[documentclass\>\|usepackage\>\|begin{\|newcommand\>\|renewcommand\>]]
-	local context_pat =
-		[[start\a\+\|setup\a\+\|usemodule\|enablemode\|enableregime\|setvariables\|useencoding\|usesymbols\|stelle\a\+\|verwende\a\+\|stel\a\+\|gebruik\a\+\|usa\a\+\|imposta\a\+\|regle\a\+\|utilisemodule\>]]
-	for i, l in ipairs(util.getlines(0, M.line_limit)) do
-		-- Skip comments
-		if l:find('^%s*%%%S') then
-			goto continue
-		end
-
-		-- Check the next thousand lines for a LaTeX or ConTeXt keyword.
-		for _, line in ipairs(util.getlines(i, i + 1000)) do
-			local lpat_match, cpat_match =
-				util.match_vim_regex(line, [[\c^\s*\\\%(]] .. latex_pat .. [[\)\|^\s*\\\(]] .. context_pat .. [[\)]])
-
-			if lpat_match then
-				return 'tex'
+		local latex_pat = [[documentclass\>\|usepackage\>\|begin{\|newcommand\>\|renewcommand\>]]
+		local context_pat =
+			[[start\a\+\|setup\a\+\|usemodule\|enablemode\|enableregime\|setvariables\|useencoding\|usesymbols\|stelle\a\+\|verwende\a\+\|stel\a\+\|gebruik\a\+\|usa\a\+\|imposta\a\+\|regle\a\+\|utilisemodule\>]]
+		for i, l in ipairs(util.getlines(0, M.line_limit)) do
+			-- Skip comments
+			if l:find('^%s*%%%S') then
+				goto continue
 			end
-			if cpat_match then
-				return 'context'
-			end
-		end
 
-		::continue::
+			-- Check the next thousand lines for a LaTeX or ConTeXt keyword.
+			for _, line in ipairs(util.getlines(i - 1, i + 1000)) do
+				if util.match_vim_regex(line, [[\c^\s*\\\%(]] .. latex_pat .. [[\)]]) then
+					return 'tex'
+				end
+
+				if util.match_vim_regex(line, [[\c^\s*\\\%(]] .. context_pat .. [[\)]]) then
+					return 'context'
+				end
+			end
+
+			::continue::
+		end
 	end
 
 	-- TODO: add AMSTeX, RevTex, others?
-	if not vim.g.tex_flavor or vim.g.tex_flavor == 'plain' then
+	if capture == 'plain' then
 		return 'plaintex'
 	end
 
-	if vim.g.tex_flavor == 'context' then
-		return 'context'
+	if capture == 'plaintex' or capture == 'context' then
+		return capture
 	end
 
 	-- Probably LaTeX

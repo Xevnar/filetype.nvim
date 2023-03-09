@@ -128,6 +128,9 @@ M.filetypes = {
 	['b'] = {
 		extensions = { 'imp', 'mch', 'ref' },
 	},
+	['bass'] = {
+		extensions = { 'bass' },
+	},
 	['bc'] = {
 		extensions = { 'bc' },
 	},
@@ -165,7 +168,7 @@ M.filetypes = {
 	},
 	['bzl'] = {
 		extensions = { 'bzl', 'BUILD', 'bazel' },
-		literals = { 'BUILD', 'WORKSPACE' },
+		literals = { 'BUILD', 'WORKSPACE', 'WORKSPACE.bzlmod' },
 	},
 	['bzr'] = {
 		starsets = { '^bzr_log%.' },
@@ -192,6 +195,12 @@ M.filetypes = {
 	['catalog'] = {
 		literals = { 'catalog' },
 		starsets = { '^sgml%.catalog' },
+	},
+	['capnp'] = {
+		extensions = { 'capnp' },
+	},
+	['cdc'] = {
+		extensions = { 'cdc' },
 	},
 	['cdl'] = {
 		extensions = { 'cdl' },
@@ -272,6 +281,7 @@ M.filetypes = {
 	},
 	['confini'] = {
 		endswith = { '/%.aws/config$', '/etc/pacman%.conf$', '/%.aws/credentials$' },
+		extensions = { 'nmconnection' },
 		literals = { 'mpv.conf', '/etc/pacman.conf' },
 	},
 	['context'] = {
@@ -280,6 +290,9 @@ M.filetypes = {
 	},
 	['cook'] = {
 		extensions = { 'cook' },
+	},
+	['cpon'] = {
+		extensions = { 'cpon' },
 	},
 	['cpp'] = {
 		extensions = { 'C', 'H', 'hh', 'c++', 'cxx', 'hpp', 'hxx', 'inl', 'ipp', 'moc', 'tcc', 'tlh' },
@@ -320,6 +333,9 @@ M.filetypes = {
 	},
 	['cuda'] = {
 		extensions = { 'cu', 'cuh' },
+	},
+	['cue'] = {
+		extensions = { 'cue' },
 	},
 	['cupl'] = {
 		extensions = { 'pld' },
@@ -375,6 +391,9 @@ M.filetypes = {
 		endswith = { '%.desktop$', '%.directory$' },
 		extensions = { 'desktop', 'directory' },
 	},
+	['dhall'] = {
+		extensions = { 'dhall' },
+	},
 	['dictconf'] = {
 		literals = { '.dictrc', 'dict.conf' },
 	},
@@ -405,7 +424,7 @@ M.filetypes = {
 	['dosini'] = {
 		endswith = { '/etc/yum%.conf$' },
 		extensions = { 'ini', 'wrap' },
-		literals = { 'npmrc', '.npmrc', '.editorconfig', '/etc/yum.conf' },
+		literals = { 'npmrc', '.npmrc', '/etc/yum.conf' },
 		starsets = { '^php%.ini%-', '/etc/yum%.repos%.d/' },
 	},
 	['dot'] = {
@@ -445,8 +464,14 @@ M.filetypes = {
 	['edif'] = {
 		extensions = { 'edf', 'edo', 'edif' },
 	},
+	['editorconfig'] = {
+		literals = { '.editorconfig' },
+	},
 	['eelixir'] = {
 		extensions = { 'eex', 'leex' },
+	},
+	['elf'] = {
+		extensions = { 'am' },
 	},
 	['elinks'] = {
 		literals = { 'elinks.conf' },
@@ -460,6 +485,9 @@ M.filetypes = {
 	},
 	['elmfilt'] = {
 		literals = { 'filter-rules' },
+	},
+	['elsa'] = {
+		extensions = { 'lc' },
 	},
 	['elvish'] = {
 		extensions = { 'elv' },
@@ -511,6 +539,9 @@ M.filetypes = {
 	},
 	['fgl'] = {
 		extensions = { '4gh', '4gl', 'm4gl' },
+	},
+	['firrtl'] = {
+		extensions = { 'fir' },
 	},
 	['fish'] = {
 		extensions = { 'fish' },
@@ -564,6 +595,9 @@ M.filetypes = {
 	},
 	['fstab'] = {
 		literals = { 'mtab', 'fstab' },
+	},
+	['func'] = {
+		extensions = { 'fc' },
 	},
 	['fusion'] = {
 		extensions = { 'fusion' },
@@ -656,6 +690,9 @@ M.filetypes = {
 	},
 	['gomod'] = {
 		literals = { 'go.mod' },
+	},
+	['gosum'] = {
+		literals = { 'go.sum', 'go.work.sum' },
 	},
 	['gowork'] = {
 		literals = { 'go.work' },
@@ -925,6 +962,9 @@ M.filetypes = {
 	['kconfig'] = {
 		literals = { 'Kconfig', 'Kconfig.debug' },
 		starsets = { '^Kconfig%.' },
+	},
+	['kdl'] = {
+		extensions = { 'kdl' },
 	},
 	['kivy'] = {
 		extensions = { 'kv' },
@@ -1236,6 +1276,9 @@ M.filetypes = {
 	['moonscript'] = {
 		extensions = { 'moon' },
 	},
+	['move'] = {
+		extensions = { 'move' },
+	},
 	['mplayerconf'] = {
 		endswith = { '/%.mplayer/config$' },
 		literals = { 'mplayer.conf', '/.mplayer/config' },
@@ -1256,6 +1299,7 @@ M.filetypes = {
 		extensions = { 'mush' },
 	},
 	['muttrc'] = {
+		complex = { '/etc/Muttrc%.d/.*%.rc$' },
 		literals = { 'Muttrc', 'Muttngrc' },
 		starsets = {
 			'^Muttrc',
@@ -1336,6 +1380,9 @@ M.filetypes = {
 	},
 	['octave'] = {
 		literals = { 'octaverc', '.octaverc', 'octave.conf' },
+	},
+	['odin'] = {
+		extensions = { 'odin' },
 	},
 	['omnimark'] = {
 		extensions = { 'xin', 'xom' },
@@ -1520,6 +1567,9 @@ M.filetypes = {
 		endswith = { '/etc/protocols$' },
 		literals = { '/etc/protocols' },
 	},
+	['prql'] = {
+		extensions = { 'prql' },
+	},
 	['ps1'] = {
 		extensions = { 'ps1', 'psd1', 'psm1', 'pssc' },
 	},
@@ -1576,7 +1626,7 @@ M.filetypes = {
 		extensions = { 'rbs' },
 	},
 	['rc'] = {
-		extensions = { 'rch' },
+		extensions = { 'rc', 'rch' },
 	},
 	['rcs'] = {
 		endswith = { ',v$' },
@@ -1627,6 +1677,9 @@ M.filetypes = {
 	},
 	['robots'] = {
 		literals = { 'robots.txt' },
+	},
+	['ron'] = {
+		extensions = { 'ron' },
 	},
 	['routeros'] = {
 		extensions = { 'rsc' },
@@ -1784,6 +1837,9 @@ M.filetypes = {
 	['sm'] = {
 		literals = { 'sendmail.cf' },
 	},
+	['smali'] = {
+		extensions = { 'smali' },
+	},
 	['smarty'] = {
 		extensions = { 'tpl' },
 	},
@@ -1792,6 +1848,9 @@ M.filetypes = {
 	},
 	['smith'] = {
 		extensions = { 'smt', 'smith' },
+	},
+	['smithy'] = {
+		extensions = { 'smithy' },
 	},
 	['sml'] = {
 		extensions = { 'sml' },
@@ -1855,6 +1914,9 @@ M.filetypes = {
 	},
 	['st'] = {
 		extensions = { 'st' },
+	},
+	['starlark'] = {
+		extensions = { 'ipd', 'star', 'starlark' },
 	},
 	['stata'] = {
 		extensions = { 'do', 'ado', 'mata', 'imata' },
@@ -1934,6 +1996,9 @@ M.filetypes = {
 	['tak'] = {
 		extensions = { 'tak' },
 	},
+	['tal'] = {
+		extensions = { 'tal' },
+	},
 	['taskdata'] = {
 		literals = { 'undo.data', 'pending.data', 'completed.data' },
 	},
@@ -1971,6 +2036,9 @@ M.filetypes = {
 	},
 	['tf'] = {
 		literals = { 'tfrc', '.tfrc' },
+	},
+	['thrift'] = {
+		extensions = { 'thrift' },
 	},
 	['tidy'] = {
 		literals = { 'tidyrc', '.tidyrc', 'tidy.conf' },
@@ -2049,6 +2117,9 @@ M.filetypes = {
 	},
 	['uil'] = {
 		extensions = { 'uil', 'uit' },
+	},
+	['ungrammar'] = {
+		extensions = { 'ungram' },
 	},
 	['updatedb'] = {
 		endswith = { '/etc/updatedb%.conf$' },
@@ -2258,10 +2329,13 @@ M.filetypes = {
 	},
 	['yaml'] = {
 		extensions = { 'bu', 'yml', 'yaml' },
-		literals = { '.clang-tidy', '.clang-format', '_clang-format' },
+		literals = { '.clangd', '.clang-tidy', '.clang-format', '_clang-format' },
 	},
 	['yang'] = {
 		extensions = { 'yang' },
+	},
+	['yuck'] = {
+		extensions = { 'yuck' },
 	},
 	['z8a'] = {
 		extensions = { 'z8a' },
