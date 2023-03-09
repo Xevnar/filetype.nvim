@@ -888,6 +888,7 @@ M.extensions = {
 	['sv'] = 'systemverilog',
 	['svh'] = 'systemverilog',
 	['tak'] = 'tak',
+	['tal'] = 'tal',
 	['task'] = 'taskedit',
 	['tk'] = 'tcl',
 	['tm'] = 'tcl',

@@ -1989,6 +1989,9 @@ M.filetypes = {
 	['tak'] = {
 		extensions = { 'tak' },
 	},
+	['tal'] = {
+		extensions = { 'tal' },
+	},
 	['taskdata'] = {
 		literals = { 'undo.data', 'pending.data', 'completed.data' },
 	},
