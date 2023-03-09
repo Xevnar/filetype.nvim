@@ -1377,6 +1377,9 @@ M.filetypes = {
 	['octave'] = {
 		literals = { 'octaverc', '.octaverc', 'octave.conf' },
 	},
+	['odin'] = {
+		extensions = { 'odin' },
+	},
 	['omnimark'] = {
 		extensions = { 'xin', 'xom' },
 	},

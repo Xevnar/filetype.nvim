@@ -630,6 +630,7 @@ M.extensions = {
 	['mly'] = 'ocaml',
 	['mlip'] = 'ocaml',
 	['occ'] = 'occam',
+	['odin'] = 'odin',
 	['xin'] = 'omnimark',
 	['xom'] = 'omnimark',
 	['opam'] = 'opam',
