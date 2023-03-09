@@ -1,0 +1,46 @@
+stages:
+  - build
+  - test
+
+image: archlinux:base-devel
+
+before_script:
+  - pacman -Syu --noconfirm base-devel git cmake unzip ninja tree-sitter curl lua51-lpeg lua51-mpack unibilium libluv libtermkey libuv libvterm luajit msgpack-c
+
+build_neovim:
+  stage: build
+  except:
+    - breaking_changes
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - neovim/
+  script:
+    - .ci/build_neovim.sh
+
+run_test_filetype:
+  stage: test
+  except:
+    - breaking_changes
+  dependencies:
+    - build_neovim
+  script:
+    - .ci/run_test_filetype.sh
+
+run_lua_filetype_spec:
+  stage: test
+  except:
+    - breaking_changes
+  dependencies:
+    - build_neovim
+  script:
+    - .ci/run_test_lua_filetype_spec.sh
+
+run_autocmd_filetype_spec:
+  stage: test
+  except:
+    - breaking_changes
+  dependencies:
+    - build_neovim
+  script:
+    - .ci/run_test_autocmd_filetype_spec.sh

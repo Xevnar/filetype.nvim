@@ -5,15 +5,16 @@ Easily speed up your neovim startup time!
 
 ## What does this do?
 
-This plugin is a replacement for the included `filetype.vim` that is sourced on startup.
-The purpose of that file is to create a series of autocommands that set the `filetype` variable
-depending on the filename. The issue is that creating autocommands have significant overhead, and
-creating [800+ of them](https://github.com/vim/vim/blob/master/runtime/filetype.vim) as `filetype.vim` does is a very inefficient way to get the job done.
+This plugin is a replacement for the included `filetype.vim` that is sourced on startup. The purpose of that file is to
+create a series of autocommands that set the `filetype` variable depending on the filename. The issue is that creating
+autocommands have significant overhead, and creating
+[800+ of them](https://github.com/vim/vim/blob/master/runtime/filetype.vim) as `filetype.vim` does is a very inefficient
+way to get the job done.
 
 As you can see, `filetype.vim` is by far the heaviest nvim runtime file
 
 ```diff
-13.782    [runtime] 
+13.782    [runtime]
 -	9.144     /usr/local/Cellar/neovim/0.5.0/share/nvim/runtime/filetype.vim
 	1.662     /usr/local/Cellar/neovim/0.5.0/share/nvim/runtime/plugin/matchit.vim
 	0.459     /usr/local/Cellar/neovim/0.5.0/share/nvim/runtime/syntax/synload.vim
@@ -35,8 +36,8 @@ As you can see, `filetype.vim` is by far the heaviest nvim runtime file
 	0.022     /usr/local/Cellar/neovim/0.5.0/share/nvim/runtime/plugin/health.vim
 ```
 
-`filetype.nvim` fixes the issue by only creating a single autocommand that resolves the file type
-when a buffer is opened. This method is ~175x faster\*!
+`filetype.nvim` fixes the issue by only creating a single autocommand that resolves the file type when a buffer is
+opened. This method is ~175x faster\*!
 
 
 ## Usage
@@ -47,74 +48,218 @@ First, install using your favorite package manager. Using [packer](https://githu
 use("nathom/filetype.nvim")
 ```
 
+If you want source ftdetect files then add the following to you `init.lua`
+
+```lua
+vim.g.source_ftdetect = true
+```
+
 If using a Neovim version earlier than 0.6.0, add the following to `init.lua`
 
 ```lua
--- Do not source the default filetype.vim
-vim.g.did_load_filetypes = 1
+-- Must be set before sourcing the filetype.lua file
+--vim.g.source_ftdetect = true
+
+-- Source our filetype
+require('filetype')
 ```
 
 That's it! You should now have a much snappier neovim experience!
 
 ## Customization
 
-`filetype.nvim` allows you to easily add custom filetypes using the `setup` function. Here's an example:
+`filetype.nvim` allows you to easily add custom filetypes using the `add` function. Here's an example:
 
 ```lua
 -- In init.lua or filetype.nvim's config file
-require("filetype").setup({
-    overrides = {
-        extensions = {
-            -- Set the filetype of *.pn files to potion
-            pn = "potion",
-        },
-        literal = {
-            -- Set the filetype of files named "MyBackupFile" to lua
-            MyBackupFile = "lua",
-        },
-        complex = {
-            -- Set the filetype of any full filename matching the regex to gitconfig
-            [".*git/config"] = "gitconfig", -- Included in the plugin
-        },
+require("filetype").add({
+	-- The following overrides use simple table lookup for matching. The values of each key can be either a string or a
+	-- function that returns the filetype
+	literals = {
+		-- Set the filetype of files named "MyBackupFile" to lua
+		MyBackupFile = "lua",
 
-        -- The same as the ones above except the keys map to functions
-        function_extensions = {
-            ["cpp"] = function()
-                vim.bo.filetype = "cpp"
-                -- Remove annoying indent jumping
-                vim.bo.cinoptions = vim.bo.cinoptions .. "L0"
-            end,
-            ["pdf"] = function()
-                vim.bo.filetype = "pdf"
-                -- Open in PDF viewer (Skim.app) automatically
-                vim.fn.jobstart(
-                    "open -a skim " .. '"' .. vim.fn.expand("%") .. '"'
-                )
-            end,
-        },
-        function_literal = {
-            Brewfile = function()
-                vim.cmd("syntax off")
-            end,
-        },
-        function_complex = {
-            ["*.math_notes/%w+"] = function()
-                vim.cmd("iabbrev $ $$")
-            end,
-        },
+		-- Set the filetype of files named "Cargo.lock" to toml and turn off syntax highlighting
+		["Cargo.lock"] = function()
+			vim.cmd("syntax off")
+			return "toml"
+		end,
 
-        shebang = {
-            -- Set the filetype of files with a dash shebang to sh
-            dash = "sh",
-        },
-    },
+		-- The keys can also be filepaths. These must match the absolute path path of the file.
+		["/bin/myscriptfile"] = "lua", -- This won't match '/usr/bin/myscriptfile'
+	},
+
+	-- The following override uses lua patterns to match against the full file path
+	complex = {
+		-- Set the filetype of any config file inside a directory that ends with git to gitconfig
+		[".*git/config$"] = "gitconfig", -- Included in the plugin
+
+		-- Add an abbreviation to all files with an alphanumeric name in the .math_notes directory
+		[".*.math_notes/%w+"] = function()
+			vim.cmd("iabbrev $ $$")
+			return "markdown"
+		end,
+
+		-- Patterns can contain environment variable that will be expanded before matching.
+		-- The variables MUST be enclosed in `${}`
+		["^${XDG_CONFIG_HOME}/mydir/.*"] = 'toml',
+
+		-- Set the filetype to all files that have the word bin in their path to sh
+		-- Avoid doing this since it might obscure more concrete patterns you defined
+		["^.*bin.*$"] = "sh",
+	},
+
+	-- Same as complex, but use vim regex for path matching
+	-- It is lower priority than complex
+	vim_regex = {
+		-- Environment variables can be also used with vim regexes
+		[ [[^${XDG_CONFIG_HOME}/\(mydir\|notmydir\)/.*]] ] = 'toml',
+
+		-- This is how you can define a vim regex
+		[ [[\c.*\(foofile\|barfile\)]] ] = 'myfiletype'
+	},
+
+	-- This is the lowest priority override
+	extensions = {
+		-- Set the filetype of *.pn files to potion
+		pn = "potion",
+
+		-- Append L0 to cinoptions for *.cpp files
+		["cpp"] = function()
+			-- Remove annoying indent jumping
+			vim.bo.cinoptions = vim.bo.cinoptions .. "L0"
+			return "cpp"
+		end,
+
+		-- The functions recieves an table table with following fields:
+		-- args table: * file_path: The absolute path of the file
+		--             * file_name: The name of the file (including extension)
+		--             * file_ext:  The extention at the end of the file
+		["pdf"] = function(args)
+			-- Open in PDF viewer (Skim.app) automatically
+			vim.fn.jobstart([[open -a skim "]] .. args.file_path .. '"')
+			return "pdf"
+		end,
+	},
+
+	-- A more concise way of defining a filetype that has varying amounts of indicators
+	--   - The record segment of this table defines filetype indicators that directly maps to single filetype
+	--   - The list segment defines filetype indicators that might conflict against multiple filetypes
+	filetypes = {
+		-- The record segment
+		['myfiletype'] = {
+			-- The values each table MUST be string
+			extensions = { 'myfiletype', 'myft', 'mft', 'my', 'mine' };
+			literals = { '/etc/myproject.cfg', '${XDG_CONFIG_HOME}/myproject/config' },
+			complex = { '/myproject/.*%.cfg$' },
+			vim_regex = { [[\c/\(myproject\|notmyproject\)/.*%.cfg$]] },
+		};
+
+		-- The list segment
+		{
+			-- The values each table MUST be string
+			extensions = { 'myfiletype', 'myft', 'mft', 'my', 'mine' };
+			literals = { '/etc/myproject.cfg', '${XDG_CONFIG_HOME}/myproject/config' },
+			complex = { '/myproject/.*%.cfg$' },
+			vim_regex = { [[\c/\(myproject\|notmyproject\)/.*%.cfg$]] },
+
+			-- The resolution function is applied to all the indicators above
+			resolution = function(args)
+				if args.path:find('/foo/') then
+					vim.b.myfiletype_is_in_foo = true
+				end
+
+				return 'myfiletype'
+			end
+		}
+	}
 })
 ```
 
-The `extensions` and `literal` tables are orders faster than the other ones
-because they only require a table lookup. Always try to use these before resorting
-to the `complex` tables, which require looping over the entries and running
-a regex for each one.
+The `literal` and `extensions` tables are orders faster than the other ones because they only require a table lookup.
+Always try to use these before resorting to the `complex` and `vim_regex` tables, which require looping over the
+entries and running a regex for each one. Furthermore, always try to use `complex` over `vim_regex` since matching
+lua patterns is faster than vim regexes.
+
+Even though the `extensions` table is orders faster than the `complex` and `vim_regex` tables, its the last table
+checked for filetype matching. That is due to how general an extension can be. Take the following filetype for example:
+
+```lua
+-- The file 'file.t.html'
+overrides = {
+	extensions = {
+		['html'] = 'html',
+	},
+
+	complex = {
+		['%.t%.html$'] = 'tilde',
+	},
+}
+
+-- If extensions were higher priority
+--     file.t.html => html
+-- If complex were higher priority
+--     file.t.html => tilde
+```
+
+```lua
+-- Any cfg file in a specific directory
+overrides = {
+	extensions = {
+		['cfg'] = 'config',
+	},
+
+	complex = {
+		['/mydir/.*%.cfg$'] = 'toml',
+	},
+}
+
+-- If extensions were higher priority
+--     mydir/file.cfg => config
+-- If complex were higher priority
+--     mydir/file.cfg => toml
+```
+
+If you want to modify the behaviour of some of the builtin conflict resolution functions, then you can use the `setup`
+function in `lua/filetype/detect.lua`.
+
+```lua
+require('filetype.detect').setup({
+	-- Specify the number of lines to check if before deciding that the contents don't provide hints to the filetype
+	line_check_limit = 500, -- default is 10 lines
+
+	-- Check if the entirety of the shell file for a hint of the executable being used;
+	-- currently only checks for `tclsh`
+	sh_check_contents = true, -- default is false
+
+	-- The default behaviour when a shebang is detected is to set the filetype to binary used unless the there is mapping
+	-- from the binary name to filetype defined.
+	-- You can define your own mapping here
+	shebang_map = {
+		-- Set the filetype of files with a dash shebang to sh
+		dash = "sh",
+
+		-- You don't need to define mappings where the binary name matches the filetype
+		gnuplot = "gnuplot", -- this is unnecessary
+
+		-- Execute code when a python shebang is detected
+		-- Version numbers at the end of binary names and the env binary are ignored:
+		--    => #!/bin/python2 = #!/bin/python3 = #!/bin/python = #!/bin/env python = python
+		python = {
+			filetype = "python", -- Required if you override the default mapping
+			on_detect = function()
+				vim.bo.expandtab = false
+			end,
+		},
+
+		-- Binary names must end in an alpha character and not contain a space to be correctly identified
+		["my-sh_interpeter"] = "sh",
+		["my-sh_interpeter-Ver2"] = "sh", -- This won't work even if it is the actual binary name
+		["bash --posix"] = "sh",          -- Neither would this
+	}
+})
+```
+
 
 ## Performance Comparison
 
@@ -126,12 +271,12 @@ Average startup time (100 rounds): **36.410 ms**
 
 <details>
 <summary>Sample log</summary>
-  
+
   ```diff
   times in msec
    clock   self+sourced   self:  sourced script
    clock   elapsed:              other lines
-  
+
   000.008  000.008: --- NVIM STARTING ---
   000.827  000.819: locale set
   001.304  000.477: inits 1
@@ -229,12 +374,12 @@ Average startup time (100 rounds): **26.492 ms**
 
 <details>
   <summary>Sample log</summary>
-  
+
   ```diff
     times in msec
    clock   self+sourced   self:  sourced script
    clock   elapsed:              other lines
-  
+
   000.008  000.008: --- NVIM STARTING ---
   000.813  000.805: locale set
   001.282  000.470: inits 1
@@ -314,6 +459,5 @@ Average startup time (100 rounds): **26.492 ms**
 All contributions are appreciated! But please make sure to follow these guidelines:
 
 - Format your code with stylua, complying with the rules in the `stylua.toml` file
-- Document any new functions you write, and update the documentation of functions
-you edit if appropriate
+- Document any new functions you write, and update the documentation of functions you edit if appropriate
 - Set the base branch to `dev`

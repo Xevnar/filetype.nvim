@@ -1,8 +1,8 @@
 # Customized
-indent_type = "Spaces"
-column_width = 79
+indent_type = "Tabs"
+column_width = 120
+quote_style = "AutoPreferSingle"
 # Default
 line_endings = "Unix"
 indent_width = 4
-quote_style = "AutoPreferDouble"
 no_call_parentheses = false
