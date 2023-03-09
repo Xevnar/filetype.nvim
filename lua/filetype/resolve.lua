@@ -297,10 +297,11 @@ function M.resolve(args)
 		return
 	end
 
+	-- Disable extension fallback cause it's wrong most of the time
 	-- At this point, no filetype has been detected so let's just default to the extension, if it has one
-	if callback_args.file_ext and set_filetype(callback_args.file_ext, callback_args) then
-		return
-	end
+	--if callback_args.file_ext and set_filetype(callback_args.file_ext, callback_args) then
+	--	return
+	--end
 
 	-- If this is an empty buffer, or there is no filetype extention then try and detect from the file's contents
 	::detect_from_contents::
