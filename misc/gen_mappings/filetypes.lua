@@ -1299,6 +1299,7 @@ M.filetypes = {
 		extensions = { 'mush' },
 	},
 	['muttrc'] = {
+		complex = { '/etc/Muttrc%.d/.*%.rc$' },
 		literals = { 'Muttrc', 'Muttngrc' },
 		starsets = {
 			'^Muttrc',
@@ -1625,7 +1626,7 @@ M.filetypes = {
 		extensions = { 'rbs' },
 	},
 	['rc'] = {
-		extensions = { 'rch' },
+		extensions = { 'rc', 'rch' },
 	},
 	['rcs'] = {
 		endswith = { ',v$' },
