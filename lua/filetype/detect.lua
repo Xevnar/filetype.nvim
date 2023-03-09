@@ -508,7 +508,7 @@ function M.tex()
 		end
 
 		-- Check the next thousand lines for a LaTeX or ConTeXt keyword.
-		for _, line in ipairs(util.getlines(i, i + 1000)) do
+		for _, line in ipairs(util.getlines(i - 1, i + 1000)) do
 			local lpat_match, cpat_match =
 				util.match_vim_regex(line, [[\c^\s*\\\%(]] .. latex_pat .. [[\)\|^\s*\\\(]] .. context_pat .. [[\)]])
 
