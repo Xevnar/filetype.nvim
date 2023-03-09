@@ -33,7 +33,7 @@ end
 if vim.g.default_filetype then
 	vim.api.nvim_create_autocmd('BufEnter', {
 		group = 'filetypedetect',
-		command = [[setf ']] .. vim.g.default_filetype .. [[']],
+		command = [[if &ft == '' | set ft=]] .. vim.g.default_filetype .. [[ | endif]],
 	})
 end
 
