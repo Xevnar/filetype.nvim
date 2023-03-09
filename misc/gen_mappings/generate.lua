@@ -180,10 +180,10 @@ M.callback_args = {}
 
 --- Create a new callback_args table
 ---
---- @param file_path string
+--- @param file string
 --- @return filetype_mapping_argument # New callback_args
-function M.callback_args:new(file_path)
-	local o = { file_path = file_path }
+function M.callback_args:new(file)
+	local o = { file_path = vim.fn.fnamemodify(file, ':p') }
 	setmetatable(o, self)
 	self.__index = self
 	return o
