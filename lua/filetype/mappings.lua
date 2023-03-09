@@ -319,6 +319,7 @@ M.extensions = {
 	['edif'] = 'edif',
 	['eex'] = 'eelixir',
 	['leex'] = 'eelixir',
+	['am'] = 'elf',
 	['exs'] = 'elixir',
 	['elm'] = 'elm',
 	['lc'] = 'elsa',

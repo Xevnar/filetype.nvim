@@ -470,6 +470,9 @@ M.filetypes = {
 	['eelixir'] = {
 		extensions = { 'eex', 'leex' },
 	},
+	['elf'] = {
+		extensions = { 'am' },
+	},
 	['elinks'] = {
 		literals = { 'elinks.conf' },
 	},
