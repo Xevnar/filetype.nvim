@@ -2259,8 +2259,11 @@ M.filetypes = {
 	['vue'] = {
 		extensions = { 'vue' },
 	},
+	['wat'] = {
+		extensions = { 'wat' },
+	},
 	['wast'] = {
-		extensions = { 'wat', 'wast' },
+		extensions = { 'wast' },
 	},
 	['wdl'] = {
 		extensions = { 'wdl' },
