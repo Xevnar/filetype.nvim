@@ -1613,6 +1613,9 @@ M.filetypes = {
 	['r'] = {
 		literals = { 'Rprofile', '.Rprofile', 'Rprofile.site' },
 	},
+	['racket'] = {
+		extensions = { 'rkt', 'rktd', 'rktl' },
+	},
 	['radiance'] = {
 		extensions = { 'mat', 'rad' },
 	},
