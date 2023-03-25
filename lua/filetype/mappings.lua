@@ -331,6 +331,7 @@ M.extensions = {
 	['yaws'] = 'erlang',
 	['erb'] = 'eruby',
 	['rhtml'] = 'eruby',
+	['esdl'] = 'esdl',
 	['EC'] = 'esqlc',
 	['ec'] = 'esqlc',
 	['strl'] = 'esterel',

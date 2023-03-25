@@ -504,6 +504,9 @@ M.filetypes = {
 	['eruby'] = {
 		extensions = { 'erb', 'rhtml' },
 	},
+	['esdl'] = {
+		extensions = { 'esdl' },
+	},
 	['esmtprc'] = {
 		endswith = { 'esmtprc$' },
 	},
