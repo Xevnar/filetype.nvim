@@ -1002,6 +1002,9 @@ M.filetypes = {
 	['ldif'] = {
 		extensions = { 'ldif' },
 	},
+	['lean'] = {
+		extensions = { 'lean' },
+	},
 	['ledger'] = {
 		extensions = { 'ldg', 'ledger', 'journal' },
 	},

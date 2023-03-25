@@ -505,6 +505,7 @@ M.extensions = {
 	['latte'] = 'latte',
 	['ld'] = 'ld',
 	['ldif'] = 'ldif',
+	['lean'] = 'lean',
 	['ldg'] = 'ledger',
 	['ledger'] = 'ledger',
 	['journal'] = 'ledger',
