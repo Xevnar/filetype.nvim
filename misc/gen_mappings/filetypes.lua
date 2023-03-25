@@ -1373,6 +1373,9 @@ M.filetypes = {
 	['nsis'] = {
 		extensions = { 'nsh', 'nsi' },
 	},
+	['nu'] = {
+		literals = { 'env.nu', 'config.nu' },
+	},
 	['obj'] = {
 		extensions = { 'obj' },
 	},
