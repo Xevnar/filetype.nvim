@@ -892,6 +892,7 @@ M.extensions = {
 	['service'] = 'systemd',
 	['sv'] = 'systemverilog',
 	['svh'] = 'systemverilog',
+	['td'] = 'tablegen',
 	['tak'] = 'tak',
 	['tal'] = 'tal',
 	['task'] = 'taskedit',

@@ -1993,6 +1993,9 @@ M.filetypes = {
 	['systemverilog'] = {
 		extensions = { 'sv', 'svh' },
 	},
+	['tablegen'] = {
+		extensions = { 'td' },
+	},
 	['tags'] = {
 		literals = { 'tags' },
 	},
