@@ -693,6 +693,7 @@ M.extensions = {
 	['pod'] = 'pod',
 	['filter'] = 'poefilter',
 	['pk'] = 'poke',
+	['pony'] = 'pony',
 	['ai'] = 'postscr',
 	['ps'] = 'postscr',
 	['afm'] = 'postscr',

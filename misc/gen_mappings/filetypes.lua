@@ -1527,6 +1527,9 @@ M.filetypes = {
 	['poke'] = {
 		extensions = { 'pk' },
 	},
+	['pony'] = {
+		extensions = { 'pony' },
+	},
 	['postscr'] = {
 		extensions = { 'ai', 'ps', 'afm', 'eps', 'pfa', 'epsf', 'epsi' },
 	},
