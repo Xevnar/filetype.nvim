@@ -1687,6 +1687,9 @@ M.filetypes = {
 	['rpcgen'] = {
 		extensions = { 'x' },
 	},
+	['rpgle'] = {
+		extensions = { 'rpgle', 'rpgleinc' },
+	},
 	['rpl'] = {
 		extensions = { 'rpl' },
 	},
