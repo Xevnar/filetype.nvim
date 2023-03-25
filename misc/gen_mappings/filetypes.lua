@@ -307,6 +307,9 @@ M.filetypes = {
 		literals = { 'crontab' },
 		starsets = { '^crontab%.', '/etc/cron%.d/' },
 	},
+	['crystal'] = {
+		extensions = { 'cr' },
+	},
 	['cs'] = {
 		extensions = { 'cs', 'csx' },
 	},
@@ -500,6 +503,9 @@ M.filetypes = {
 	},
 	['eruby'] = {
 		extensions = { 'erb', 'rhtml' },
+	},
+	['esdl'] = {
+		extensions = { 'esdl' },
 	},
 	['esmtprc'] = {
 		endswith = { 'esmtprc$' },
@@ -996,6 +1002,9 @@ M.filetypes = {
 	['ldif'] = {
 		extensions = { 'ldif' },
 	},
+	['lean'] = {
+		extensions = { 'lean' },
+	},
 	['ledger'] = {
 		extensions = { 'ldg', 'ledger', 'journal' },
 	},
@@ -1364,6 +1373,9 @@ M.filetypes = {
 	['nsis'] = {
 		extensions = { 'nsh', 'nsi' },
 	},
+	['nu'] = {
+		literals = { 'env.nu', 'config.nu' },
+	},
 	['obj'] = {
 		extensions = { 'obj' },
 	},
@@ -1527,6 +1539,9 @@ M.filetypes = {
 	['poke'] = {
 		extensions = { 'pk' },
 	},
+	['pony'] = {
+		extensions = { 'pony' },
+	},
 	['postscr'] = {
 		extensions = { 'ai', 'ps', 'afm', 'eps', 'pfa', 'epsf', 'epsi' },
 	},
@@ -1598,6 +1613,9 @@ M.filetypes = {
 	['ql'] = {
 		extensions = { 'ql', 'qll' },
 	},
+	['qmldir'] = {
+		extensions = { 'qmldir' },
+	},
 	['quake'] = {
 		complex = { 'id1/.*%.cfg$', 'baseq[2-3]/.*%.cfg$', 'quake[1-3]/.*%.cfg$' },
 	},
@@ -1609,6 +1627,9 @@ M.filetypes = {
 	},
 	['r'] = {
 		literals = { 'Rprofile', '.Rprofile', 'Rprofile.site' },
+	},
+	['racket'] = {
+		extensions = { 'rkt', 'rktd', 'rktl' },
 	},
 	['radiance'] = {
 		extensions = { 'mat', 'rad' },
@@ -1687,6 +1708,9 @@ M.filetypes = {
 	['rpcgen'] = {
 		extensions = { 'x' },
 	},
+	['rpgle'] = {
+		extensions = { 'rpgle', 'rpgleinc' },
+	},
 	['rpl'] = {
 		extensions = { 'rpl' },
 	},
@@ -1731,6 +1755,9 @@ M.filetypes = {
 	},
 	['rust'] = {
 		extensions = { 'rs' },
+	},
+	['sage'] = {
+		extensions = { 'sage' },
 	},
 	['samba'] = {
 		literals = { 'smb.conf' },
@@ -1990,6 +2017,9 @@ M.filetypes = {
 	['systemverilog'] = {
 		extensions = { 'sv', 'svh' },
 	},
+	['tablegen'] = {
+		extensions = { 'td' },
+	},
 	['tags'] = {
 		literals = { 'tags' },
 	},
@@ -2229,8 +2259,11 @@ M.filetypes = {
 	['vue'] = {
 		extensions = { 'vue' },
 	},
+	['wat'] = {
+		extensions = { 'wat' },
+	},
 	['wast'] = {
-		extensions = { 'wat', 'wast' },
+		extensions = { 'wast' },
 	},
 	['wdl'] = {
 		extensions = { 'wdl' },
@@ -2246,6 +2279,9 @@ M.filetypes = {
 	},
 	['winbatch'] = {
 		extensions = { 'wbt' },
+	},
+	['wit'] = {
+		extensions = { 'wit' },
 	},
 	['wml'] = {
 		extensions = { 'wml' },

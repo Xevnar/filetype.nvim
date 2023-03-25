@@ -2,7 +2,7 @@
 # Script to build neovim in the current directory
 
 # This is the latest synced up commit, update as it goes
-NEOVIM_COMMIT="ae70e946eeaec792c9a87a89fea7141b5ee6a33c"
+NEOVIM_COMMIT='ee5008f8789f61a3b153220abb870dd49427e52c'
 
 # Shallow Fetch neovim
 mkdir neovim && cd neovim
