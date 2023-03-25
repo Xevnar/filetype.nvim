@@ -1598,6 +1598,9 @@ M.filetypes = {
 	['ql'] = {
 		extensions = { 'ql', 'qll' },
 	},
+	['qmldir'] = {
+		extensions = { 'qmldir' },
+	},
 	['quake'] = {
 		complex = { 'id1/.*%.cfg$', 'baseq[2-3]/.*%.cfg$', 'quake[1-3]/.*%.cfg$' },
 	},

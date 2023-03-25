@@ -728,6 +728,7 @@ M.extensions = {
 	['pyw'] = 'python',
 	['ql'] = 'ql',
 	['qll'] = 'ql',
+	['qmldir'] = 'qmldir',
 	['qmd'] = 'quarto',
 	['mat'] = 'radiance',
 	['rad'] = 'radiance',
