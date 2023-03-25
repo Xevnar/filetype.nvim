@@ -1756,6 +1756,9 @@ M.filetypes = {
 	['rust'] = {
 		extensions = { 'rs' },
 	},
+	['sage'] = {
+		extensions = { 'sage' },
+	},
 	['samba'] = {
 		literals = { 'smb.conf' },
 	},

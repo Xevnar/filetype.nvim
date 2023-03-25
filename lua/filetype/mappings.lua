@@ -807,6 +807,7 @@ M.extensions = {
 	['Brewfile'] = 'ruby',
 	['Fastfile'] = 'ruby',
 	['rs'] = 'rust',
+	['sage'] = 'sage',
 	['sas'] = 'sas',
 	['sass'] = 'sass',
 	['sa'] = 'sather',
