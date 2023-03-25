@@ -2277,6 +2277,9 @@ M.filetypes = {
 	['winbatch'] = {
 		extensions = { 'wbt' },
 	},
+	['wit'] = {
+		extensions = { 'wit' },
+	},
 	['wml'] = {
 		extensions = { 'wml' },
 	},

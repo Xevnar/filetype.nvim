@@ -984,6 +984,7 @@ M.extensions = {
 	['wdl'] = 'wdl',
 	['wm'] = 'webmacro',
 	['wbt'] = 'winbatch',
+	['wit'] = 'wit',
 	['wml'] = 'wml',
 	['wsc'] = 'wsh',
 	['wsf'] = 'wsh',
