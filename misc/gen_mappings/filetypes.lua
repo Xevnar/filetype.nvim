@@ -307,6 +307,9 @@ M.filetypes = {
 		literals = { 'crontab' },
 		starsets = { '^crontab%.', '/etc/cron%.d/' },
 	},
+	['crystal'] = {
+		extensions = { 'cr' },
+	},
 	['cs'] = {
 		extensions = { 'cs', 'csx' },
 	},

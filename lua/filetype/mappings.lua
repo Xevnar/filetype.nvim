@@ -270,6 +270,7 @@ M.extensions = {
 	['tlh'] = 'cpp',
 	['cql'] = 'cqlang',
 	['crm'] = 'crm',
+	['cr'] = 'crystal',
 	['cs'] = 'cs',
 	['csx'] = 'cs',
 	['csc'] = 'csc',
