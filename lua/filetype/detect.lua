@@ -32,15 +32,15 @@ function M.setup(opts)
 		return M
 	end
 
-	M.line_limit = opts.line_check_limit
-
 	-- Extend the shebang_map with users map and override already existing
 	-- values
 	for binary, ft in pairs(opts.shebang_map) do
 		M.shebang_map[binary] = ft
 	end
 
-	M.sh_check_contents = opts.sh_check_contents
+	M.line_limit = type(opts.line_check_limit) == "number" and opts.line_check_limit or M.line_limit
+
+	M.sh_check_contents = type(opts.sh_check_contents) == "boolean" and opts.sh_check_contents or M.sh_check_contents
 
 	return M
 end
