@@ -57,6 +57,7 @@ M.shebang_map = {
 	['gawk'] = 'awk',
 	['guile'] = 'scheme',
 	['gforth'] = 'forth',
+	['luajit'] = 'lua',
 	['escript'] = 'erlang',
 	['instantfpc'] = 'pascal',
 
