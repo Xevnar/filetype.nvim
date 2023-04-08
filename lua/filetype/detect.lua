@@ -57,6 +57,7 @@ M.shebang_map = {
 	['gawk'] = 'awk',
 	['guile'] = 'scheme',
 	['gforth'] = 'forth',
+	['luajit'] = 'lua',
 	['escript'] = 'erlang',
 	['instantfpc'] = 'pascal',
 
@@ -1187,9 +1188,10 @@ function M.fs()
 		return vim.g.filetype_fs
 	end
 
-	local line = util.get_next_nonblank_line()
-	if util.findany(line, { '^%s*%.?%( ', '^%s*\\G? ', '^\\$', '^%s*: %S' }) then
-		return 'forth'
+	for _, line in ipairs(util.getlines(0, M.line_limit)) do
+		if line:find('^[:(\\] ') then
+			return 'forth'
+		end
 	end
 
 	return 'fsharp'

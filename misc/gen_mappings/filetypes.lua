@@ -188,6 +188,9 @@ M.filetypes = {
 		literals = { 'cabal.project' },
 		starsets = { '^cabal%.project%.' },
 	},
+	['cairo'] = {
+		extensions = { 'cairo' },
+	},
 	['calendar'] = {
 		literals = { 'calendar' },
 		starsets = { '/%.calendar/', '/share/calendar/calendar%.', '/share/calendar/.*/calendar%.' },
@@ -1053,6 +1056,9 @@ M.filetypes = {
 	['litestep'] = {
 		complex = { '/LiteStep/.*/.*%.rc$' },
 	},
+	['livebook'] = {
+		extensions = { 'livemd' },
+	},
 	['logcheck'] = {
 		starsets = { '/etc/logcheck/.*%.d.*/' },
 	},
@@ -1614,7 +1620,7 @@ M.filetypes = {
 		extensions = { 'ql', 'qll' },
 	},
 	['qmldir'] = {
-		extensions = { 'qmldir' },
+		literals = { 'qmldir' },
 	},
 	['quake'] = {
 		complex = { 'id1/.*%.cfg$', 'baseq[2-3]/.*%.cfg$', 'quake[1-3]/.*%.cfg$' },
@@ -1778,7 +1784,7 @@ M.filetypes = {
 		extensions = { 'scala' },
 	},
 	['scheme'] = {
-		extensions = { 'ss', 'rkt', 'scm', 'sld', 'rktd', 'rktl' },
+		extensions = { 'ss', 'scm', 'sld' },
 	},
 	['scilab'] = {
 		extensions = { 'sce', 'sci' },
