@@ -527,6 +527,7 @@ M.extensions = {
 	['lisp'] = 'lisp',
 	['lt'] = 'lite',
 	['lite'] = 'lite',
+	['livemd'] = 'livebook',
 	['lgt'] = 'logtalk',
 	['lot'] = 'lotos',
 	['lotos'] = 'lotos',

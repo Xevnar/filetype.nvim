@@ -1053,6 +1053,9 @@ M.filetypes = {
 	['litestep'] = {
 		complex = { '/LiteStep/.*/.*%.rc$' },
 	},
+	['livebook'] = {
+		extensions = { 'livemd' },
+	},
 	['logcheck'] = {
 		starsets = { '/etc/logcheck/.*%.d.*/' },
 	},
