@@ -1781,7 +1781,7 @@ M.filetypes = {
 		extensions = { 'scala' },
 	},
 	['scheme'] = {
-		extensions = { 'ss', 'rkt', 'scm', 'sld', 'rktd', 'rktl' },
+		extensions = { 'ss', 'scm', 'sld' },
 	},
 	['scilab'] = {
 		extensions = { 'sce', 'sci' },
