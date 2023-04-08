@@ -217,6 +217,7 @@ M.extensions = {
 	['bazel'] = 'bzl',
 	['qc'] = 'c',
 	['cabal'] = 'cabal',
+	['cairo'] = 'cairo',
 	['capnp'] = 'capnp',
 	['cdc'] = 'cdc',
 	['cdl'] = 'cdl',

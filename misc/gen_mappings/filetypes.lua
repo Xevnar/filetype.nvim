@@ -188,6 +188,9 @@ M.filetypes = {
 		literals = { 'cabal.project' },
 		starsets = { '^cabal%.project%.' },
 	},
+	['cairo'] = {
+		extensions = { 'cairo' },
+	},
 	['calendar'] = {
 		literals = { 'calendar' },
 		starsets = { '/%.calendar/', '/share/calendar/calendar%.', '/share/calendar/.*/calendar%.' },
