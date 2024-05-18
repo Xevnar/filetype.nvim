@@ -125,7 +125,7 @@ local function try_regex(callback_args, map_name)
 			break
 		end
 
-		if util.match_vim_regex(callback_args.file_path, pattern) then
+		if vim.regex(pattern):match_str(callback_args.file_path) then
 			return set_filetype(ft, callback_args)
 		end
 	end
@@ -137,7 +137,7 @@ local function try_regex(callback_args, map_name)
 			break
 		end
 
-		if util.match_vim_regex(callback_args.file_name, pattern) then
+		if vim.regex(pattern):match_str(callback_args.file_name) then
 			return set_filetype(ft, callback_args)
 		end
 	end
@@ -260,7 +260,7 @@ function M.resolve(args)
 		vim.g.ft_ignore_pat = [[\.\(Z\|gz\|bz2\|zip\|tgz\)$]]
 	end
 
-	if util.match_vim_regex(callback_args.file_path, vim.g.ft_ignore_pat) then
+	if vim.regex(vim.g.ft_ignore_pat):match_str(callback_args.file_path) then
 		return -- Don't set the files filetype
 	end
 

@@ -191,7 +191,7 @@ function M.shell(name, contents)
 		line = line:lower()
 		if line:find('%s*exec%s') and not prev_line:find('^%s*#.*\\$') then
 			-- Found an "exec" line after a comment with continuation
-			if util.match_vim_regex(line, [[\c\<tclsh\|\<wish]]) then
+			if vim.regex([[\c\<tclsh\|\<wish]]):match_str(line) then
 				return 'tclsh'
 			end
 		end
@@ -300,7 +300,7 @@ function M.elixir_check()
 	end
 
 	for _, line in ipairs(util.getlines(0, M.line_limit)) do
-		if util.match_vim_regex(line, [[\c^--\|^ifdef\>\|^include\>]]) then
+		if vim.regex([[\c^--\|^ifdef\>\|^include\>]]):match_str(line) then
 			return 'euphoria3'
 		end
 	end
@@ -340,7 +340,7 @@ function M.perl(file_path, file_ext)
 	end
 
 	for _, line in ipairs(util.getlines(0, M.line_limit)) do
-		if util.match_vim_regex(line, [[\c^use\s\s*\k]]) then
+		if vim.regex([[\c^use\s\s*\k]]):match_str(line) then
 			return 'perl'
 		end
 	end
@@ -379,13 +379,13 @@ function M.vbasic()
 
 		if
 			line:find(fb_comment)
-			or util.match_vim_regex(line, fb_preproc)
-			or util.match_vim_regex(line, fb_keywords)
+			or vim.regex(fb_preproc):match_str(line)
+			or vim.regex(fb_keywords):match_str(line)
 		then
 			return 'freebasic'
 		end
 
-		if util.match_vim_regex(line, qb64_preproc) then
+		if vim.regex(qb64_preproc):match_str(line) then
 			return 'qb64'
 		end
 	end
@@ -415,11 +415,11 @@ end
 --- @return string # The detected filetype
 function M.html()
 	for _, line in ipairs(util.getlines(0, M.line_limit)) do
-		if util.match_vim_regex(line, [[\<DTD\s\+XHTML\s]]) then
+		if vim.regex([[\<DTD\s\+XHTML\s]]):match_str(line) then
 			return 'xhtml'
 		end
 
-		if util.match_vim_regex(line, [[\c{%\s*\(extends\|block\|load\)\>\|{#\s\+]]) then
+		if vim.regex([[\c{%\s*\(extends\|block\|load\)\>\|{#\s\+]]):match_str(line) then
 			return 'htmldjango'
 		end
 	end
@@ -504,11 +504,11 @@ function M.tex()
 
 			-- Check the next thousand lines for a LaTeX or ConTeXt keyword.
 			for _, line in ipairs(util.getlines(i - 1, i + 1000)) do
-				if util.match_vim_regex(line, [[\c^\s*\\\%(]] .. latex_pat .. [[\)]]) then
+				if vim.regex([[\c^\s*\\\%(]] .. latex_pat .. [[\)]]):match_str(line) then
 					return 'tex'
 				end
 
-				if util.match_vim_regex(line, [[\c^\s*\\\%(]] .. context_pat .. [[\)]]) then
+				if vim.regex([[\c^\s*\\\%(]] .. context_pat .. [[\)]]):match_str(line) then
 					return 'context'
 				end
 			end
@@ -537,7 +537,7 @@ end
 function M.r()
 	local lines = util.getlines(0, M.line_limit)
 	-- Rebol is easy to recognize, check for that first
-	if util.match_vim_regex(table.concat(lines), [[\c\<rebol\>]]) then
+	if vim.regex([[\c\<rebol\>]]):match_str(table.concat(lines)) then
 		return 'rebol'
 	end
 
@@ -580,7 +580,7 @@ function M.proto()
 	local line = util.get_next_nonblank_line()
 	if
 		line:find(':%-')
-		or util.match_vim_regex(line, [[\c\<prolog\>]])
+		or vim.regex([[\c\<prolog\>]]):match_str(line)
 		or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
 	then
 		return 'prolog'
@@ -598,7 +598,7 @@ function M.dtrace()
 	end
 
 	for _, line in ipairs(util.getlines(0, M.line_limit)) do
-		if util.match_vim_regex(line, [[\c^module\>\|^import\>]]) then
+		if vim.regex([[\c^module\>\|^import\>]]):match_str(line) then
 			-- D files often start with a module and/or import statement.
 			return 'd'
 		end
@@ -737,16 +737,16 @@ function M.m()
 
 		if
 			line:find('^%s*//')
-			or util.match_vim_regex(line, [[\c^\s*@import\>]])
-			or util.match_vim_regex(line, objc_preprocessor)
+			or vim.regex([[\c^\s*@import\>]]):match_str(line)
+			or vim.regex(objc_preprocessor):match_str(line)
 		then
 			return 'objc'
 		end
 
 		if
 			util.findany(line, { '^%s*#', '^%s*%%!' })
-			or util.match_vim_regex(line, [[\c^\s*unwind_protect\>]])
-			or util.match_vim_regex(line, [[\c\%(^\|;\)\s*]] .. octave_block_terminators)
+			or vim.regex([[\c^\s*unwind_protect\>]]):match_str(line)
+			or vim.regex([[\c\%(^\|;\)\s*]] .. octave_block_terminators):match_str(line)
 		then
 			return 'octave'
 		end
@@ -759,7 +759,7 @@ function M.m()
 			return 'mma'
 		end
 
-		if util.match_vim_regex(line, [[\c^\s*\(\(type\|var\)\>\|--\)]]) then
+		if vim.regex([[\c^\s*\(\(type\|var\)\>\|--\)]]):match_str(line) then
 			return 'murphi'
 		end
 	end
@@ -780,7 +780,7 @@ end
 --- @return string # the Detected filetype
 function M.mm()
 	for _, line in ipairs(util.getlines(0, M.line_limit)) do
-		if util.match_vim_regex(line, [[\c^\s*\(#\s*\(include\|import\)\>\|@import\>\|/\*\)]]) then
+		if vim.regex([[\c^\s*\(#\s*\(include\|import\)\>\|@import\>\|/\*\)]]):match_str(line) then
 			return 'objcpp'
 		end
 	end
@@ -819,7 +819,7 @@ function M.pp()
 	end
 
 	local line = util.get_next_nonblank_line()
-	if util.findany(line, pascal_comments) or util.match_vim_regex(line, pascal_keywords) then
+	if util.findany(line, pascal_comments) or vim.regex(pascal_keywords):match_str(line) then
 		return 'pascal'
 	end
 
@@ -840,7 +840,7 @@ function M.pl()
 	local line = util.get_next_nonblank_line()
 	if
 		line:find(':%-')
-		or util.match_vim_regex(line, [[\c\<prolog\>]])
+		or vim.regex([[\c\<prolog\>]]):match_str(line)
 		or util.findany(line, { '^%s*%%+%s', '^%s*%%+$', '^%s*/%*' })
 	then
 		return 'prolog'
@@ -872,7 +872,7 @@ function M.inc()
 	end
 
 	-- Pascal supports // comments but they're vary rarely used for file headers so assume POV-Ray
-	if util.findany(lines, { '^%s{', '^%s%(%*' }) or util.match_vim_regex(lines, pascal_keywords) then
+	if util.findany(lines, { '^%s{', '^%s%(%*' }) or vim.regex(pascal_keywords):match_str(lines) then
 		return 'pascal'
 	end
 
@@ -943,7 +943,7 @@ function M.progress_pascal()
 	end
 
 	for _, line in ipairs(util.getlines(0, M.line_limit)) do
-		if util.findany(line, pascal_comments) or util.match_vim_regex(line, pascal_keywords) then
+		if util.findany(line, pascal_comments) or vim.regex(pascal_keywords):match_str(line) then
 			return 'pascal'
 		end
 
@@ -1026,7 +1026,7 @@ function M.y()
 			return 'yacc'
 		end
 
-		if util.match_vim_regex(line, [[\c^\s*\(#\|class\>\)]]) and not line:lower():find('^%s*#%s*include') then
+		if vim.regex([[\c^\s*\(#\|class\>\)]]):match_str(line) and not line:lower():find('^%s*#%s*include') then
 			return 'racc'
 		end
 	end
@@ -1060,7 +1060,7 @@ end
 local function is_rapid()
 	-- Called from mod, prg or sys functions
 	local line = util.get_next_nonblank_line()
-	return util.match_vim_regex(line, [[\c\v^\s*%(\%{3}|module\s+\k+\s*%(\(|$))]]) ---@diagnostic disable-line
+	return vim.regex([[\c\v^\s*%(\%{3}|module\s+\k+\s*%(\(|$))]]):match_str(line) ---@diagnostic disable-line
 end
 
 --- Read the file contents to identify if the file is RAPID or a cfg file
@@ -1107,7 +1107,7 @@ function M.dat()
 
 	-- Determine if a *.dat file is Kuka Robot Language
 	local line = util.get_next_nonblank_line()
-	if util.match_vim_regex(line, [[\c\v^\s*%(\&\w+|defdat>)]]) then
+	if vim.regex([[\c\v^\s*%(\&\w+|defdat>)]]):match_str(line) then
 		return 'krl'
 	end
 end
@@ -1221,7 +1221,7 @@ function M.src()
 	end
 
 	local line = util.get_next_nonblank_line()
-	if util.match_vim_regex(line, [[\c\v^\s*%(\&\w+|%(global\s+)?def%(fct)?>)]]) then
+	if vim.regex([[\c\v^\s*%(\&\w+|%(global\s+)?def%(fct)?>)]]):match_str(line) then
 		return 'krl'
 	end
 end
@@ -1270,7 +1270,7 @@ local function is_lprolog()
 		-- The second pattern matches a LambdaProlog comment
 		if not util.findany(line, { '^%s*$', '^%s*%%' }) then
 			-- The pattern must not catch a go.mod file
-			return util.match_vim_regex(line, [[\c\<module\s\+\w\+\s*\.\s*\(%\|$\)]]) ~= nil
+			return vim.regex([[\c\<module\s\+\w\+\s*\.\s*\(%\|$\)]]):match_str(line) ~= nil
 		end
 	end
 end
@@ -1288,7 +1288,7 @@ function M.mod()
 		return 'lprolog'
 	end
 
-	if util.match_vim_regex(util.get_next_nonblank_line(), [[\%(\<MODULE\s\+\w\+\s*;\|^\s*(\*\)]]) then
+	if vim.regex([[\%(\<MODULE\s\+\w\+\s*;\|^\s*(\*\)]]):match_str(util.get_next_nonblank_line()) then
 		return 'modula2'
 	end
 
@@ -1490,7 +1490,7 @@ function M.from_content()
 	end
 
 	-- Z shell scripts
-	if util.match_vim_regex('\n' .. table.concat(contents, '\n'), [[\n\s*emulate\s\+\%(-[LR]\s\+\)\=[ckz]\=sh\>]]) then
+	if vim.regex([[\n\s*emulate\s\+\%(-[LR]\s\+\)\=[ckz]\=sh\>]]):match_str('\n' .. table.concat(contents, '\n')) then
 		return 'zsh'
 	end
 
@@ -1532,7 +1532,7 @@ function M.from_content()
 	-- Check if the ft has a defined regex
 	for regex, val in pairs(general_syntax_regex_markers) do
 		-- Check the first line only
-		if util.match_vim_regex(contents[1], regex) then
+		if vim.regex(regex):match_str(contents[1]) then
 			return val
 		end
 	end
@@ -1566,7 +1566,7 @@ function M.from_content()
 			goto continue
 		end
 
-		if util.match_vim_regex(line, [[^Index:\s\+\f\+$]]) then
+		if vim.regex([[^Index:\s\+\f\+$]]):match_str(line) then
 			-- CVS diff
 			return 'diff'
 		end
