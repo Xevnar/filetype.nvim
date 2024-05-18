@@ -47,18 +47,25 @@ function M.get_next_nonblank_line(i)
 	return nil
 end
 
---- Check whether the given string matches the Vim regex pattern. It
---- stores the patterns in a cache
----
---- @return integer[] The byte indices for the beginning and end of the match
---- @type fun(s: string?, pattern: string): integer[]
-M.match_vim_regex = vim.filetype.matchregex
-
 --- Check whether a string matches any of the given Lua patterns.
+--- Taken from https://github.com/neovim/neovim/blob/c6c21db82b31ea43ce878ab3725dcd901db1e7a1/runtime/lua/vim/filetype.lua#L65
 ---
+--- @param s string? The string to check
+--- @param patterns string[] A list of Lua patterns
 --- @return boolean `true` if s matched a pattern, else `false`
---- @type fun(s: string?, patterns: string[]): boolean
-M.findany = vim.filetype.findany
+function M.findany(s, patterns)
+	if not s then
+		return false
+	end
+
+	for _, v in ipairs(patterns) do
+		if s:find(v) then
+			return true
+		end
+	end
+
+	return false
+end
 
 --- Print a deprecation warning to the user
 ---

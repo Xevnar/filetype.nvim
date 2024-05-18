@@ -2460,7 +2460,7 @@ M.starsets = {
 	end,
 	['%.git/'] = function()
 		local line = util.getline()
-		if util.match_vim_regex(line, [[^\x\{40,\}\>\|^ref: ]]) then
+		if vim.regex([[^\x\{40,\}\>\|^ref: ]]):match_str(line) then
 			return 'git'
 		end
 	end,
